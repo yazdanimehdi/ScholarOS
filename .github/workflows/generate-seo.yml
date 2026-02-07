@@ -18,6 +18,7 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
     steps:
       - uses: actions/checkout@v4
 

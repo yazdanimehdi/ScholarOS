@@ -16,6 +16,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
