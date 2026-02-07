@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   init:
@@ -47,3 +48,69 @@ jobs:
           git add config/site.yml config/cms.yml .template-initialized
           git diff --cached --quiet || git commit -m "chore: initialize template for ${OWNER}"
           git push
+
+      - name: Determine site URL
+        if: steps.check.outputs.skip == 'false'
+        id: url
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          # username.github.io repos are served at the root
+          if [ "${REPO_NAME}" = "${OWNER}.github.io" ]; then
+            echo "site_url=https://${OWNER}.github.io" >> "$GITHUB_OUTPUT"
+            echo "admin_url=https://${OWNER}.github.io/admin/" >> "$GITHUB_OUTPUT"
+          else
+            echo "site_url=https://${OWNER}.github.io/${REPO_NAME}" >> "$GITHUB_OUTPUT"
+            echo "admin_url=https://${OWNER}.github.io/${REPO_NAME}/admin/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create setup issue
+        if: steps.check.outputs.skip == 'false'
+        uses: actions/github-script@v7
+        env:
+          SITE_URL: ${{ steps.url.outputs.site_url }}
+          ADMIN_URL: ${{ steps.url.outputs.admin_url }}
+        with:
+          script: |
+            const siteUrl = process.env.SITE_URL;
+            const adminUrl = process.env.ADMIN_URL;
+            const owner = context.repo.owner;
+
+            await github.rest.issues.create({
+              ...context.repo,
+              title: 'Setup: Enable CMS login with GitHub',
+              labels: ['setup'],
+              body: `## Enable the CMS admin panel
+
+            Your site has been auto-configured, but the CMS needs a **GitHub OAuth App** to enable the "Login with GitHub" button.
+
+            ### Steps
+
+            1. Go to **[GitHub Developer Settings > OAuth Apps > New OAuth App](https://github.com/settings/applications/new)**
+            2. Fill in:
+               - **Application name:** \`${owner} site CMS\`
+               - **Homepage URL:** \`${siteUrl}\`
+               - **Authorization callback URL:** \`${adminUrl}\`
+            3. Click **Register application**
+            4. Copy the **Client ID** (you do NOT need the client secret)
+            5. Edit \`config/cms.yml\` in this repo and set the \`app_id\`:
+               \`\`\`yaml
+               backend:
+                 name: github
+                 repo: "${context.repo.owner}/${context.repo.repo}"
+                 branch: main
+                 auth_type: pkce
+                 app_id: "YOUR_CLIENT_ID_HERE"
+               \`\`\`
+            6. Commit the change — after the site rebuilds, go to [${adminUrl}](${adminUrl}) and click **Login with GitHub**
+
+            ### Also required: GitHub Pages source
+
+            Make sure GitHub Pages is set to deploy via **GitHub Actions** (not Jekyll):
+
+            > [Settings > Pages](https://github.com/${context.repo.owner}/${context.repo.repo}/settings/pages) > Build and deployment > Source > **GitHub Actions**
+
+            ---
+            *This issue was created automatically by the template initialization workflow. Close it once setup is complete.*`
+            });

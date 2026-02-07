@@ -5,6 +5,8 @@ backend:
   name: github
   repo: "yazdanimehdi/ScholarOS"   # <-- CHANGE THIS
   branch: main
+  auth_type: pkce                   # Client-side OAuth (works on GitHub Pages without a proxy)
+  app_id: ""                        # <-- GitHub OAuth App Client ID (see README)
 
 media_folder: "src/assets/images"
 public_folder: "/src/assets/images"
