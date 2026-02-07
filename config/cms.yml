@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: "your-username/your-repo"   # <-- CHANGE THIS
+  repo: "yazdanimehdi/ScholarOS"   # <-- CHANGE THIS
   branch: main
 
 media_folder: "src/assets/images"
