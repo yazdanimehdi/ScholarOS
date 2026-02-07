@@ -137,7 +137,7 @@ seo:
 adminPath: "admin"
 
 adminUsers:
-  - "yazdanimehdi"
+  - "janesmith"
 
 # GDPR cookie consent banner
 cookieConsent: false

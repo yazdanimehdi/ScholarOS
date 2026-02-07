@@ -14,17 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check if already initialized
+      - name: Check if template needs initialization
         id: check
         run: |
-          if [ -f .template-initialized ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
+          # If cms.yml still has the default placeholder, this is an uninitialized template
+          if grep -q 'repo: "your-username/your-repo"' config/cms.yml; then
+            echo "needs_init=true" >> "$GITHUB_OUTPUT"
           else
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "needs_init=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Configure template
-        if: steps.check.outputs.skip == 'false'
+        if: steps.check.outputs.needs_init == 'true'
         env:
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.repository }}
@@ -35,22 +36,19 @@ jobs:
           # Update repo in cms.yml
           sed -i "s|repo: \"your-username/your-repo\"|repo: \"${REPO}\"|" config/cms.yml
 
-          # Create marker
-          date -u > .template-initialized
-
       - name: Commit changes
-        if: steps.check.outputs.skip == 'false'
+        if: steps.check.outputs.needs_init == 'true'
         env:
           OWNER: ${{ github.repository_owner }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add config/site.yml config/cms.yml .template-initialized
+          git add config/site.yml config/cms.yml
           git diff --cached --quiet || git commit -m "chore: initialize template for ${OWNER}"
           git push
 
       - name: Determine site URL
-        if: steps.check.outputs.skip == 'false'
+        if: steps.check.outputs.needs_init == 'true'
         id: url
         env:
           OWNER: ${{ github.repository_owner }}
@@ -66,7 +64,7 @@ jobs:
           fi
 
       - name: Create setup issue
-        if: steps.check.outputs.skip == 'false'
+        if: steps.check.outputs.needs_init == 'true'
         uses: actions/github-script@v7
         env:
           SITE_URL: ${{ steps.url.outputs.site_url }}

@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 .claude/
 .playwright-mcp/
+
+# template init marker (created by CI, should not be in template)
+.template-initialized
