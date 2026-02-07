@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'config/cv.yml'
+      - 'config/cv-upload.yml'
   workflow_dispatch:
 
 permissions:

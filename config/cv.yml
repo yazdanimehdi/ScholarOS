@@ -59,6 +59,13 @@ cv:
           - "Established NLP research lab"
           - "Secured $500K+ in research funding"
 
+    publications:
+      - title: "Equi-mRNA: Protein Translation Equivariant Encoding for mRNA Language Models"
+        authors: ["**Mehdi Yazdani-Jahromi**", "Ali Khodabandeh Yalabadi", "Ozlem Ozmen Garibay"]
+        journal: "Neurips 2025"
+        date: 2025
+        doi: "10.48550/arXiv.2508.15103"
+
     awards:
       - label: "Best Paper Award, ACL 2023"
         details: "2023"

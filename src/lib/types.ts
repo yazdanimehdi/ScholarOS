@@ -204,6 +204,15 @@ export interface CvSkill {
   details: string;
 }
 
+export interface CvPublication {
+  title: string;
+  authors: string[];
+  journal?: string;
+  date: string | number;
+  doi?: string;
+  url?: string;
+}
+
 export interface CvSocialNetwork {
   network: string;
   username: string;
@@ -212,6 +221,7 @@ export interface CvSocialNetwork {
 export interface CvSections {
   education?: CvEducation[];
   experience?: CvExperience[];
+  publications?: CvPublication[];
   awards?: CvAward[];
   skills?: CvSkill[];
 }

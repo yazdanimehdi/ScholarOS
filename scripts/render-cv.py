@@ -21,9 +21,29 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config" / "cv.yml"
+UPLOAD_PATH = ROOT / "config" / "cv-upload.yml"
 OUTPUT_PDF = ROOT / "public" / "cv.pdf"
 METADATA_PATH = ROOT / "src" / "data" / "cv.json"
 MAX_PDF_SIZE = 10 * 1024 * 1024  # 10 MB limit
+
+
+def load_upload() -> dict | None:
+    """Load raw YAML upload if enabled and non-empty."""
+    if not UPLOAD_PATH.exists():
+        return None
+    with open(UPLOAD_PATH, "r") as f:
+        data = yaml.safe_load(f)
+    if not data or not data.get("enabled"):
+        return None
+    content = (data.get("content") or "").strip()
+    if not content:
+        return None
+    parsed = yaml.safe_load(content)
+    if not isinstance(parsed, dict) or "cv" not in parsed:
+        print("WARNING: Uploaded YAML is missing 'cv' key, falling back to structured config")
+        return None
+    print("Using raw YAML from cv-upload.yml")
+    return parsed
 
 
 def load_config() -> dict:
@@ -61,6 +81,10 @@ def transform_section_entries(sections: dict) -> dict:
         elif section_name == "experience":
             result[section_name] = [
                 transform_experience_entry(e) for e in entries
+            ]
+        elif section_name == "publications":
+            result[section_name] = [
+                transform_publication_entry(e) for e in entries
             ]
         elif section_name == "awards":
             result[section_name] = [
@@ -111,6 +135,23 @@ def transform_experience_entry(entry: dict) -> dict:
     highlights = entry.get("highlights", [])
     if highlights:
         result["highlights"] = highlights
+    return result
+
+
+def transform_publication_entry(entry: dict) -> dict:
+    """Map publication entry to RenderCV PublicationEntry."""
+    result = {
+        "title": entry.get("title", ""),
+        "authors": entry.get("authors", []),
+    }
+    if entry.get("journal"):
+        result["journal"] = entry["journal"]
+    if entry.get("date"):
+        result["date"] = str(entry["date"])
+    if entry.get("doi"):
+        result["doi"] = entry["doi"]
+    if entry.get("url"):
+        result["url"] = entry["url"]
     return result
 
 
@@ -223,19 +264,26 @@ def write_metadata(pdf_size: int) -> None:
 
 
 def main():
-    if not CONFIG_PATH.exists():
-        print(f"ERROR: CV config not found at {CONFIG_PATH}")
-        sys.exit(1)
+    # Check for raw YAML upload first (takes priority)
+    uploaded = load_upload()
 
-    print(f"Loading CV config from {CONFIG_PATH}...")
-    config = load_config()
+    if uploaded:
+        # Raw upload is already in RenderCV-native format — use directly
+        rendercv_input = uploaded
+    else:
+        if not CONFIG_PATH.exists():
+            print(f"ERROR: CV config not found at {CONFIG_PATH}")
+            sys.exit(1)
 
-    if not config or not config.get("cv"):
-        print("ERROR: CV config is empty or missing 'cv' section")
-        sys.exit(1)
+        print(f"Loading CV config from {CONFIG_PATH}...")
+        config = load_config()
 
-    # Build RenderCV input
-    rendercv_input = build_rendercv_input(config)
+        if not config or not config.get("cv"):
+            print("ERROR: CV config is empty or missing 'cv' section")
+            sys.exit(1)
+
+        # Build RenderCV input from structured config
+        rendercv_input = build_rendercv_input(config)
 
     # Render PDF
     try:

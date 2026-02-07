@@ -309,8 +309,26 @@ collections:
           - { label: "CMS Admin Path", name: "adminPath", widget: "string", default: "admin" }
           - { label: "Cookie Consent", name: "cookieConsent", widget: "boolean", default: false }
 
+      - name: "cv-upload"
+        label: "CV (Raw YAML Upload)"
+        file: "config/cv-upload.yml"
+        fields:
+          - label: "Use uploaded YAML"
+            name: "enabled"
+            widget: "boolean"
+            default: false
+            hint: "When enabled, the raw YAML below is used instead of the structured CV form fields."
+          - label: "RenderCV YAML"
+            name: "content"
+            widget: "code"
+            default_language: "yaml"
+            allow_language_selection: false
+            output_code_only: true
+            required: false
+            hint: "Paste your complete RenderCV YAML here. See https://docs.rendercv.com for the format."
+
       - name: "cv"
-        label: "CV"
+        label: "CV (Structured)"
         file: "config/cv.yml"
         fields:
           - label: "CV"
@@ -363,6 +381,21 @@ collections:
                         widget: "list"
                         required: false
                         field: { label: "Highlight", name: "highlight", widget: "string" }
+                  - label: "Publications"
+                    name: "publications"
+                    widget: "list"
+                    required: false
+                    fields:
+                      - { label: "Title", name: "title", widget: "string" }
+                      - label: "Authors"
+                        name: "authors"
+                        widget: "list"
+                        field: { label: "Author", name: "author", widget: "string" }
+                        hint: "Wrap a name in ** for bold (e.g. **Jane Smith**)"
+                      - { label: "Journal / Venue", name: "journal", widget: "string", required: false }
+                      - { label: "Date / Year", name: "date", widget: "string", hint: "e.g. 2025 or 2025-01" }
+                      - { label: "DOI", name: "doi", widget: "string", required: false }
+                      - { label: "URL", name: "url", widget: "string", required: false }
                   - label: "Awards"
                     name: "awards"
                     widget: "list"

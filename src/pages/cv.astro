@@ -4,13 +4,34 @@ import PublicationEntry from '../components/astro/PublicationEntry.astro';
 import { getCollection } from 'astro:content';
 import { getSiteConfig, loadYamlConfig } from '../lib/config';
 import type { CvConfig, CvMetadata } from '../lib/types';
+import yaml from 'js-yaml';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const config = getSiteConfig();
-const cvConfig = loadYamlConfig<CvConfig>('cv.yml');
+
+// Check raw YAML upload first, fall back to structured config
+let cvConfig: CvConfig;
+let usingUpload = false;
+try {
+  const upload = loadYamlConfig<{ enabled?: boolean; content?: string }>('cv-upload.yml');
+  if (upload?.enabled && upload.content?.trim()) {
+    const parsed = yaml.load(upload.content) as CvConfig;
+    if (parsed?.cv) {
+      cvConfig = parsed;
+      usingUpload = true;
+    } else {
+      cvConfig = loadYamlConfig<CvConfig>('cv.yml');
+    }
+  } else {
+    cvConfig = loadYamlConfig<CvConfig>('cv.yml');
+  }
+} catch {
+  cvConfig = loadYamlConfig<CvConfig>('cv.yml');
+}
+
 const cv = cvConfig.cv;
-const sections = cv.sections;
+const sections = cv.sections ?? {};
 
 const publications = (await getCollection('publications'))
   .sort((a, b) => b.data.year - a.data.year);
@@ -124,27 +145,75 @@ function formatDateRange(start?: string, end?: string): string {
     </section>
   )}
 
-  <!-- Selected Publications -->
-  <section class="mb-8">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-3">
-      Selected Publications
-      <a href="/publications" class="float-end text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
-    </h2>
-    <div class="space-y-3">
-      {publications.slice(0, 5).map(pub => (
-        <PublicationEntry
-          title={pub.data.title}
-          authors={pub.data.authors}
-          venue={pub.data.venue}
-          year={pub.data.year}
-          doi={pub.data.doi}
-          url={pub.data.url}
-          type={pub.data.type}
-          highlightAuthors={[config.author]}
-        />
-      ))}
-    </div>
-  </section>
+  <!-- Publications -->
+  {sections.publications && sections.publications.length > 0 ? (
+    <section class="mb-8">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-3">
+        Publications
+        <a href="/publications" class="float-end text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
+      </h2>
+      <div class="space-y-3">
+        {sections.publications.map(pub => {
+          const cleanAuthors = pub.authors.map(a => a.replace(/\*+/g, ''));
+          return (
+            <div class="text-sm">
+              <p class="font-medium text-surface-900 dark:text-[#e6edf3]">{pub.title}</p>
+              <p class="text-surface-500 dark:text-[#8b949e]">
+                {pub.authors.map((author, i) => {
+                  const clean = author.replace(/\*+/g, '');
+                  const isBold = author.startsWith('**');
+                  return (
+                    <>
+                      {i > 0 && ', '}
+                      {isBold ? <strong>{clean}</strong> : <span>{clean}</span>}
+                    </>
+                  );
+                })}
+              </p>
+              <p class="text-surface-400 dark:text-[#484f58]">
+                {pub.journal && <span>{pub.journal}</span>}
+                {pub.journal && pub.date && <span> · </span>}
+                {pub.date && <span>{pub.date}</span>}
+                {pub.doi && (
+                  <>
+                    <span> · </span>
+                    <a href={`https://doi.org/${pub.doi}`} class="text-primary-600 dark:text-accent-400 hover:underline">DOI</a>
+                  </>
+                )}
+                {pub.url && (
+                  <>
+                    <span> · </span>
+                    <a href={pub.url} class="text-primary-600 dark:text-accent-400 hover:underline">Link</a>
+                  </>
+                )}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  ) : (
+    <section class="mb-8">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-3">
+        Selected Publications
+        <a href="/publications" class="float-end text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
+      </h2>
+      <div class="space-y-3">
+        {publications.slice(0, 5).map(pub => (
+          <PublicationEntry
+            title={pub.data.title}
+            authors={pub.data.authors}
+            venue={pub.data.venue}
+            year={pub.data.year}
+            doi={pub.data.doi}
+            url={pub.data.url}
+            type={pub.data.type}
+            highlightAuthors={[config.author]}
+          />
+        ))}
+      </div>
+    </section>
+  )}
 
   <!-- Awards -->
   {sections.awards && sections.awards.length > 0 && (

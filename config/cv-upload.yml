@@ -1,0 +1,6 @@
+# Raw RenderCV YAML Upload
+# Toggle "enabled" to true and paste your complete RenderCV YAML into the content field.
+# When enabled, this takes priority over the structured CV form fields in config/cv.yml.
+
+enabled: false
+content: ""
