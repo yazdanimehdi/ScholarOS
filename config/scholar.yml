@@ -1,12 +1,8 @@
-# Google Scholar Configuration (Phase 3)
-# Add Google Scholar author IDs to auto-sync publications
-
 authors:
   - name: "Jane Smith"
-    scholarId: "XXXXXXXXXX"
+    scholar_id: "XXXXXXXXXX"    # Google Scholar author ID
   - name: "John Doe"
-    scholarId: "YYYYYYYYYY"
+    scholar_id: "YYYYYYYYYY"
 
-# Sync settings
-syncInterval: "weekly" # daily, weekly, monthly
+syncInterval: "weekly"
 maxResults: 100

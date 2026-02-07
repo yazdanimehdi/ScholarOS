@@ -172,6 +172,7 @@ export interface FeedItem {
   source: string;
   excerpt?: string;
   author?: string;
+  tags?: string[];
 }
 
 export type PersonRole = 'pi' | 'postdoc' | 'phd' | 'masters' | 'undergrad' | 'research-assistant' | 'visiting' | 'alumni';

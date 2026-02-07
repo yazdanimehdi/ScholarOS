@@ -121,6 +121,7 @@ const feeds = defineCollection({
     source: z.string(),
     excerpt: z.string().optional(),
     author: z.string().optional(),
+    tags: z.array(z.string()).optional(),
   }),
 });
 

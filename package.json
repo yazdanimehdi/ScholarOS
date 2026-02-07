@@ -9,7 +9,9 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "sync:feeds": "tsx scripts/sync-feeds.ts",
+    "sync:scholar": "python3 scripts/sync-scholar.py"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",
@@ -26,6 +28,8 @@
     "js-yaml": "^4.1.0",
     "sharp": "^0.33.0",
     "tailwindcss": "^4.0.0",
+    "rss-parser": "^3.13.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.7.0"
   },
   "pnpm": {

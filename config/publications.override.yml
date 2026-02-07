@@ -1,0 +1,12 @@
+# Manual additions (publications not on Scholar)
+additions: []
+
+# Exclude by DOI (removed from synced results)
+exclude: []
+
+# Field overrides by DOI (merged on top of synced data)
+overrides: []
+#  - doi: "10.xxxx/example"
+#    set:
+#      featured: true
+#      pdf: "https://example.com/paper.pdf"
