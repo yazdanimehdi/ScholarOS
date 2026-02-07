@@ -1,9 +1,11 @@
 ---
 // Dynamic CMS admin page — path is read from config/site.yml → adminPath
 // The is:inline directive prevents Astro from bundling the CDN script as a module
-import { getSiteConfig } from '../lib/config';
+import { getSiteConfig, loadYamlConfig } from '../lib/config';
 
 const config = getSiteConfig();
+const cmsConfig = loadYamlConfig<{ backend?: Record<string, unknown> }>('cms.yml');
+const backend = cmsConfig.backend || {};
 
 export function getStaticPaths() {
   const config = getSiteConfig();
@@ -22,7 +24,11 @@ export function getStaticPaths() {
   <style>body { margin: 0; }</style>
 </head>
 <body>
-  <div id="cms-config" data-admin-users={JSON.stringify(config.adminUsers || [])} style="display:none"></div>
+  <div id="cms-config"
+    data-admin-users={JSON.stringify(config.adminUsers || [])}
+    data-backend={JSON.stringify(backend)}
+    style="display:none"></div>
+  <script is:inline>window.CMS_MANUAL_INIT = true;</script>
   <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script is:inline>
   (function() {
@@ -236,6 +242,19 @@ export function getStaticPaths() {
         return '<figure style="text-align:center;margin:1.5rem 0"><img src="' + (data.src || '') + '" alt="' + (data.alt || '') + '" style="max-width:100%;border-radius:4px"><figcaption style="font-size:0.85rem;margin-top:0.5rem">' + (data.caption || '') + '</figcaption></figure>';
       }
     });
+  })();
+  </script>
+  <script is:inline>
+  (function() {
+    if (!window.CMS) return;
+    var el = document.getElementById('cms-config');
+    var backendData = el && el.dataset.backend ? JSON.parse(el.dataset.backend) : {};
+    // Only init with config if we have backend data
+    if (Object.keys(backendData).length > 0) {
+      window.CMS.init({ config: { backend: backendData } });
+    } else {
+      window.CMS.init();
+    }
   })();
   </script>
 </body>
