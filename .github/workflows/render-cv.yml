@@ -75,7 +75,7 @@ jobs:
             [ -f "$f" ] && git add "$f"
           done
           [ -d "public/cv" ] && git add public/cv/
-          git diff --cached --quiet || git commit -m "chore: regenerate CV PDF [skip ci]"
+          git diff --cached --quiet || git commit -m "chore: regenerate CV PDF"
           git pull --rebase
           git diff --cached --quiet 2>/dev/null || git push
 
