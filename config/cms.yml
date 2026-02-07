@@ -322,6 +322,14 @@ collections:
               - { label: "Email", name: "email", widget: "string" }
               - { label: "Phone", name: "phone", widget: "string", required: false }
               - { label: "Website", name: "website", widget: "string", required: false }
+              - label: "Social Networks"
+                name: "socialNetworks"
+                widget: "list"
+                required: false
+                collapsed: true
+                fields:
+                  - { label: "Network", name: "network", widget: "select", options: ["LinkedIn", "GitHub", "Google Scholar", "ORCID", "Twitter"] }
+                  - { label: "Username", name: "username", widget: "string" }
               - label: "Sections"
                 name: "sections"
                 widget: "object"
@@ -333,31 +341,53 @@ collections:
                       - { label: "Institution", name: "institution", widget: "string" }
                       - { label: "Area", name: "area", widget: "string" }
                       - { label: "Degree", name: "degree", widget: "string" }
-                      - { label: "Start Date", name: "startDate", widget: "string" }
-                      - { label: "End Date", name: "endDate", widget: "string" }
+                      - { label: "Location", name: "location", widget: "string", required: false }
+                      - { label: "Start Date", name: "startDate", widget: "string", hint: "Format: YYYY-MM (e.g. 2020-09)" }
+                      - { label: "End Date", name: "endDate", widget: "string", hint: "Format: YYYY-MM or 'present'" }
+                      - label: "Highlights"
+                        name: "highlights"
+                        widget: "list"
+                        required: false
+                        field: { label: "Highlight", name: "highlight", widget: "string" }
                   - label: "Experience"
                     name: "experience"
                     widget: "list"
                     fields:
-                      - { label: "Company", name: "company", widget: "string" }
+                      - { label: "Company / Institution", name: "company", widget: "string" }
                       - { label: "Position", name: "position", widget: "string" }
-                      - { label: "Start Date", name: "startDate", widget: "string" }
-                      - { label: "End Date", name: "endDate", widget: "string" }
-                  - label: "Publications"
-                    name: "publications"
-                    widget: "list"
-                    required: false
-                    field: { label: "Publication", name: "publication", widget: "string" }
+                      - { label: "Location", name: "location", widget: "string", required: false }
+                      - { label: "Start Date", name: "startDate", widget: "string", hint: "Format: YYYY-MM (e.g. 2020-09)" }
+                      - { label: "End Date", name: "endDate", widget: "string", hint: "Format: YYYY-MM or 'present'" }
+                      - label: "Highlights"
+                        name: "highlights"
+                        widget: "list"
+                        required: false
+                        field: { label: "Highlight", name: "highlight", widget: "string" }
                   - label: "Awards"
                     name: "awards"
                     widget: "list"
                     required: false
-                    field: { label: "Award", name: "award", widget: "string" }
+                    fields:
+                      - { label: "Award", name: "label", widget: "string" }
+                      - { label: "Year / Details", name: "details", widget: "string" }
                   - label: "Skills"
                     name: "skills"
                     widget: "list"
                     required: false
-                    field: { label: "Skill", name: "skill", widget: "string" }
+                    fields:
+                      - { label: "Category", name: "label", widget: "string" }
+                      - { label: "Details", name: "details", widget: "string" }
+          - label: "Design"
+            name: "design"
+            widget: "object"
+            required: false
+            collapsed: true
+            fields:
+              - label: "Theme"
+                name: "theme"
+                widget: "select"
+                options: ["classic", "sb2nov", "moderncv", "engineeringresumes"]
+                default: "classic"
 
       - name: "feeds"
         label: "Feed Sources"

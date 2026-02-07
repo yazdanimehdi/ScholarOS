@@ -1,5 +1,6 @@
-# RenderCV Configuration (Phase 4)
-# This file will be used to generate a PDF CV
+# CV Configuration
+# Edit this file to update your CV. Changes trigger PDF regeneration via GitHub Actions.
+# Fields use camelCase for CMS compatibility; the render script converts to RenderCV format.
 
 cv:
   name: "Prof. Jane Smith"
@@ -8,20 +9,72 @@ cv:
   phone: "+1-555-0100"
   website: "https://example.com"
 
+  socialNetworks:
+    - network: "LinkedIn"
+      username: "janesmith"
+    - network: "GitHub"
+      username: "janesmith"
+
   sections:
     education:
       - institution: "University of Example"
         area: "Computer Science"
         degree: "Ph.D."
-        startDate: "2010"
-        endDate: "2015"
+        location: "City, Country"
+        startDate: "2010-09"
+        endDate: "2015-05"
+        highlights:
+          - "Thesis: Adaptive Methods for Low-Resource NLP"
+          - "Advisor: Prof. John Doe"
+      - institution: "University of Example"
+        area: "Computer Science"
+        degree: "M.S."
+        location: "City, Country"
+        startDate: "2008-09"
+        endDate: "2010-05"
+        highlights: []
+      - institution: "Another University"
+        area: "Mathematics"
+        degree: "B.S."
+        location: "City, Country"
+        startDate: "2004-09"
+        endDate: "2008-05"
+        highlights: []
 
     experience:
       - company: "University of Technology"
         position: "Associate Professor"
-        startDate: "2020"
+        location: "City, Country"
+        startDate: "2020-01"
         endDate: "present"
+        highlights:
+          - "Leading research group of 10+ members in NLP and multimodal learning"
+          - "Teaching graduate courses in NLP and Machine Learning"
+      - company: "Previous University"
+        position: "Assistant Professor"
+        location: "City, Country"
+        startDate: "2015-09"
+        endDate: "2019-12"
+        highlights:
+          - "Established NLP research lab"
+          - "Secured $500K+ in research funding"
 
-    publications: []
-    awards: []
-    skills: []
+    awards:
+      - label: "Best Paper Award, ACL 2023"
+        details: "2023"
+      - label: "NSF CAREER Award"
+        details: "2022"
+      - label: "Outstanding Dissertation Award"
+        details: "2016"
+
+    skills:
+      - label: "Languages"
+        details: "Python, TypeScript, C++"
+      - label: "Frameworks"
+        details: "PyTorch, TensorFlow, Hugging Face Transformers"
+      - label: "Research Areas"
+        details: "NLP, Multimodal Learning, AI Safety, Low-Resource Languages"
+
+# RenderCV theme and design options
+design:
+  theme: "classic"

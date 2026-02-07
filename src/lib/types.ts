@@ -175,6 +175,70 @@ export interface FeedItem {
   tags?: string[];
 }
 
+export interface CvEducation {
+  institution: string;
+  area: string;
+  degree: string;
+  location?: string;
+  startDate: string;
+  endDate: string;
+  highlights?: string[];
+}
+
+export interface CvExperience {
+  company: string;
+  position: string;
+  location?: string;
+  startDate: string;
+  endDate: string;
+  highlights?: string[];
+}
+
+export interface CvAward {
+  label: string;
+  details: string;
+}
+
+export interface CvSkill {
+  label: string;
+  details: string;
+}
+
+export interface CvSocialNetwork {
+  network: string;
+  username: string;
+}
+
+export interface CvSections {
+  education?: CvEducation[];
+  experience?: CvExperience[];
+  awards?: CvAward[];
+  skills?: CvSkill[];
+}
+
+export interface CvData {
+  name: string;
+  location?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  socialNetworks?: CvSocialNetwork[];
+  sections: CvSections;
+}
+
+export interface CvConfig {
+  cv: CvData;
+  design?: {
+    theme?: string;
+  };
+}
+
+export interface CvMetadata {
+  lastGenerated: string;
+  pdfPath: string;
+  pdfSize: number;
+}
+
 export type PersonRole = 'pi' | 'postdoc' | 'phd' | 'masters' | 'undergrad' | 'research-assistant' | 'visiting' | 'alumni';
 
 export type AnnouncementCategory = 'paper' | 'grant' | 'award' | 'talk' | 'media' | 'general';
