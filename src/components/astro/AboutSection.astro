@@ -1,5 +1,6 @@
 ---
 import { getSiteConfig, isPersonalMode } from '../../lib/config';
+import { getImageShapeClass } from '../../lib/imageShape';
 
 const config = getSiteConfig();
 const about = config.about;
@@ -7,6 +8,7 @@ const personal = isPersonalMode();
 const show = !!about?.enabled;
 const title = about?.title ?? (personal ? 'About Me' : 'About Our Lab');
 const hasImage = !!about?.image;
+const shapeClass = getImageShapeClass();
 ---
 
 {show && (
@@ -26,7 +28,7 @@ const hasImage = !!about?.image;
             <img
               src={about!.image}
               alt={title}
-              class="w-full rounded-lg object-cover"
+              class:list={["w-full object-cover", shapeClass]}
               loading="lazy"
             />
           </div>

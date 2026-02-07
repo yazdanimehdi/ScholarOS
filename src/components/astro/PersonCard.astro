@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import SocialLinks from './SocialLinks.astro';
 import { getRoleName } from '../../lib/utils';
+import { getImageShapeClass, isCircularShape } from '../../lib/imageShape';
 
 interface Props {
   id: string;
@@ -17,11 +18,13 @@ interface Props {
 
 const { id, name, role, title, photo, email, socials, startDate, showDate = false } = Astro.props;
 const displayTitle = title || getRoleName(role);
+const shapeClass = getImageShapeClass();
+const circular = isCircularShape();
 ---
 
 <a href={`/people/${id}`} class="block text-center group">
   <!-- Photo -->
-  <div class="w-[140px] h-[170px] mx-auto mb-3 overflow-hidden bg-surface-100 dark:bg-[#161b22]">
+  <div class:list={["mx-auto mb-3 overflow-hidden bg-surface-100 dark:bg-[#161b22]", shapeClass, circular ? "w-[140px] h-[140px]" : "w-[140px] h-[170px]"]}>
     {photo ? (
       <Image
         src={photo}

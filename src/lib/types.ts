@@ -67,6 +67,8 @@ export interface HeroConfig {
 export type SiteDirection = 'ltr' | 'rtl';
 export type DefaultTheme = 'light' | 'dark' | 'system';
 
+export type ImageShape = 'rectangular' | 'circular' | 'oval';
+
 export interface AboutConfig {
   enabled: boolean;
   title?: string;
@@ -92,6 +94,7 @@ export interface SiteConfig {
   topBar?: TopBarConfig;
   hero?: HeroConfig;
   about?: AboutConfig;
+  imageShape?: ImageShape;
 }
 
 export interface Publication {

@@ -5,6 +5,7 @@ import SEO from '../../components/astro/SEO.astro';
 import { Image } from 'astro:assets';
 import { getCollection, getEntry, render } from 'astro:content';
 import { getRoleName } from '../../lib/utils';
+import { getImageShapeClass, isCircularShape } from '../../lib/imageShape';
 
 export async function getStaticPaths() {
   const people = await getCollection('people');
@@ -23,6 +24,9 @@ const publications = (await getCollection('publications'))
 
 const projects = (await getCollection('projects'))
   .filter(p => p.data.team?.includes(person.id));
+
+const shapeClass = getImageShapeClass();
+const circular = isCircularShape();
 ---
 
 <PageLayout title={person.data.name} description={`${person.data.name} - ${getRoleName(person.data.role)}`}>
@@ -32,7 +36,7 @@ const projects = (await getCollection('projects'))
   <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 border-b border-surface-200 dark:border-[#21262d]">
     <!-- Photo -->
     <div class="shrink-0">
-      <div class="w-40 h-48 sm:w-44 sm:h-52 overflow-hidden bg-surface-100 dark:bg-[#161b22] rounded">
+      <div class:list={["overflow-hidden bg-surface-100 dark:bg-[#161b22]", shapeClass, circular ? "w-44 h-44 sm:w-48 sm:h-48" : "w-40 h-48 sm:w-44 sm:h-52"]}>
         {person.data.photo ? (
           <Image
             src={person.data.photo}

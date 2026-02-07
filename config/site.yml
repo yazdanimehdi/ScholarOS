@@ -40,6 +40,9 @@ hero:
     preset: "particles"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
     customScript: ""      # path to JS file in /public (when preset: "custom")
 
+# Image shape for people photos and about section
+imageShape: "rectangular"   # "rectangular" | "circular" | "oval"
+
 # About section (shown on homepage between hero and content grid)
 about:
   enabled: true

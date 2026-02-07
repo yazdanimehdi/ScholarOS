@@ -5,6 +5,7 @@ import SocialLinks from '../../components/astro/SocialLinks.astro';
 import { getCollection } from 'astro:content';
 import { getRoleGroup, getRoleName } from '../../lib/utils';
 import { isPersonalMode } from '../../lib/config';
+import { getImageShapeClass } from '../../lib/imageShape';
 
 const personal = isPersonalMode();
 
@@ -22,6 +23,7 @@ const activeGroups = tabOrder.filter(t => groups[t]?.length > 0);
 
 const currentMembers = [...(groups['Faculty'] || []), ...(groups['Researchers'] || []), ...(groups['Students'] || [])];
 const alumni = groups['Alumni'] || [];
+const alumniShapeClass = getImageShapeClass();
 ---
 
 <PageLayout title="People" description={personal ? "Collaborators, students, and research group members." : "Meet our team of researchers, students, and collaborators."}>
@@ -61,7 +63,7 @@ const alumni = groups['Alumni'] || [];
         {alumni.map(person => (
           <div class="text-center">
             <a href={`/people/${person.id}`} class="block group">
-              <div class="w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden bg-surface-100 dark:bg-[#161b22]">
+              <div class:list={["w-16 h-16 mx-auto mb-2 overflow-hidden bg-surface-100 dark:bg-[#161b22]", alumniShapeClass]}>
                 <div class="w-full h-full flex items-center justify-center text-sm font-light text-surface-400 dark:text-[#484f58] font-serif">
                   {person.data.name.split(' ').map(n => n[0]).join('')}
                 </div>
