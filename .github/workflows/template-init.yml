@@ -11,6 +11,8 @@ permissions:
 jobs:
   init:
     runs-on: ubuntu-latest
+    # Only run on repos generated from this template, not on the template itself
+    if: ${{ !github.event.repository.is_template }}
     steps:
       - uses: actions/checkout@v4
 
