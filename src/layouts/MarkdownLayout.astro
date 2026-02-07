@@ -10,14 +10,15 @@ interface Props {
   date?: Date;
   author?: string;
   tags?: string[];
+  keywords?: string;
   headings?: { depth: number; slug: string; text: string }[];
 }
 
-const { title, description, date, author, tags, headings = [] } = Astro.props;
+const { title, description, date, author, tags, keywords, headings = [] } = Astro.props;
 const showToc = headings.length > 2;
 ---
 
-<PageLayout title={title} description={description}>
+<PageLayout title={title} description={description} keywords={keywords}>
   <Breadcrumb />
 
   <article class="mt-4">

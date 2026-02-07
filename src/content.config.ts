@@ -17,6 +17,7 @@ const people = defineCollection({
           twitter: z.string().url().optional(),
           linkedin: z.string().url().optional(),
           orcid: z.string().url().optional(),
+          mastodon: z.string().url().optional(),
           website: z.string().url().optional(),
         })
         .optional(),
@@ -72,6 +73,7 @@ const posts = defineCollection({
       excerpt: z.string().optional(),
       coverImage: image().optional(),
       tags: z.array(z.string()).optional(),
+      keywords: z.string().optional(),
       draft: z.boolean().default(false),
     }),
 });

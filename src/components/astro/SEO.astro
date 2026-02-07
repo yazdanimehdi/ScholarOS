@@ -2,22 +2,61 @@
 import { getSiteConfig, isPersonalMode, getSiteName } from '../../lib/config';
 
 interface Props {
-  type?: 'website' | 'article' | 'profile';
+  type?: 'website' | 'article' | 'blogPost' | 'profile';
   title: string;
   description?: string;
   datePublished?: Date;
   dateModified?: Date;
   author?: string;
+  keywords?: string;
 }
 
 const config = getSiteConfig();
-const { type = 'website', title, description = config.description, datePublished, dateModified, author } = Astro.props;
+const { type = 'website', title, description = config.description, datePublished, dateModified, author, keywords } = Astro.props;
 
+const personal = isPersonalMode();
+
+// Build sameAs array from all configured social profiles
+const sameAs: string[] = [];
+const socials = config.socials || {};
+if (socials.github) sameAs.push(socials.github);
+if (socials.twitter) sameAs.push(socials.twitter);
+if (socials.linkedin) sameAs.push(socials.linkedin);
+if (socials.orcid) sameAs.push(socials.orcid);
+if (socials.scholar) sameAs.push(socials.scholar);
+if (socials.mastodon) sameAs.push(socials.mastodon);
+if (socials.website) sameAs.push(socials.website);
+
+// Resolve keywords: per-page prop takes priority, then site-wide config
+const resolvedKeywords = keywords || config.seo?.keywords || undefined;
+
+// Build breadcrumb list from current URL
+const pathname = Astro.url.pathname;
+const segments = pathname.split('/').filter(Boolean);
+const breadcrumbItems = [
+  { '@type': 'ListItem', position: 1, name: 'Home', item: config.siteUrl },
+];
+let cumPath = '';
+segments.forEach((seg, i) => {
+  cumPath += `/${seg}`;
+  breadcrumbItems.push({
+    '@type': 'ListItem',
+    position: i + 2,
+    name: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' '),
+    item: `${config.siteUrl}${cumPath}`,
+  });
+});
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbItems,
+};
+
+// Main JSON-LD
 const jsonLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
 };
-
-const personal = isPersonalMode();
 
 if (type === 'website') {
   if (personal) {
@@ -27,6 +66,7 @@ if (type === 'website') {
       jobTitle: config.title,
       description: config.description,
       url: config.siteUrl,
+      sameAs: sameAs.length > 0 ? sameAs : undefined,
       affiliation: {
         '@type': 'CollegeOrUniversity',
         name: config.university,
@@ -38,6 +78,7 @@ if (type === 'website') {
       name: config.labName,
       description: config.description,
       url: config.siteUrl,
+      sameAs: sameAs.length > 0 ? sameAs : undefined,
       parentOrganization: {
         '@type': 'CollegeOrUniversity',
         name: config.university,
@@ -52,6 +93,22 @@ if (type === 'website') {
     datePublished: datePublished?.toISOString(),
     dateModified: dateModified?.toISOString() || datePublished?.toISOString(),
     author: author ? { '@type': 'Person', name: author } : undefined,
+    keywords: resolvedKeywords,
+    publisher: personal
+      ? { '@type': 'Person', name: config.author }
+      : { '@type': 'ResearchOrganization', name: config.labName },
+  });
+} else if (type === 'blogPost') {
+  Object.assign(jsonLd, {
+    '@type': 'BlogPosting',
+    headline: title,
+    description,
+    datePublished: datePublished?.toISOString(),
+    dateModified: dateModified?.toISOString() || datePublished?.toISOString(),
+    author: author
+      ? { '@type': 'Person', name: author }
+      : { '@type': 'Person', name: config.author },
+    keywords: resolvedKeywords,
     publisher: personal
       ? { '@type': 'Person', name: config.author }
       : { '@type': 'ResearchOrganization', name: config.labName },
@@ -61,6 +118,7 @@ if (type === 'website') {
     '@type': 'Person',
     name: title,
     description,
+    sameAs: sameAs.length > 0 ? sameAs : undefined,
     affiliation: personal
       ? { '@type': 'CollegeOrUniversity', name: config.university }
       : { '@type': 'ResearchOrganization', name: config.labName },
@@ -69,3 +127,4 @@ if (type === 'website') {
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />

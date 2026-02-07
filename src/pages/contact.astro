@@ -2,6 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import ContactForm from '../components/vue/ContactForm.vue';
 import SocialLinks from '../components/astro/SocialLinks.astro';
+import ObfuscatedEmail from '../components/astro/ObfuscatedEmail.astro';
 import { getSiteConfig, getSiteName, isPersonalMode } from '../lib/config';
 
 const config = getSiteConfig();
@@ -36,9 +37,7 @@ const personal = isPersonalMode();
           </div>
           <div>
             <span class="text-surface-700 dark:text-[#c9d1d9]">Email:</span><br />
-            <a href={`mailto:${config.socials.email}`} class="text-primary-600 dark:text-accent-400 hover:underline">
-              {config.socials.email}
-            </a>
+            <ObfuscatedEmail email={config.socials.email!} class="text-primary-600 dark:text-accent-400 hover:underline" />
           </div>
           <div>
             <span class="text-surface-700 dark:text-[#c9d1d9]">Address:</span><br />

@@ -1,22 +1,37 @@
 ---
 import '../../styles/global.css';
-import { getSiteConfig } from '../../lib/config';
+import { getSiteConfig, getSiteName } from '../../lib/config';
 
 interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  keywords?: string;
 }
 
 const config = getSiteConfig();
-const { title, description = config.description, ogImage } = Astro.props;
+const { title, description = config.description, ogImage, keywords } = Astro.props;
 const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const lang = config.lang ?? 'en';
+
+// Resolve keywords: per-page takes priority, then site-wide
+const resolvedKeywords = keywords || config.seo?.keywords || '';
+
+// Extract Twitter/X username from URL for twitter:site / twitter:creator
+const twitterUrl = config.socials?.twitter || '';
+const twitterUsername = twitterUrl ? (() => {
+  const match = twitterUrl.match(/(?:twitter\.com|x\.com)\/(@?\w+)/);
+  return match ? (match[1].startsWith('@') ? match[1] : `@${match[1]}`) : '';
+})() : '';
 ---
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
+
+<!-- FLoC/Topics API opt-out -->
+<meta http-equiv="Permissions-Policy" content="interest-cohort=()" />
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -29,22 +44,36 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   rel="stylesheet"
 />
 
+<!-- RSS Feed -->
+<link rel="alternate" type="application/rss+xml" title={config.title} href={new URL('/feed.xml', Astro.site)} />
+
 <!-- Primary Meta Tags -->
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
 
+{/* SEO: keywords (per-page or site-wide) */}
+{resolvedKeywords && <meta name="keywords" content={resolvedKeywords} />}
+
+{/* Search engine verification */}
+{config.seo?.googleSiteVerification && <meta name="google-site-verification" content={config.seo.googleSiteVerification} />}
+{config.seo?.bingSiteVerification && <meta name="msvalidate.01" content={config.seo.bingSiteVerification} />}
+
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
+<meta property="og:site_name" content={getSiteName()} />
+<meta property="og:locale" content={lang} />
 {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:card" content="summary" />
 <meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={fullTitle} />
 <meta property="twitter:description" content={description} />
 {ogImage && <meta property="twitter:image" content={new URL(ogImage, Astro.site)} />}
+{twitterUsername && <meta property="twitter:site" content={twitterUsername} />}
+{twitterUsername && <meta property="twitter:creator" content={twitterUsername} />}

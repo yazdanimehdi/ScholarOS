@@ -101,6 +101,25 @@ socials:
   twitter: "https://twitter.com/example_lab"
   linkedin: "https://linkedin.com/company/example-lab"
   orcid: "https://orcid.org/0000-0000-0000-0000"
+  # mastodon: "https://mastodon.social/@example"
+
+# Analytics (all disabled by default, opt-in)
+analytics:
+  googleAnalytics: ""        # G-XXXXXXXXXX
+  googleTagManager: ""       # GTM-XXXXXXX
+  cronitor: ""               # site ID
+  openpanel: ""              # client UUID
+  pirsch: ""                 # site ID
+  microsoftClarity: ""       # project ID
+
+# SEO
+seo:
+  keywords: ""               # comma-separated keywords
+  googleSiteVerification: "" # Google Search Console verification code
+  bingSiteVerification: ""   # Bing Webmaster verification code
+
+# GDPR cookie consent banner
+cookieConsent: false
 
 # Footer
 footer:

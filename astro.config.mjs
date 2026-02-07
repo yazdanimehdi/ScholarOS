@@ -3,6 +3,7 @@ import vue from '@astrojs/vue';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import { rehypeExternalLinks } from './src/lib/rehype-external-links';
 
 export default defineConfig({
   site: 'https://example.com',
@@ -11,6 +12,9 @@ export default defineConfig({
     mdx(),
     sitemap(),
   ],
+  markdown: {
+    rehypePlugins: [rehypeExternalLinks],
+  },
   vite: {
     plugins: [tailwindcss()],
   },

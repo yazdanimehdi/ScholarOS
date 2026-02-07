@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import ObfuscatedEmail from '../components/astro/ObfuscatedEmail.astro';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
 
 const config = getSiteConfig();
@@ -61,9 +62,7 @@ const personal = isPersonalMode();
       {personal ? "To apply, please visit the" : "To apply for a position in our lab, please visit the"}{' '}
       <a href="/positions" class="text-primary-600 dark:text-accent-400 hover:underline">positions page</a>{' '}
       and use the application form on the relevant position, or send the following materials to{' '}
-      <a href={`mailto:${config.socials.email}`} class="text-primary-600 dark:text-accent-400 hover:underline">
-        {config.socials.email}
-      </a>:
+      <ObfuscatedEmail email={config.socials.email!} class="text-primary-600 dark:text-accent-400 hover:underline" />:
     </p>
     <ol class="list-decimal list-inside text-sm text-surface-500 dark:text-[#8b949e] space-y-1.5 mb-4">
       <li>Your CV/resume</li>

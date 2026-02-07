@@ -8,13 +8,14 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  keywords?: string;
   fullWidth?: boolean;
 }
 
-const { title, description, ogImage, fullWidth = false } = Astro.props;
+const { title, description, ogImage, keywords, fullWidth = false } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} ogImage={ogImage}>
+<BaseLayout title={title} description={description} ogImage={ogImage} keywords={keywords}>
   <div class="sticky top-0 z-40">
     <TopBar />
     <Header />

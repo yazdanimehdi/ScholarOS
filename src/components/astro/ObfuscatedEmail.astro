@@ -1,0 +1,42 @@
+---
+/**
+ * Renders an email address that is obfuscated in the HTML source to prevent
+ * harvesting by bots/scrapers. The real address is decoded client-side.
+ * Mirrors al-folio's jekyll-email-protect approach.
+ */
+interface Props {
+  email: string;
+  class?: string;
+}
+
+const { email, class: className } = Astro.props;
+
+// Encode each character as its char code, joined by commas
+const encoded = Array.from(email).map(c => c.charCodeAt(0).toString()).join(',');
+---
+
+<a
+  href="#"
+  class:list={[className]}
+  data-encoded-email={encoded}
+  aria-label="Email"
+>
+  <noscript>{email.replace('@', ' [at] ')}</noscript>
+</a>
+
+<script is:inline>
+  (function () {
+    function decodeLinks() {
+      document.querySelectorAll('a[data-encoded-email]').forEach(function (el) {
+        if (el.getAttribute('data-decoded')) return;
+        var codes = el.getAttribute('data-encoded-email').split(',');
+        var addr = codes.map(function (c) { return String.fromCharCode(parseInt(c, 10)); }).join('');
+        el.setAttribute('href', 'mailto:' + addr);
+        el.textContent = addr;
+        el.setAttribute('data-decoded', '1');
+      });
+    }
+    decodeLinks();
+    document.addEventListener('astro:after-swap', decodeLinks);
+  })();
+</script>

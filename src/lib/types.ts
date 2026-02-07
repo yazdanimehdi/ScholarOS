@@ -10,6 +10,7 @@ export interface SocialLinks {
   twitter?: string;
   linkedin?: string;
   orcid?: string;
+  mastodon?: string;
   website?: string;
 }
 
@@ -85,6 +86,21 @@ export interface GitHubConfig {
   trophyBaseUrl?: string;
 }
 
+export interface AnalyticsConfig {
+  googleAnalytics?: string;
+  googleTagManager?: string;
+  cronitor?: string;
+  openpanel?: string;
+  pirsch?: string;
+  microsoftClarity?: string;
+}
+
+export interface SeoConfig {
+  keywords?: string;
+  googleSiteVerification?: string;
+  bingSiteVerification?: string;
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   title: string;
@@ -105,6 +121,9 @@ export interface SiteConfig {
   about?: AboutConfig;
   imageShape?: ImageShape;
   github?: GitHubConfig;
+  analytics?: AnalyticsConfig;
+  seo?: SeoConfig;
+  cookieConsent?: boolean;
 }
 
 export interface Publication {
