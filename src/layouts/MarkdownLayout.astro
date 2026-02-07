@@ -3,6 +3,7 @@ import PageLayout from './PageLayout.astro';
 import Breadcrumb from '../components/astro/Breadcrumb.astro';
 import TableOfContents from '../components/astro/TableOfContents.astro';
 import FormattedDate from '../components/astro/FormattedDate.astro';
+import ProseEnhancements from '../components/astro/ProseEnhancements.astro';
 
 interface Props {
   title: string;
@@ -51,6 +52,7 @@ const showToc = headings.length > 2;
       <div class="prose">
         <slot />
       </div>
+      <ProseEnhancements />
 
       {showToc && (
         <aside class="hidden lg:block">

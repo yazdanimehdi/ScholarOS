@@ -2,6 +2,7 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import Breadcrumb from '../../components/astro/Breadcrumb.astro';
 import TagBadge from '../../components/astro/TagBadge.astro';
+import ProseEnhancements from '../../components/astro/ProseEnhancements.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import { getRoleName } from '../../lib/utils';
 
@@ -101,6 +102,7 @@ if (project.data.team) {
     <div class="prose mb-8">
       <Content />
     </div>
+    <ProseEnhancements />
 
     <!-- Team -->
     {teamMembers.length > 0 && (

@@ -1,0 +1,247 @@
+---
+/**
+ * ProseEnhancements — client-side rendering for MathJax, Chart.js, Mermaid, and TikZ.
+ * Include this component once in MarkdownLayout.astro.
+ * Libraries are lazy-loaded only when their elements exist on the page.
+ */
+---
+
+<script>
+  /* ── Helpers ───────────────────────────────────────────────── */
+
+  /** Idempotent script loader — resolves when the script is ready. */
+  function loadScript(src: string, id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (document.getElementById(id)) {
+        resolve();
+        return;
+      }
+      const s = document.createElement('script');
+      s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(s);
+    });
+  }
+
+  function isDark(): boolean {
+    return document.documentElement.classList.contains('dark');
+  }
+
+  /* ── MathJax ───────────────────────────────────────────────── */
+
+  async function renderMath() {
+    const hasMath =
+      document.querySelector('.math-inline') ||
+      document.querySelector('.math-display');
+    if (!hasMath) return;
+
+    if ((window as any).MathJax?.typesetPromise) {
+      await (window as any).MathJax.typesetPromise();
+      return;
+    }
+
+    // Configure MathJax before loading the script
+    (window as any).MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
+      startup: { typeset: true },
+    };
+
+    await loadScript(
+      'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
+      'mathjax-cdn',
+    );
+  }
+
+  /* ── Chart.js ──────────────────────────────────────────────── */
+
+  const chartInstances: Map<HTMLCanvasElement, any> = new Map();
+
+  async function renderCharts() {
+    const blocks = document.querySelectorAll<HTMLPreElement>(
+      'pre[data-language="chartjs"]',
+    );
+    if (blocks.length === 0) return;
+
+    const { Chart, registerables } = await import(
+      /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.js/+esm'
+    ) as any;
+    Chart.register(...registerables);
+
+    blocks.forEach((pre) => {
+      if (pre.dataset.enhanced) return;
+      pre.dataset.enhanced = 'true';
+
+      const code = pre.querySelector('code');
+      const raw = code?.textContent?.trim() ?? '';
+
+      let config: any;
+      try {
+        config = JSON.parse(raw);
+      } catch {
+        pre.textContent = '⚠ Invalid Chart.js JSON';
+        return;
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'chartjs-container';
+      const canvas = document.createElement('canvas');
+      wrapper.appendChild(canvas);
+      pre.replaceWith(wrapper);
+
+      const instance = new Chart(canvas, config);
+      chartInstances.set(canvas, instance);
+    });
+  }
+
+  /* ── Mermaid ───────────────────────────────────────────────── */
+
+  /**
+   * Set the SVG output from Mermaid's render() into a container element.
+   * Mermaid.render() returns trusted SVG — this is the library's standard API.
+   */
+  function setMermaidSvg(container: HTMLElement, svg: string) {
+    // Clear existing children safely
+    while (container.firstChild) container.removeChild(container.firstChild);
+    // Parse and insert as DOM nodes rather than raw innerHTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, 'image/svg+xml');
+    const svgEl = doc.documentElement;
+    container.appendChild(container.ownerDocument.importNode(svgEl, true));
+  }
+
+  async function renderMermaid() {
+    const blocks = document.querySelectorAll<HTMLPreElement>(
+      'pre[data-language="mermaid"]',
+    );
+    if (blocks.length === 0) return;
+
+    const { default: mermaid } = await import(
+      /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
+    ) as any;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark() ? 'dark' : 'default',
+    });
+
+    for (const pre of blocks) {
+      const code = pre.querySelector('code');
+      const definition = code?.textContent?.trim() ?? '';
+      if (!definition) continue;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mermaid-container';
+      wrapper.dataset.definition = definition;
+
+      const id = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
+      const { svg } = await mermaid.render(id, definition);
+      setMermaidSvg(wrapper, svg);
+
+      pre.replaceWith(wrapper);
+    }
+  }
+
+  async function reRenderMermaid() {
+    const containers = document.querySelectorAll<HTMLDivElement>('.mermaid-container');
+    if (containers.length === 0) return;
+
+    const { default: mermaid } = await import(
+      /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
+    ) as any;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark() ? 'dark' : 'default',
+    });
+
+    for (const wrapper of containers) {
+      const definition = wrapper.dataset.definition;
+      if (!definition) continue;
+
+      const id = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
+      const { svg } = await mermaid.render(id, definition);
+      setMermaidSvg(wrapper, svg);
+    }
+  }
+
+  /* ── TikZ ──────────────────────────────────────────────────── */
+
+  async function renderTikz() {
+    const blocks = document.querySelectorAll<HTMLPreElement>(
+      'pre[data-language="tikz"]',
+    );
+    if (blocks.length === 0) return;
+
+    await loadScript(
+      'https://cdn.jsdelivr.net/npm/tikzjax@1/dist/tikzjax.js',
+      'tikzjax-cdn',
+    );
+
+    // Ensure tikzjax CSS is loaded
+    if (!document.getElementById('tikzjax-css')) {
+      const link = document.createElement('link');
+      link.id = 'tikzjax-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/tikzjax@1/dist/fonts.css';
+      document.head.appendChild(link);
+    }
+
+    blocks.forEach((pre) => {
+      if (pre.dataset.enhanced) return;
+      pre.dataset.enhanced = 'true';
+
+      const code = pre.querySelector('code');
+      const tikzSource = code?.textContent?.trim() ?? '';
+      if (!tikzSource) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'tikz-container';
+
+      const script = document.createElement('script');
+      script.type = 'text/tikz';
+      script.textContent = tikzSource;
+      wrapper.appendChild(script);
+
+      pre.replaceWith(wrapper);
+    });
+  }
+
+  /* ── Master init ───────────────────────────────────────────── */
+
+  async function initProseEnhancements() {
+    await Promise.allSettled([
+      renderMath(),
+      renderCharts(),
+      renderMermaid(),
+      renderTikz(),
+    ]);
+  }
+
+  // Run on initial load and on every ViewTransition navigation
+  document.addEventListener('astro:page-load', () => {
+    initProseEnhancements();
+  });
+
+  // Clean up Chart.js instances before ViewTransition swap
+  document.addEventListener('astro:before-swap', () => {
+    chartInstances.forEach((instance) => {
+      try { instance.destroy(); } catch {}
+    });
+    chartInstances.clear();
+  });
+
+  // Re-render Mermaid on dark mode toggle
+  const themeObserver = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.attributeName === 'class') {
+        reRenderMermaid();
+        break;
+      }
+    }
+  });
+  themeObserver.observe(document.documentElement, { attributes: true });
+</script>
