@@ -109,7 +109,7 @@ jobs:
 
             For a proper "Login with GitHub" button (recommended for multiple editors):
 
-            1. **Deploy the auth worker** — go to [sveltia-cms-auth](https://github.com/sveltia/sveltia-cms-auth) and click "Deploy to Cloudflare Workers"
+            1. **Deploy the auth worker** — run \`cd cloudflare-auth && npm install && npx wrangler deploy\` (requires a free [Cloudflare account](https://dash.cloudflare.com/sign-up))
             2. **Create a GitHub OAuth App** at [Developer Settings > OAuth Apps](https://github.com/settings/applications/new):
                - **Application name:** \`${owner} site CMS\`
                - **Homepage URL:** \`${siteUrl}\`

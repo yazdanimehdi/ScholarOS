@@ -5,9 +5,10 @@ backend:
   name: github
   repo: "your-username/your-repo"   # <-- CHANGE THIS (auto-configured on template init)
   branch: main
-  # base_url: ""                    # <-- Set this to your Cloudflare Worker URL for OAuth login
+  # base_url: ""                    # <-- Cloudflare Worker URL for OAuth login
+                                    #     Deploy cloudflare-auth/ then set this to your Worker URL
                                     #     (e.g. https://sveltia-cms-auth.your-name.workers.dev)
-                                    #     Or leave commented out and use "Sign in with Token" instead
+                                    #     Without this, users sign in with a Personal Access Token
 
 media_folder: "src/assets/images"
 public_folder: "/src/assets/images"
