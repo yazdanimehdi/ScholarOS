@@ -76,6 +76,15 @@ export interface AboutConfig {
   image?: string;
 }
 
+export interface GitHubConfig {
+  username: string;
+  stats?: boolean;
+  trophies?: boolean;
+  pinnedRepos?: string[];
+  statsBaseUrl?: string;
+  trophyBaseUrl?: string;
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   title: string;
@@ -95,6 +104,7 @@ export interface SiteConfig {
   hero?: HeroConfig;
   about?: AboutConfig;
   imageShape?: ImageShape;
+  github?: GitHubConfig;
 }
 
 export interface Publication {

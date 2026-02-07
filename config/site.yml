@@ -76,8 +76,22 @@ nav:
     href: "/blog"
   - label: "Positions"
     href: "/positions"
+  - label: "Repositories"
+    href: "/repositories"
   - label: "Contact"
     href: "/contact"
+
+# GitHub repositories page
+github:
+  username: "example-lab"
+  stats: true
+  trophies: true
+  pinnedRepos:
+    - "nlp-toolkit"
+    - "multilingual-benchmark"
+  # Self-hosted base URLs (optional, defaults to public Vercel instances)
+  # statsBaseUrl: "https://your-stats-instance.vercel.app"
+  # trophyBaseUrl: "https://your-trophy-instance.vercel.app"
 
 # Social links
 socials:
@@ -89,7 +103,7 @@ socials:
   orcid: "https://orcid.org/0000-0000-0000-0000"
 
 # Footer
-footer:
+footer:the h
   text: "Built with Astro"
   links:
     - label: "Privacy"

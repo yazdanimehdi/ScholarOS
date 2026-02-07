@@ -1,0 +1,100 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getSiteConfig, isPersonalMode } from '../lib/config';
+
+const config = getSiteConfig();
+const personal = isPersonalMode();
+const github = config.github;
+
+if (!github) {
+  return Astro.redirect('/');
+}
+
+const { username, stats, trophies, pinnedRepos } = github;
+
+const statsBase = (github.statsBaseUrl ?? 'https://github-readme-stats.vercel.app').replace(/\/$/, '');
+const trophyBase = (github.trophyBaseUrl ?? 'https://github-profile-trophy.vercel.app').replace(/\/$/, '');
+
+const statsUrl = (theme: string) =>
+  `${statsBase}/api?username=${username}&show_icons=true&theme=${theme}`;
+const langsUrl = (theme: string) =>
+  `${statsBase}/api/top-langs/?username=${username}&layout=compact&theme=${theme}`;
+const repoUrl = (repo: string, theme: string) =>
+  `${statsBase}/api/pin/?username=${username}&repo=${repo}&theme=${theme}`;
+const trophyUrl = (theme: string) =>
+  `${trophyBase}/?username=${username}&theme=${theme}&no-frame=true&column=-1`;
+
+const lightTheme = 'default';
+const darkTheme = 'github_dark';
+---
+
+<PageLayout title="Repositories" description={personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+    Repositories
+  </h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8">
+    {personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}
+  </p>
+
+  {/* GitHub Stats */}
+  {stats && (
+    <section class="mb-10">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+        GitHub Stats
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <img class="dark:hidden w-full" src={statsUrl(lightTheme)} alt="GitHub Stats" loading="lazy" />
+          <img class="hidden dark:block w-full" src={statsUrl(darkTheme)} alt="GitHub Stats" loading="lazy" />
+        </div>
+        <div>
+          <img class="dark:hidden w-full" src={langsUrl(lightTheme)} alt="Top Languages" loading="lazy" />
+          <img class="hidden dark:block w-full" src={langsUrl(darkTheme)} alt="Top Languages" loading="lazy" />
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Trophies */}
+  {trophies && (
+    <section class="mb-10">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+        Trophies
+      </h2>
+      <div class="overflow-x-auto">
+        <img class="dark:hidden w-full" src={trophyUrl(lightTheme)} alt="GitHub Trophies" loading="lazy" />
+        <img class="hidden dark:block w-full" src={trophyUrl(darkTheme)} alt="GitHub Trophies" loading="lazy" />
+      </div>
+    </section>
+  )}
+
+  {/* Pinned Repositories */}
+  {pinnedRepos && pinnedRepos.length > 0 && (
+    <section class="mb-10">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+        Pinned Repositories
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {pinnedRepos.map((repo) => (
+          <a href={`https://github.com/${username}/${repo}`} target="_blank" rel="noopener noreferrer" class="block">
+            <img class="dark:hidden w-full" src={repoUrl(repo, lightTheme)} alt={repo} loading="lazy" />
+            <img class="hidden dark:block w-full" src={repoUrl(repo, darkTheme)} alt={repo} loading="lazy" />
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* GitHub Profile Link */}
+  <div class="text-center pt-4 border-t border-surface-200 dark:border-[#21262d]">
+    <a
+      href={`https://github.com/${username}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-2 text-sm text-primary-600 dark:text-accent-400 hover:underline"
+    >
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View full profile on GitHub
+    </a>
+  </div>
+</PageLayout>
