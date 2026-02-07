@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import HeroSection from '../components/astro/HeroSection.astro';
+import AboutSection from '../components/astro/AboutSection.astro';
 import SectionHeading from '../components/astro/SectionHeading.astro';
 import AnnouncementCard from '../components/astro/AnnouncementCard.astro';
 import PublicationEntry from '../components/astro/PublicationEntry.astro';
@@ -47,6 +48,8 @@ const feeds = (await getCollection('feeds'))
     secondaryCtaText={personal ? "Download CV" : "Join the Lab"}
     secondaryCtaHref={personal ? "/cv" : "/join"}
   />
+
+  <AboutSection />
 
   <!-- Three-column section: News / Publications / Blog -->
   <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-8">

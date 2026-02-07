@@ -67,6 +67,13 @@ export interface HeroConfig {
 export type SiteDirection = 'ltr' | 'rtl';
 export type DefaultTheme = 'light' | 'dark' | 'system';
 
+export interface AboutConfig {
+  enabled: boolean;
+  title?: string;
+  text: string;
+  image?: string;
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   title: string;
@@ -84,6 +91,7 @@ export interface SiteConfig {
   footer: FooterConfig;
   topBar?: TopBarConfig;
   hero?: HeroConfig;
+  about?: AboutConfig;
 }
 
 export interface Publication {

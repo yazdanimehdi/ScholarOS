@@ -1,0 +1,37 @@
+---
+import { getSiteConfig, isPersonalMode } from '../../lib/config';
+
+const config = getSiteConfig();
+const about = config.about;
+const personal = isPersonalMode();
+const show = !!about?.enabled;
+const title = about?.title ?? (personal ? 'About Me' : 'About Our Lab');
+const hasImage = !!about?.image;
+---
+
+{show && (
+  <section class="border-b border-surface-200 dark:border-[#21262d] bg-surface-50 dark:bg-[#0d1117]">
+    <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <h2 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-6">
+        {title}
+      </h2>
+      <div class:list={["flex flex-col gap-8", hasImage && "md:flex-row"]}>
+        <div class:list={[hasImage ? "md:flex-1" : "w-full"]}>
+          <p class="text-base text-surface-600 dark:text-[#8b949e] leading-relaxed">
+            {about!.text}
+          </p>
+        </div>
+        {hasImage && (
+          <div class="md:w-[280px] flex-shrink-0">
+            <img
+              src={about!.image}
+              alt={title}
+              class="w-full rounded-lg object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}

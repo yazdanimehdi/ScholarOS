@@ -40,6 +40,13 @@ hero:
     preset: "particles"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
     customScript: ""      # path to JS file in /public (when preset: "custom")
 
+# About section (shown on homepage between hero and content grid)
+about:
+  enabled: true
+  title: "About Our Lab"
+  text: "We are a multidisciplinary research group dedicated to advancing the frontiers of computer science and artificial intelligence. Our work spans natural language processing, computer vision, and human–computer interaction, with a focus on building systems that are robust, interpretable, and socially responsible."
+  image: "/images/about.jpg"
+
 title: "Research Lab"
 description: "Welcome to our research lab. We explore cutting-edge topics in computer science and artificial intelligence."
 author: "Prof. Jane Smith"

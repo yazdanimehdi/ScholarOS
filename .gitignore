@@ -26,3 +26,4 @@ pnpm-debug.log*
 *.swo
 
 .claude/
+.playwright-mcp/
