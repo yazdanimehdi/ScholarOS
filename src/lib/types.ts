@@ -163,6 +163,7 @@ export interface Publication {
   type: 'journal' | 'conference' | 'preprint' | 'workshop' | 'thesis' | 'book-chapter';
   featured?: boolean;
   abstract?: string;
+  image?: string;
 }
 
 export interface FeedItem {

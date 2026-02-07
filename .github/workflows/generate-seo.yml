@@ -1,0 +1,51 @@
+name: Generate SEO Keywords
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/**'
+      - 'config/research.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-keywords
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - run: pnpm install
+
+      - run: pnpm generate:keywords
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet config/site.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config/site.yml
+          git commit -m "chore: auto-generate SEO keywords [skip ci]"
+          git push

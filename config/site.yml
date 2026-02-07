@@ -24,7 +24,7 @@ topBar:
 
 # Hero background configuration
 hero:
-  type: "animation"  # "image" | "video" | "pattern" | "animation" | "none"
+  type: "pattern"  # "image" | "video" | "pattern" | "animation" | "none"
   light:
     bgColor: "#ffffff"
     bgImage: ""           # e.g. "/images/hero-light.jpg"
@@ -35,9 +35,9 @@ hero:
     src: "/videos/hero-bg.mp4"
     poster: "/images/hero-poster.jpg"
   pattern:
-    name: "dots"          # "dots" | "grid" | "waves" | "diagonal" | "hexagons"
+    name: "hexagons"          # "dots" | "grid" | "waves" | "diagonal" | "hexagons"
   animation:
-    preset: "particles"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
+    preset: "wave-lines"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
     customScript: ""      # path to JS file in /public (when preset: "custom")
 
 # Typography
@@ -47,12 +47,12 @@ fonts:
     serif: "Roboto Slab"         # Headings
     mono: "Roboto Mono"          # Code blocks
   sizes:
-    base: "1rem"                 # Body text (default: 1rem / 16px)
-    sm: "0.875rem"               # Meta text, dates, tags (default: 0.875rem / 14px)
-    lg: "1.125rem"               # Lead paragraphs (default: 1.125rem / 18px)
-    h1: "2rem"                   # Page titles in prose (default: 2rem / 32px)
-    h2: "1.5rem"                 # Section headings in prose (default: 1.5rem / 24px)
-    h3: "1.25rem"                # Subsection headings in prose (default: 1.25rem / 20px)
+    base: "1.2rem"                 # Body text (default: 1rem / 16px)
+    sm: "0.95rem"               # Meta text, dates, tags (default: 0.875rem / 14px)
+    lg: "1.3rem"               # Lead paragraphs (default: 1.125rem / 18px)
+    h1: "2.3rem"                   # Page titles in prose (default: 2rem / 32px)
+    h2: "1.7rem"                 # Section headings in prose (default: 1.5rem / 24px)
+    h3: "1.5rem"                # Subsection headings in prose (default: 1.25rem / 20px)
 
 # Image shape for people photos and about section
 imageShape: "rectangular"   # "rectangular" | "circular" | "oval"
@@ -129,7 +129,7 @@ analytics:
 
 # SEO
 seo:
-  keywords: ""               # comma-separated keywords
+  keywords: "language, learning, natural, multimodal, multilingual, models, vision, robustness, nlp, computer, safety, 2024, processing, computer vision, multimodal learning, ai safety, research, training, benchmark, fairness, reinforcement, natural language, language processing, language models, multilingual nlp, text generation, vision multimodal, vision-language models, image understanding, multimodal reasoning"               # comma-separated keywords
   googleSiteVerification: "" # Google Search Console verification code
   bingSiteVerification: ""   # Bing Webmaster verification code
 

@@ -80,21 +80,22 @@ const posts = defineCollection({
 });
 
 const publications = defineCollection({
-  loader: file('src/data/publications.json'),
-  schema: z.object({
-    id: z.string(),
-    title: z.string(),
-    authors: z.array(z.string()),
-    venue: z.string(),
-    year: z.number(),
-    doi: z.string().optional(),
-    url: z.string().url().optional(),
-    pdf: z.string().url().optional(),
-    bibtex: z.string().optional(),
-    type: z.enum(['journal', 'conference', 'preprint', 'workshop', 'thesis', 'book-chapter']),
-    featured: z.boolean().default(false),
-    abstract: z.string().optional(),
-  }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: 'src/content/publications' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      authors: z.array(z.string()),
+      venue: z.string(),
+      year: z.number(),
+      doi: z.string().optional(),
+      url: z.string().url().optional(),
+      pdf: z.string().url().optional(),
+      bibtex: z.string().optional(),
+      type: z.enum(['journal', 'conference', 'preprint', 'workshop', 'thesis', 'book-chapter']),
+      featured: z.boolean().default(false),
+      abstract: z.string().optional(),
+      image: image().optional(),
+    }),
 });
 
 const positions = defineCollection({

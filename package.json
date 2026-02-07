@@ -12,7 +12,8 @@
     "astro": "astro",
     "sync:feeds": "tsx scripts/sync-feeds.ts",
     "sync:scholar": "python3 scripts/sync-scholar.py",
-    "render:cv": "python3 scripts/render-cv.py"
+    "render:cv": "python3 scripts/render-cv.py",
+    "generate:keywords": "tsx scripts/generate-seo-keywords.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",

@@ -159,6 +159,38 @@ collections:
       - { label: "Draft", name: "draft", widget: "boolean", default: false }
       - { label: "Body", name: "body", widget: "markdown" }
 
+  - name: "publications"
+    label: "Publications"
+    folder: "src/content/publications"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Authors"
+        name: "authors"
+        widget: "list"
+        field: { label: "Author", name: "author", widget: "string" }
+      - { label: "Venue", name: "venue", widget: "string" }
+      - { label: "Year", name: "year", widget: "number", value_type: "int" }
+      - { label: "DOI", name: "doi", widget: "string", required: false }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "PDF", name: "pdf", widget: "string", required: false }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Journal", value: "journal" }
+          - { label: "Conference", value: "conference" }
+          - { label: "Preprint", value: "preprint" }
+          - { label: "Workshop", value: "workshop" }
+          - { label: "Thesis", value: "thesis" }
+          - { label: "Book Chapter", value: "book-chapter" }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false }
+      - { label: "Abstract", name: "abstract", widget: "text", required: false }
+      - { label: "Image", name: "image", widget: "image", required: false, hint: "Thumbnail image or GIF (e.g. a figure from the paper)" }
+      - { label: "BibTeX", name: "bibtex", widget: "code", required: false, default_language: "bibtex", allow_language_selection: false, output_code_only: true }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
+
   - name: "positions"
     label: "Positions"
     folder: "src/content/positions"
@@ -627,6 +659,7 @@ collections:
         label: "Feed Sources"
         file: "config/feeds.yml"
         fields:
+          - { label: "Medium RSS URL", name: "mediumUrl", widget: "string", required: false, hint: "Your Medium profile or publication RSS feed (e.g. https://medium.com/feed/@username)" }
           - label: "Feeds"
             name: "feeds"
             widget: "list"

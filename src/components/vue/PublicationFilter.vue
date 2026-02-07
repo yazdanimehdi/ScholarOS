@@ -1,69 +1,95 @@
 <template>
   <div>
-    <!-- Filter bar (al-folio style: Filter by: All | Journal | Conference | Year + search) -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-3 border-b border-[var(--color-surface-200)] dark:border-[#21262d]">
-      <div class="flex items-center gap-1 text-sm">
-        <span class="text-[var(--color-surface-400)] dark:text-[#484f58] me-1">Filter by:</span>
+    <!-- Filter bar -->
+    <div class="flex flex-col gap-3 mb-6 pb-3 border-b border-[var(--color-surface-200)] dark:border-[#21262d]">
+      <!-- Row 1: Search bar (always visible) -->
+      <div class="relative">
+        <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-surface-400)] dark:text-[#484f58]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Search publications..."
+          class="w-full ps-9 pe-8 py-1.5 text-sm rounded-md border border-[var(--color-surface-200)] dark:border-[#30363d] bg-white dark:bg-[#0d1117] text-[var(--color-surface-800)] dark:text-[#c9d1d9] placeholder-[var(--color-surface-400)] dark:placeholder-[#484f58] outline-none focus:border-[var(--color-primary-500)] dark:focus:border-[var(--color-accent-500)]"
+        />
         <button
-          @click="selectedType = ''"
-          :class="[
-            'px-2 py-0.5 text-sm transition-colors border-b-2',
-            !selectedType
-              ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
-              : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
-          ]"
+          v-if="search"
+          @click="search = ''"
+          class="absolute end-2 top-1/2 -translate-y-1/2 text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-[#484f58] dark:hover:text-[#8b949e] text-lg leading-none"
         >
-          All
+          &times;
         </button>
-        <button
-          v-for="t in types"
-          :key="t"
-          @click="selectedType = t"
-          :class="[
-            'px-2 py-0.5 text-sm capitalize transition-colors border-b-2',
-            selectedType === t
-              ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
-              : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
-          ]"
-        >
-          {{ t }}
-        </button>
-        <select
-          v-model="selectedYear"
-          class="ms-2 px-2 py-0.5 text-sm bg-transparent text-[var(--color-surface-500)] dark:text-[#8b949e] border-b-2 border-transparent cursor-pointer outline-none"
-        >
-          <option value="">Year</option>
-          <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-        </select>
       </div>
 
-      <!-- Search -->
-      <div class="flex items-center gap-2">
-        <div v-if="showSearch" class="relative">
-          <input
-            ref="searchInput"
-            v-model="search"
-            type="text"
-            placeholder="Search..."
-            class="w-48 ps-3 pe-8 py-1 text-sm rounded border border-[var(--color-surface-200)] dark:border-[#30363d] bg-white dark:bg-[#0d1117] text-[var(--color-surface-800)] dark:text-[#c9d1d9] placeholder-[var(--color-surface-400)] dark:placeholder-[#484f58] outline-none focus:border-[var(--color-primary-500)] dark:focus:border-[var(--color-accent-500)]"
-            @keydown.escape="showSearch = false; search = ''"
-          />
+      <!-- Row 2: Filter buttons + year + view toggle -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-1 text-sm">
+          <span class="text-[var(--color-surface-400)] dark:text-[#484f58] me-1">Filter by:</span>
           <button
-            @click="showSearch = false; search = ''"
-            class="absolute inset-inline-end-2 top-1/2 -translate-y-1/2 text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-[#484f58] dark:hover:text-[#8b949e]"
+            @click="selectedType = ''"
+            :class="[
+              'px-2 py-0.5 text-sm transition-colors border-b-2',
+              !selectedType
+                ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
+                : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
+            ]"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
+            All
+          </button>
+          <button
+            v-for="t in types"
+            :key="t"
+            @click="selectedType = t"
+            :class="[
+              'px-2 py-0.5 text-sm capitalize transition-colors border-b-2',
+              selectedType === t
+                ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
+                : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
+            ]"
+          >
+            {{ t }}
+          </button>
+          <select
+            v-model="selectedYear"
+            class="ms-2 px-2 py-0.5 text-sm bg-transparent text-[var(--color-surface-500)] dark:text-[#8b949e] border-b-2 border-transparent cursor-pointer outline-none"
+          >
+            <option value="">Year</option>
+            <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+          </select>
+        </div>
+
+        <!-- View toggle -->
+        <div class="flex items-center gap-1">
+          <button
+            @click="viewMode = 'list'"
+            :class="[
+              'p-1 rounded transition-colors',
+              viewMode === 'list'
+                ? 'text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)]'
+                : 'text-[var(--color-surface-400)] dark:text-[#484f58] hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
+            ]"
+            title="List view"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <button
+            @click="viewMode = 'grid'"
+            :class="[
+              'p-1 rounded transition-colors',
+              viewMode === 'grid'
+                ? 'text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)]'
+                : 'text-[var(--color-surface-400)] dark:text-[#484f58] hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
+            ]"
+            title="Grid view"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+            </svg>
           </button>
         </div>
-        <button
-          @click="toggleSearch"
-          class="text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-[#484f58] dark:hover:text-[#8b949e] transition-colors"
-          title="Search"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
       </div>
     </div>
 
@@ -72,15 +98,20 @@
       {{ filteredPublications.length }} of {{ publications.length }} publications
     </p>
 
-    <!-- Publications list -->
-    <div class="divide-y divide-[var(--color-surface-100)] dark:divide-[#21262d]">
+    <!-- List view -->
+    <div v-if="viewMode === 'list'" class="divide-y divide-[var(--color-surface-100)] dark:divide-[#21262d]">
       <div
         v-for="pub in filteredPublications"
         :key="pub.id"
         class="flex gap-3 py-3"
       >
-        <!-- Venue badge -->
-        <div class="shrink-0 pt-0.5">
+        <!-- Thumbnail (if image exists) -->
+        <div v-if="pub.image" class="shrink-0 pt-0.5">
+          <img :src="pub.image" :alt="pub.title" class="w-16 h-16 object-cover rounded border border-[var(--color-surface-200)] dark:border-[#30363d]" loading="lazy" />
+        </div>
+
+        <!-- Venue badge (if no image) -->
+        <div v-else class="shrink-0 pt-0.5">
           <span class="pub-badge">{{ getVenueAbbr(pub.venue) }}</span>
         </div>
 
@@ -127,6 +158,60 @@
       </div>
     </div>
 
+    <!-- Grid view -->
+    <div v-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        v-for="pub in filteredPublications"
+        :key="pub.id"
+        class="rounded-lg border border-[var(--color-surface-200)] dark:border-[#30363d] overflow-hidden bg-white dark:bg-[#161b22] hover:border-[var(--color-primary-400)] dark:hover:border-[var(--color-accent-500)] transition-colors"
+      >
+        <!-- Card image or placeholder -->
+        <div class="relative h-36 bg-[var(--color-surface-100)] dark:bg-[#0d1117]">
+          <img v-if="pub.image" :src="pub.image" :alt="pub.title" class="w-full h-full object-cover" loading="lazy" />
+          <div v-else class="w-full h-full flex items-center justify-center">
+            <span class="text-2xl font-bold text-[var(--color-surface-300)] dark:text-[#30363d]">{{ getVenueAbbr(pub.venue) }}</span>
+          </div>
+          <span class="absolute top-2 end-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white capitalize">{{ pub.type }}</span>
+        </div>
+
+        <!-- Card content -->
+        <div class="p-3">
+          <h3 class="text-sm leading-snug font-medium text-[var(--color-surface-900)] dark:text-[#e6edf3] line-clamp-2">
+            <a
+              v-if="pub.url"
+              :href="pub.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-accent-400)] transition-colors"
+            >
+              {{ pub.title }}
+            </a>
+            <span v-else>{{ pub.title }}</span>
+          </h3>
+
+          <p class="mt-1 text-xs text-[var(--color-surface-500)] dark:text-[#8b949e] truncate">
+            {{ pub.authors.join(', ') }}
+          </p>
+
+          <p class="mt-0.5 text-xs text-[var(--color-surface-500)] dark:text-[#8b949e]">
+            {{ pub.venue }}, {{ pub.year }}
+          </p>
+
+          <div class="mt-2 flex flex-wrap gap-1">
+            <a v-if="pub.url" :href="pub.url" target="_blank" rel="noopener noreferrer" class="action-btn text-xs">Paper</a>
+            <a v-if="pub.doi" :href="`https://doi.org/${pub.doi}`" target="_blank" rel="noopener noreferrer" class="action-btn text-xs">DOI</a>
+            <button
+              v-if="pub.bibtex"
+              @click="copyBibtex(pub)"
+              class="action-btn text-xs"
+            >
+              {{ copiedId === pub.id ? 'Copied!' : 'BibTeX' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <p v-if="filteredPublications.length === 0" class="text-center py-12 text-sm text-[var(--color-surface-400)] dark:text-[#484f58]">
       No publications match your filters.
     </p>
@@ -134,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 
 interface Publication {
   id: string;
@@ -147,6 +232,8 @@ interface Publication {
   bibtex?: string;
   type: string;
   featured?: boolean;
+  abstract?: string;
+  image?: string;
 }
 
 const props = defineProps<{
@@ -158,8 +245,7 @@ const search = ref('');
 const selectedYear = ref('');
 const selectedType = ref('');
 const copiedId = ref<string | null>(null);
-const showSearch = ref(false);
-const searchInput = ref<HTMLInputElement | null>(null);
+const viewMode = ref<'list' | 'grid'>('list');
 
 const years = computed(() => {
   const y = [...new Set(props.publications.map(p => p.year))];
@@ -172,10 +258,12 @@ const types = computed(() => {
 
 const filteredPublications = computed(() => {
   return props.publications.filter(pub => {
+    const q = search.value.toLowerCase();
     const matchesSearch = !search.value ||
-      pub.title.toLowerCase().includes(search.value.toLowerCase()) ||
-      pub.authors.some(a => a.toLowerCase().includes(search.value.toLowerCase())) ||
-      pub.venue.toLowerCase().includes(search.value.toLowerCase());
+      pub.title.toLowerCase().includes(q) ||
+      pub.authors.some(a => a.toLowerCase().includes(q)) ||
+      pub.venue.toLowerCase().includes(q) ||
+      (pub.abstract && pub.abstract.toLowerCase().includes(q));
     const matchesYear = !selectedYear.value || pub.year === Number(selectedYear.value);
     const matchesType = !selectedType.value || pub.type === selectedType.value;
     return matchesSearch && matchesYear && matchesType;
@@ -192,15 +280,6 @@ function getVenueAbbr(venue: string): string {
   const parts = venue.split(' ');
   if (parts.length === 1) return venue;
   return parts[0].replace(/[^A-Za-z]/g, '');
-}
-
-function toggleSearch() {
-  showSearch.value = !showSearch.value;
-  if (showSearch.value) {
-    nextTick(() => searchInput.value?.focus());
-  } else {
-    search.value = '';
-  }
 }
 
 function copyBibtex(pub: Publication) {

@@ -3,7 +3,8 @@
 Sync publications from Google Scholar.
 
 Reads author IDs from config/scholar.yml, fetches publication metadata
-via the `scholarly` library, and writes src/data/publications.json.
+via the `scholarly` library, and writes individual markdown files to
+src/content/publications/.
 """
 
 import json
@@ -26,7 +27,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config" / "scholar.yml"
 OVERRIDE_PATH = ROOT / "config" / "publications.override.yml"
-OUTPUT_PATH = ROOT / "src" / "data" / "publications.json"
+OUTPUT_DIR = ROOT / "src" / "content" / "publications"
 
 # Delay between scholarly API calls to avoid rate-limiting
 FETCH_DELAY = 4  # seconds
@@ -49,11 +50,58 @@ def load_overrides():
     }
 
 
-def load_existing():
-    if not OUTPUT_PATH.exists():
+def parse_frontmatter(filepath: Path) -> dict:
+    """Read a .md file and extract YAML frontmatter as a dict."""
+    text = filepath.read_text(encoding="utf-8")
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    try:
+        return yaml.safe_load(parts[1]) or {}
+    except yaml.YAMLError:
+        return {}
+
+
+def write_publication_md(pub: dict, output_dir: Path) -> None:
+    """Write a publication as a .md file with YAML frontmatter."""
+    pub_id = pub.get("id", "unknown")
+    filepath = output_dir / f"{pub_id}.md"
+
+    # Build frontmatter dict (exclude 'id' since it comes from filename)
+    fm = {}
+    for key in ("title", "authors", "venue", "year", "doi", "url", "pdf",
+                 "type", "featured", "abstract", "bibtex", "image"):
+        if key in pub and pub[key] is not None:
+            fm[key] = pub[key]
+
+    # Ensure required fields
+    fm.setdefault("title", "Untitled")
+    fm.setdefault("authors", [])
+    fm.setdefault("venue", "")
+    fm.setdefault("year", 0)
+    fm.setdefault("type", "conference")
+    fm.setdefault("featured", False)
+    fm.setdefault("image", "")
+
+    frontmatter = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False)
+    content = f"---\n{frontmatter}---\n"
+
+    filepath.write_text(content, encoding="utf-8")
+
+
+def load_existing() -> list[dict]:
+    """Scan OUTPUT_DIR/*.md, parse frontmatter, set id from filename stem."""
+    if not OUTPUT_DIR.exists():
         return []
-    with open(OUTPUT_PATH, "r") as f:
-        return json.load(f)
+    pubs = []
+    for md_file in OUTPUT_DIR.glob("*.md"):
+        fm = parse_frontmatter(md_file)
+        if fm:
+            fm["id"] = md_file.stem
+            pubs.append(fm)
+    return pubs
 
 
 def generate_id(authors_str: str, year, title: str) -> str:
@@ -191,7 +239,7 @@ def merge_with_existing(new_pubs: list[dict], existing: list[dict]) -> list[dict
 
         seen_ids.add(pub["id"])
 
-    # Keep existing entries that weren't in the new set
+    # Keep existing entries that weren't in the new set (preserve CMS-created publications)
     for pub in existing:
         if pub["id"] not in seen_ids and normalize_title(pub["title"]) not in {
             normalize_title(p["title"]) for p in new_pubs
@@ -314,10 +362,12 @@ def main():
     # Sort
     merged = sort_publications(merged)
 
-    # Write output
-    with open(OUTPUT_PATH, "w") as f:
-        json.dump(merged, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+    # Ensure output directory exists
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Write individual .md files (do NOT delete files not in new set)
+    for pub in merged:
+        write_publication_md(pub, OUTPUT_DIR)
 
     added = len(merged) - len(existing)
     print(f"\nSummary:")

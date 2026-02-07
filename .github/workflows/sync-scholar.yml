@@ -38,18 +38,21 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          if git diff --quiet src/data/publications.json 2>/dev/null; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+          changed=false
+          if ! git diff --quiet src/content/publications/ 2>/dev/null; then
+            changed=true
           fi
+          if [ -n "$(git ls-files --others --exclude-standard src/content/publications/)" ]; then
+            changed=true
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/data/publications.json
+          git add src/content/publications/
           git commit -m "chore: sync scholar publications [skip ci]"
           git push
 

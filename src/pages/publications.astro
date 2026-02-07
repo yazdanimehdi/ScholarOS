@@ -2,6 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import PublicationFilter from '../components/vue/PublicationFilter.vue';
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
 
 const config = getSiteConfig();
@@ -10,17 +11,26 @@ const personal = isPersonalMode();
 const publications = (await getCollection('publications'))
   .sort((a, b) => b.data.year - a.data.year);
 
-const pubData = publications.map(p => ({
-  id: p.data.id,
-  title: p.data.title,
-  authors: p.data.authors,
-  venue: p.data.venue,
-  year: p.data.year,
-  doi: p.data.doi,
-  url: p.data.url,
-  bibtex: p.data.bibtex,
-  type: p.data.type,
-  featured: p.data.featured,
+const pubData = await Promise.all(publications.map(async p => {
+  let imageUrl: string | undefined;
+  if (p.data.image) {
+    const resolved = await getImage({ src: p.data.image, width: 400 });
+    imageUrl = resolved.src;
+  }
+  return {
+    id: p.id,
+    title: p.data.title,
+    authors: p.data.authors,
+    venue: p.data.venue,
+    year: p.data.year,
+    doi: p.data.doi,
+    url: p.data.url,
+    bibtex: p.data.bibtex,
+    type: p.data.type,
+    featured: p.data.featured,
+    abstract: p.data.abstract,
+    image: imageUrl,
+  };
 }));
 ---
 

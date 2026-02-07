@@ -24,6 +24,7 @@ interface FeedSource {
 }
 
 interface FeedsConfig {
+  mediumUrl?: string;
   feeds: FeedSource[];
   syncInterval: string;
   maxItemsPerFeed: number;
@@ -178,8 +179,18 @@ function sortByDateDesc(items: FeedItem[]): FeedItem[] {
 
 async function main() {
   const config = loadConfig();
-  const sources = config.feeds || [];
+  const sources = [...(config.feeds || [])];
   const maxItems = config.maxItemsPerFeed || 20;
+
+  // Auto-inject Medium feed if mediumUrl is configured
+  if (config.mediumUrl) {
+    sources.push({
+      name: "Medium",
+      url: config.mediumUrl,
+      author: null,
+      tags: ["medium"],
+    });
+  }
 
   if (sources.length === 0) {
     console.log("No feeds configured in config/feeds.yml");

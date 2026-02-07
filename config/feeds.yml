@@ -1,3 +1,5 @@
+mediumUrl: ""  # e.g. https://medium.com/feed/@username
+
 feeds:
   - name: "Jane Smith's Blog"
     url: "https://example.com/feed.xml"

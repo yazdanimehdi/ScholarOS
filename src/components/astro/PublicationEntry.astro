@@ -1,4 +1,6 @@
 ---
+import type { ImageMetadata } from 'astro';
+
 interface Props {
   title: string;
   authors: string[];
@@ -10,10 +12,11 @@ interface Props {
   bibtex?: string;
   type: string;
   featured?: boolean;
+  image?: ImageMetadata;
   highlightAuthors?: string[];
 }
 
-const { title, authors, venue, year, doi, url, pdf, bibtex, type, featured, highlightAuthors = [] } = Astro.props;
+const { title, authors, venue, year, doi, url, pdf, bibtex, type, featured, image, highlightAuthors = [] } = Astro.props;
 
 function isHighlighted(author: string): boolean {
   return highlightAuthors.some(h =>
@@ -31,10 +34,16 @@ function getVenueAbbr(venue: string): string {
 ---
 
 <div class="flex gap-3 py-3">
-  <!-- Venue badge -->
-  <div class="shrink-0 pt-0.5">
-    <span class="pub-badge">{getVenueAbbr(venue)}</span>
-  </div>
+  <!-- Thumbnail (if image exists) -->
+  {image ? (
+    <div class="shrink-0 pt-0.5">
+      <img src={image.src} alt={title} class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-[#30363d]" loading="lazy" />
+    </div>
+  ) : (
+    <div class="shrink-0 pt-0.5">
+      <span class="pub-badge">{getVenueAbbr(venue)}</span>
+    </div>
+  )}
 
   <!-- Content -->
   <div class="flex-1 min-w-0">
