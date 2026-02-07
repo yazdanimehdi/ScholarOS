@@ -1,0 +1,380 @@
+# Decap CMS Configuration
+# See: https://decapcms.org/docs/configuration-options/
+
+backend:
+  name: github
+  repo: "your-username/your-repo"   # <-- CHANGE THIS
+  branch: main
+
+media_folder: "src/assets/images"
+public_folder: "/src/assets/images"
+
+publish_mode: editorial_workflow
+
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  # ──────────────────────────────────────────────
+  # Folder Collections (markdown content)
+  # ──────────────────────────────────────────────
+
+  - name: "people"
+    label: "People"
+    folder: "src/content/people"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - label: "Role"
+        name: "role"
+        widget: "select"
+        options:
+          - { label: "Principal Investigator", value: "pi" }
+          - { label: "Postdoc", value: "postdoc" }
+          - { label: "PhD Student", value: "phd" }
+          - { label: "Master's Student", value: "masters" }
+          - { label: "Undergraduate", value: "undergrad" }
+          - { label: "Research Assistant", value: "research-assistant" }
+          - { label: "Visiting Researcher", value: "visiting" }
+          - { label: "Alumni", value: "alumni" }
+      - { label: "Title", name: "title", widget: "string", required: false }
+      - { label: "Photo", name: "photo", widget: "image", required: false }
+      - { label: "Email", name: "email", widget: "string", required: false }
+      - label: "Socials"
+        name: "socials"
+        widget: "object"
+        required: false
+        collapsed: true
+        fields:
+          - { label: "GitHub", name: "github", widget: "string", required: false }
+          - { label: "Google Scholar", name: "scholar", widget: "string", required: false }
+          - { label: "Twitter / X", name: "twitter", widget: "string", required: false }
+          - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+          - { label: "ORCID", name: "orcid", widget: "string", required: false }
+          - { label: "Mastodon", name: "mastodon", widget: "string", required: false }
+          - { label: "Bluesky", name: "bluesky", widget: "string", required: false }
+          - { label: "Website", name: "website", widget: "string", required: false }
+      - label: "Research Interests"
+        name: "researchInterests"
+        widget: "list"
+        required: false
+        field: { label: "Interest", name: "interest", widget: "string" }
+      - { label: "Start Date", name: "startDate", widget: "datetime", required: false }
+      - { label: "End Date", name: "endDate", widget: "datetime", required: false }
+      - { label: "Sort Order", name: "sortOrder", widget: "number", default: 99, value_type: "int" }
+      - { label: "Active", name: "active", widget: "boolean", default: true }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "announcements"
+    label: "Announcements"
+    folder: "src/content/announcements"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Paper", value: "paper" }
+          - { label: "Grant", value: "grant" }
+          - { label: "Award", value: "award" }
+          - { label: "Talk", value: "talk" }
+          - { label: "Media", value: "media" }
+          - { label: "General", value: "general" }
+      - { label: "Pinned", name: "pinned", widget: "boolean", default: false }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false }
+      - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
+      - label: "People"
+        name: "people"
+        widget: "list"
+        required: false
+        field: { label: "Person ID", name: "person", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "Projects"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Software", value: "software" }
+          - { label: "Dataset", value: "dataset" }
+          - { label: "Benchmark", value: "benchmark" }
+          - { label: "Hardware", value: "hardware" }
+          - { label: "Other", value: "other" }
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options:
+          - { label: "Active", value: "active" }
+          - { label: "Completed", value: "completed" }
+          - { label: "Upcoming", value: "upcoming" }
+      - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "Repository URL", name: "repoUrl", widget: "string", required: false }
+      - { label: "Paper URL", name: "paperUrl", widget: "string", required: false }
+      - label: "Team"
+        name: "team"
+        widget: "list"
+        required: false
+        field: { label: "Person ID", name: "person", widget: "string" }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        field: { label: "Tag", name: "tag", widget: "string" }
+      - { label: "Start Date", name: "startDate", widget: "datetime", required: false }
+      - { label: "End Date", name: "endDate", widget: "datetime", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "src/content/posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Author", name: "author", widget: "string", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
+      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        field: { label: "Tag", name: "tag", widget: "string" }
+      - { label: "Keywords", name: "keywords", widget: "string", required: false }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "positions"
+    label: "Positions"
+    folder: "src/content/positions"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "PhD", value: "phd" }
+          - { label: "Postdoc", value: "postdoc" }
+          - { label: "Master's", value: "masters" }
+          - { label: "Undergraduate", value: "undergrad" }
+          - { label: "Research Assistant", value: "research-assistant" }
+          - { label: "Visiting Researcher", value: "visiting" }
+          - { label: "Other", value: "other" }
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options:
+          - { label: "Open", value: "open" }
+          - { label: "Closed", value: "closed" }
+      - { label: "Deadline", name: "deadline", widget: "datetime", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        field: { label: "Tag", name: "tag", widget: "string" }
+      - { label: "Contact", name: "contact", widget: "string", required: false }
+      - { label: "Sort Order", name: "sortOrder", widget: "number", default: 99, value_type: "int" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  # ──────────────────────────────────────────────
+  # File Collections (config files)
+  # ──────────────────────────────────────────────
+
+  - name: "settings"
+    label: "Settings"
+    files:
+      - name: "site"
+        label: "Site Settings"
+        file: "config/site.yml"
+        fields:
+          - label: "Site Mode"
+            name: "siteMode"
+            widget: "select"
+            options:
+              - { label: "Lab / Research Group", value: "lab" }
+              - { label: "Personal Academic Site", value: "personal" }
+          - { label: "Language", name: "lang", widget: "string", default: "en" }
+          - label: "Text Direction"
+            name: "direction"
+            widget: "select"
+            options:
+              - { label: "Left to Right", value: "ltr" }
+              - { label: "Right to Left", value: "rtl" }
+          - label: "Default Theme"
+            name: "defaultTheme"
+            widget: "select"
+            options:
+              - { label: "Light", value: "light" }
+              - { label: "Dark", value: "dark" }
+              - { label: "System", value: "system" }
+          - { label: "Site Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Author", name: "author", widget: "string" }
+          - { label: "Lab Name", name: "labName", widget: "string", required: false }
+          - { label: "University", name: "university", widget: "string", required: false }
+          - { label: "Department", name: "department", widget: "string", required: false }
+          - { label: "Site URL", name: "siteUrl", widget: "string" }
+          - label: "Image Shape"
+            name: "imageShape"
+            widget: "select"
+            options:
+              - { label: "Rectangular", value: "rectangular" }
+              - { label: "Circular", value: "circular" }
+              - { label: "Oval", value: "oval" }
+          - label: "About Section"
+            name: "about"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Text", name: "text", widget: "text" }
+              - { label: "Image", name: "image", widget: "string", required: false }
+          - label: "Top Bar"
+            name: "topBar"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
+              - { label: "Text", name: "text", widget: "string" }
+              - label: "Links"
+                name: "links"
+                widget: "list"
+                fields:
+                  - { label: "Label", name: "label", widget: "string" }
+                  - { label: "URL", name: "href", widget: "string" }
+                  - { label: "External", name: "external", widget: "boolean", required: false, default: false }
+          - label: "Navigation"
+            name: "nav"
+            widget: "list"
+            fields:
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "URL", name: "href", widget: "string" }
+          - label: "Social Links"
+            name: "socials"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Email", name: "email", widget: "string", required: false }
+              - { label: "GitHub", name: "github", widget: "string", required: false }
+              - { label: "Google Scholar", name: "scholar", widget: "string", required: false }
+              - { label: "Twitter / X", name: "twitter", widget: "string", required: false }
+              - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+              - { label: "ORCID", name: "orcid", widget: "string", required: false }
+              - { label: "Mastodon", name: "mastodon", widget: "string", required: false }
+              - { label: "Bluesky", name: "bluesky", widget: "string", required: false }
+          - label: "GitHub Repositories"
+            name: "github"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Username", name: "username", widget: "string" }
+              - { label: "Show Stats", name: "stats", widget: "boolean", default: true }
+              - { label: "Show Trophies", name: "trophies", widget: "boolean", default: true }
+              - label: "Pinned Repos"
+                name: "pinnedRepos"
+                widget: "list"
+                required: false
+                field: { label: "Repo Name", name: "repo", widget: "string" }
+          - label: "Footer"
+            name: "footer"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Text", name: "text", widget: "string" }
+              - label: "Links"
+                name: "links"
+                widget: "list"
+                fields:
+                  - { label: "Label", name: "label", widget: "string" }
+                  - { label: "URL", name: "href", widget: "string" }
+          - { label: "CMS Admin Path", name: "adminPath", widget: "string", default: "admin" }
+          - { label: "Cookie Consent", name: "cookieConsent", widget: "boolean", default: false }
+
+      - name: "cv"
+        label: "CV"
+        file: "config/cv.yml"
+        fields:
+          - label: "CV"
+            name: "cv"
+            widget: "object"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Location", name: "location", widget: "string" }
+              - { label: "Email", name: "email", widget: "string" }
+              - { label: "Phone", name: "phone", widget: "string", required: false }
+              - { label: "Website", name: "website", widget: "string", required: false }
+              - label: "Sections"
+                name: "sections"
+                widget: "object"
+                fields:
+                  - label: "Education"
+                    name: "education"
+                    widget: "list"
+                    fields:
+                      - { label: "Institution", name: "institution", widget: "string" }
+                      - { label: "Area", name: "area", widget: "string" }
+                      - { label: "Degree", name: "degree", widget: "string" }
+                      - { label: "Start Date", name: "startDate", widget: "string" }
+                      - { label: "End Date", name: "endDate", widget: "string" }
+                  - label: "Experience"
+                    name: "experience"
+                    widget: "list"
+                    fields:
+                      - { label: "Company", name: "company", widget: "string" }
+                      - { label: "Position", name: "position", widget: "string" }
+                      - { label: "Start Date", name: "startDate", widget: "string" }
+                      - { label: "End Date", name: "endDate", widget: "string" }
+                  - label: "Publications"
+                    name: "publications"
+                    widget: "list"
+                    required: false
+                    field: { label: "Publication", name: "publication", widget: "string" }
+                  - label: "Awards"
+                    name: "awards"
+                    widget: "list"
+                    required: false
+                    field: { label: "Award", name: "award", widget: "string" }
+                  - label: "Skills"
+                    name: "skills"
+                    widget: "list"
+                    required: false
+                    field: { label: "Skill", name: "skill", widget: "string" }
+
+      - name: "feeds"
+        label: "Feed Sources"
+        file: "config/feeds.yml"
+        fields:
+          - label: "Feeds"
+            name: "feeds"
+            widget: "list"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+              - { label: "Author", name: "author", widget: "string", required: false }
+          - label: "Sync Interval"
+            name: "syncInterval"
+            widget: "select"
+            options:
+              - { label: "Hourly", value: "hourly" }
+              - { label: "Daily", value: "daily" }
+              - { label: "Weekly", value: "weekly" }
+          - { label: "Max Items per Feed", name: "maxItemsPerFeed", widget: "number", default: 20, value_type: "int" }

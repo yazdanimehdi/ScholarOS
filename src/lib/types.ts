@@ -146,6 +146,7 @@ export interface SiteConfig {
   seo?: SeoConfig;
   cookieConsent?: boolean;
   fonts?: FontsConfig;
+  adminPath?: string;
 }
 
 export interface Publication {

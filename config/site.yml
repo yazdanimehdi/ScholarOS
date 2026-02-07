@@ -133,6 +133,9 @@ seo:
   googleSiteVerification: "" # Google Search Console verification code
   bingSiteVerification: ""   # Bing Webmaster verification code
 
+# CMS admin panel path (change this to a custom secret path for security)
+adminPath: "admin"
+
 # GDPR cookie consent banner
 cookieConsent: false
 
