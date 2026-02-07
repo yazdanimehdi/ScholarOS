@@ -102,6 +102,26 @@ export interface SeoConfig {
   bingSiteVerification?: string;
 }
 
+export interface FontFamiliesConfig {
+  sans?: string;
+  serif?: string;
+  mono?: string;
+}
+
+export interface FontSizesConfig {
+  base?: string;
+  sm?: string;
+  lg?: string;
+  h1?: string;
+  h2?: string;
+  h3?: string;
+}
+
+export interface FontsConfig {
+  families?: FontFamiliesConfig;
+  sizes?: FontSizesConfig;
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   title: string;
@@ -125,6 +145,7 @@ export interface SiteConfig {
   analytics?: AnalyticsConfig;
   seo?: SeoConfig;
   cookieConsent?: boolean;
+  fonts?: FontsConfig;
 }
 
 export interface Publication {

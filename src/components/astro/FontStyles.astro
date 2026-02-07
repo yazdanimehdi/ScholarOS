@@ -1,0 +1,106 @@
+---
+import { getSiteConfig } from '../../lib/config';
+
+const config = getSiteConfig();
+const fonts = config.fonts;
+
+// Defaults matching global.css @theme values
+const defaultFamilies = {
+  sans: 'Roboto',
+  serif: 'Roboto Slab',
+  mono: 'Roboto Mono',
+};
+
+const defaultSizes = {
+  base: '1rem',
+  sm: '0.875rem',
+  lg: '1.125rem',
+  h1: '2rem',
+  h2: '1.5rem',
+  h3: '1.25rem',
+};
+
+const families = {
+  sans: fonts?.families?.sans || defaultFamilies.sans,
+  serif: fonts?.families?.serif || defaultFamilies.serif,
+  mono: fonts?.families?.mono || defaultFamilies.mono,
+};
+
+const sizes = {
+  base: fonts?.sizes?.base || defaultSizes.base,
+  sm: fonts?.sizes?.sm || defaultSizes.sm,
+  lg: fonts?.sizes?.lg || defaultSizes.lg,
+  h1: fonts?.sizes?.h1 || defaultSizes.h1,
+  h2: fonts?.sizes?.h2 || defaultSizes.h2,
+  h3: fonts?.sizes?.h3 || defaultSizes.h3,
+};
+
+// Build Google Fonts URL
+const uniqueFamilies = [...new Set([families.sans, families.serif, families.mono])];
+const fontParams = uniqueFamilies.map((family) => {
+  const encoded = family.replace(/ /g, '+');
+  // Mono fonts get fewer weights
+  if (family === families.mono && family !== families.sans && family !== families.serif) {
+    return `family=${encoded}:wght@400;500`;
+  }
+  return `family=${encoded}:wght@300;400;500;700`;
+}).join('&');
+const googleFontsUrl = `https://fonts.googleapis.com/css2?${fontParams}&display=swap`;
+
+// Font family stacks
+const sansFallback = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
+const serifFallback = 'ui-serif, Georgia, serif';
+const monoFallback = 'ui-monospace, monospace';
+
+// Check if any value differs from defaults
+const hasFamilyOverrides =
+  families.sans !== defaultFamilies.sans ||
+  families.serif !== defaultFamilies.serif ||
+  families.mono !== defaultFamilies.mono;
+
+const hasSizeOverrides =
+  sizes.base !== defaultSizes.base ||
+  sizes.sm !== defaultSizes.sm ||
+  sizes.lg !== defaultSizes.lg ||
+  sizes.h1 !== defaultSizes.h1 ||
+  sizes.h2 !== defaultSizes.h2 ||
+  sizes.h3 !== defaultSizes.h3;
+
+// Build CSS override block
+let cssOverrides = '';
+
+if (hasFamilyOverrides || hasSizeOverrides) {
+  let rootProps = '';
+  if (hasFamilyOverrides) {
+    rootProps += `  --font-sans: "${families.sans}", ${sansFallback};\n`;
+    rootProps += `  --font-serif: "${families.serif}", ${serifFallback};\n`;
+    rootProps += `  --font-mono: "${families.mono}", ${monoFallback};\n`;
+  }
+  if (rootProps) {
+    cssOverrides += `:root {\n${rootProps}}\n`;
+  }
+}
+
+if (hasSizeOverrides) {
+  if (sizes.base !== defaultSizes.base) {
+    cssOverrides += `body { font-size: ${sizes.base}; }\n`;
+    cssOverrides += `.prose { font-size: ${sizes.base}; }\n`;
+  }
+  if (sizes.h1 !== defaultSizes.h1) {
+    cssOverrides += `.prose h1 { font-size: ${sizes.h1}; }\n`;
+  }
+  if (sizes.h2 !== defaultSizes.h2) {
+    cssOverrides += `.prose h2 { font-size: ${sizes.h2}; }\n`;
+  }
+  if (sizes.h3 !== defaultSizes.h3) {
+    cssOverrides += `.prose h3 { font-size: ${sizes.h3}; }\n`;
+  }
+}
+---
+
+<!-- Font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href={googleFontsUrl} rel="stylesheet" />
+
+{cssOverrides && <style set:html={cssOverrides} />}

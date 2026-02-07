@@ -1,6 +1,7 @@
 ---
 import '../../styles/global.css';
 import { getSiteConfig, getSiteName } from '../../lib/config';
+import FontStyles from './FontStyles.astro';
 
 interface Props {
   title: string;
@@ -36,13 +37,8 @@ const twitterUsername = twitterUrl ? (() => {
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-<!-- Fonts: Roboto + Roboto Slab + Roboto Mono -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap"
-  rel="stylesheet"
-/>
+<!-- Fonts (driven by config/site.yml) -->
+<FontStyles />
 
 <!-- RSS Feed -->
 <link rel="alternate" type="application/rss+xml" title={config.title} href={new URL('/feed.xml', Astro.site)} />

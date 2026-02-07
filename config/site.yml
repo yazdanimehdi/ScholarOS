@@ -40,6 +40,20 @@ hero:
     preset: "particles"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
     customScript: ""      # path to JS file in /public (when preset: "custom")
 
+# Typography
+fonts:
+  families:
+    sans: "Roboto"               # Body text, UI elements
+    serif: "Roboto Slab"         # Headings
+    mono: "Roboto Mono"          # Code blocks
+  sizes:
+    base: "1rem"                 # Body text (default: 1rem / 16px)
+    sm: "0.875rem"               # Meta text, dates, tags (default: 0.875rem / 14px)
+    lg: "1.125rem"               # Lead paragraphs (default: 1.125rem / 18px)
+    h1: "2rem"                   # Page titles in prose (default: 2rem / 32px)
+    h2: "1.5rem"                 # Section headings in prose (default: 1.5rem / 24px)
+    h3: "1.25rem"                # Subsection headings in prose (default: 1.25rem / 20px)
+
 # Image shape for people photos and about section
 imageShape: "rectangular"   # "rectangular" | "circular" | "oval"
 
