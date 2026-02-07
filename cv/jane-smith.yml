@@ -1,0 +1,22 @@
+cv:
+  name: "Jane Smith"
+  location: "City, Country"
+  email: "jane.smith@example.com"
+  website: "https://janesmith.com"
+  sections:
+    education:
+      - institution: "University of Example"
+        area: "Computer Science"
+        degree: "Ph.D."
+        startDate: "2010-09"
+        endDate: "2015-05"
+    experience:
+      - company: "University of Technology"
+        position: "Associate Professor"
+        startDate: "2020-01"
+        endDate: "present"
+    skills:
+      - label: "Languages"
+        details: "Python, TypeScript, C++"
+design:
+  theme: "classic"

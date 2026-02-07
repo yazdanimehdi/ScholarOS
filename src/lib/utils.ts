@@ -83,3 +83,14 @@ export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).replace(/\s+\S*$/, '') + '…';
 }
+
+export function extractGitHubUsername(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'github.com') {
+      const parts = parsed.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+      return parts.length === 1 ? parts[0] : null;
+    }
+  } catch {}
+  return null;
+}

@@ -2,7 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
 import { getCollection } from 'astro:content';
-import { getRoleName } from '../lib/utils';
+import { getRoleName, extractGitHubUsername } from '../lib/utils';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
@@ -28,18 +28,6 @@ const trophyUrl = (theme: string) =>
 
 const lightTheme = 'default';
 const darkTheme = 'github_dark';
-
-// Extract GitHub username from a profile URL like "https://github.com/username"
-function extractGitHubUsername(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    if (parsed.hostname === 'github.com') {
-      const parts = parsed.pathname.replace(/\/$/, '').split('/').filter(Boolean);
-      return parts.length === 1 ? parts[0] : null;
-    }
-  } catch {}
-  return null;
-}
 
 // Get all active people who have a GitHub link
 const members = (await getCollection('people'))

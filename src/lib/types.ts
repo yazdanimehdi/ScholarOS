@@ -147,6 +147,7 @@ export interface SiteConfig {
   cookieConsent?: boolean;
   fonts?: FontsConfig;
   adminPath?: string;
+  adminUsers?: string[];
 }
 
 export interface Publication {

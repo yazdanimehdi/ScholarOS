@@ -3,6 +3,8 @@
 // The is:inline directive prevents Astro from bundling the CDN script as a module
 import { getSiteConfig } from '../lib/config';
 
+const config = getSiteConfig();
+
 export function getStaticPaths() {
   const config = getSiteConfig();
   const adminPath = config.adminPath || 'admin';
@@ -20,6 +22,65 @@ export function getStaticPaths() {
   <style>body { margin: 0; }</style>
 </head>
 <body>
+  <div id="cms-config" data-admin-users={JSON.stringify(config.adminUsers || [])} style="display:none"></div>
   <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script is:inline>
+  (function() {
+    var adminUsers = JSON.parse(
+      document.getElementById('cms-config')?.dataset.adminUsers || '[]'
+    );
+
+    function extractGitHubUsername(url) {
+      try {
+        var p = new URL(url);
+        if (p.hostname === 'github.com') {
+          var parts = p.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+          return parts.length === 1 ? parts[0] : null;
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    function getLoggedInGitHubUser() {
+      try {
+        var s = localStorage.getItem('netlify-cms-user');
+        if (s) return JSON.parse(s).login || null;
+      } catch(e) {}
+      return null;
+    }
+
+    if (window.CMS) {
+      window.CMS.registerEventListener({
+        name: 'preSave',
+        handler: function(args) {
+          var entry = args.entry;
+          if (entry.get('collection') !== 'people') return;
+
+          var loggedInUser = getLoggedInGitHubUser();
+          if (!loggedInUser) {
+            alert('Could not determine your GitHub identity. Please log out and log back in.');
+            throw new Error('Unknown GitHub identity');
+          }
+
+          var lower = loggedInUser.toLowerCase();
+          if (adminUsers.some(function(u) { return u.toLowerCase() === lower; })) return;
+
+          var socials = entry.get('data').get('socials');
+          var ghUrl = socials ? socials.get('github') : null;
+          if (!ghUrl) {
+            alert('This profile has no GitHub link. Only admins can edit it.');
+            throw new Error('No GitHub link on profile');
+          }
+
+          var profileUser = extractGitHubUsername(ghUrl);
+          if (!profileUser || profileUser.toLowerCase() !== lower) {
+            alert('You can only edit your own profile. Your GitHub: @' + loggedInUser);
+            throw new Error('Profile edit not allowed');
+          }
+        }
+      });
+    }
+  })();
+  </script>
 </body>
 </html>

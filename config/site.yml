@@ -2,7 +2,7 @@
 # Edit this file to customize your academic website
 
 # "personal" = individual academic site, "lab" = research group site
-siteMode: "lab"
+siteMode: "personal"
 
 # Language and direction
 lang: "en"             # BCP 47 language tag (e.g. "en", "fa", "ar", "zh")
@@ -135,6 +135,9 @@ seo:
 
 # CMS admin panel path (change this to a custom secret path for security)
 adminPath: "admin"
+
+adminUsers:
+  - "janesmith"
 
 # GDPR cookie consent banner
 cookieConsent: false

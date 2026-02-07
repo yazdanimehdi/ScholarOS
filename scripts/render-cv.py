@@ -24,6 +24,9 @@ CONFIG_PATH = ROOT / "config" / "cv.yml"
 UPLOAD_PATH = ROOT / "config" / "cv-upload.yml"
 OUTPUT_PDF = ROOT / "public" / "cv.pdf"
 METADATA_PATH = ROOT / "src" / "data" / "cv.json"
+PERSON_CV_DIR = ROOT / "cv"
+PERSON_OUTPUT_DIR = ROOT / "public" / "cv"
+PERSON_META_PATH = ROOT / "src" / "data" / "cv-people.json"
 MAX_PDF_SIZE = 10 * 1024 * 1024  # 10 MB limit
 
 
@@ -263,6 +266,68 @@ def write_metadata(pdf_size: int) -> None:
     print(f"Metadata written to {METADATA_PATH}")
 
 
+def render_person_cvs() -> None:
+    """Render per-person CV PDFs from cv/*.yml files."""
+    if not PERSON_CV_DIR.exists():
+        print("No per-person CV directory found, skipping.")
+        return
+
+    yml_files = sorted(PERSON_CV_DIR.glob("*.yml"))
+    # Filter out .gitkeep and other non-CV files
+    yml_files = [f for f in yml_files if f.stem != ".gitkeep"]
+
+    if not yml_files:
+        print("No per-person CV files found, skipping.")
+        return
+
+    PERSON_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    person_meta: dict = {}
+    errors: list[str] = []
+
+    for cv_file in yml_files:
+        person_id = cv_file.stem
+        print(f"\n--- Rendering CV for {person_id} ---")
+
+        try:
+            with open(cv_file, "r") as f:
+                config = yaml.safe_load(f)
+
+            if not config or not config.get("cv"):
+                print(f"WARNING: {cv_file.name} is empty or missing 'cv' section, skipping.")
+                continue
+
+            rendercv_input = build_rendercv_input(config)
+            pdf_path = render_cv(rendercv_input)
+            validate_pdf(pdf_path)
+
+            dest = PERSON_OUTPUT_DIR / f"{person_id}.pdf"
+            shutil.copy2(pdf_path, dest)
+            pdf_size = dest.stat().st_size
+            pdf_path.unlink(missing_ok=True)
+
+            person_meta[person_id] = {
+                "lastGenerated": datetime.now(timezone.utc).isoformat(),
+                "pdfPath": f"/cv/{person_id}.pdf",
+                "pdfSize": pdf_size,
+            }
+
+            print(f"PDF written to {dest} ({pdf_size / 1024:.1f} KB)")
+
+        except Exception as e:
+            print(f"ERROR: Failed to render CV for {person_id}: {e}")
+            errors.append(person_id)
+
+    # Write per-person metadata
+    PERSON_META_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(PERSON_META_PATH, "w") as f:
+        json.dump(person_meta, f, indent=2)
+        f.write("\n")
+
+    print(f"\nPerson CV metadata written to {PERSON_META_PATH}")
+    if errors:
+        print(f"WARNING: Failed to render CVs for: {', '.join(errors)}")
+
+
 def main():
     # Check for raw YAML upload first (takes priority)
     uploaded = load_upload()
@@ -316,6 +381,9 @@ def main():
     write_metadata(pdf_size)
 
     print("\nCV render complete!")
+
+    # Render per-person CVs
+    render_person_cvs()
 
 
 if __name__ == "__main__":

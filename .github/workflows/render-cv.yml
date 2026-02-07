@@ -6,6 +6,7 @@ on:
     paths:
       - 'config/cv.yml'
       - 'config/cv-upload.yml'
+      - 'cv/*.yml'
   workflow_dispatch:
 
 permissions:
@@ -53,8 +54,14 @@ jobs:
           if ! git diff --quiet src/data/cv.json 2>/dev/null; then
             changed=true
           fi
+          if ! git diff --quiet public/cv/ 2>/dev/null; then
+            changed=true
+          fi
+          if ! git diff --quiet src/data/cv-people.json 2>/dev/null; then
+            changed=true
+          fi
           # Check for new untracked files
-          if [ -n "$(git ls-files --others --exclude-standard public/cv.pdf src/data/cv.json)" ]; then
+          if [ -n "$(git ls-files --others --exclude-standard public/cv.pdf src/data/cv.json public/cv/ src/data/cv-people.json)" ]; then
             changed=true
           fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
@@ -64,7 +71,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/cv.pdf src/data/cv.json
+          git add public/cv.pdf src/data/cv.json public/cv/ src/data/cv-people.json || true
           git commit -m "chore: regenerate CV PDF [skip ci]"
           git push
 
