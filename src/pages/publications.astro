@@ -1,0 +1,40 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PublicationFilter from '../components/vue/PublicationFilter.vue';
+import { getCollection } from 'astro:content';
+import { getSiteConfig, isPersonalMode } from '../lib/config';
+
+const config = getSiteConfig();
+const personal = isPersonalMode();
+
+const publications = (await getCollection('publications'))
+  .sort((a, b) => b.data.year - a.data.year);
+
+const pubData = publications.map(p => ({
+  id: p.data.id,
+  title: p.data.title,
+  authors: p.data.authors,
+  venue: p.data.venue,
+  year: p.data.year,
+  doi: p.data.doi,
+  url: p.data.url,
+  bibtex: p.data.bibtex,
+  type: p.data.type,
+  featured: p.data.featured,
+}));
+---
+
+<PageLayout title="Publications" description={personal ? "My published research papers and articles." : "Our published research papers and articles."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Publications</h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-6">
+    {personal
+      ? "Browse my research publications. Use the filters below to search by keyword, year, or type."
+      : "Browse our research publications. Use the filters below to search by keyword, year, or type."}
+  </p>
+
+  <PublicationFilter
+    publications={pubData}
+    highlightAuthors={[config.author]}
+    client:load
+  />
+</PageLayout>

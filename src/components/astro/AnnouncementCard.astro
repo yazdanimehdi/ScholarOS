@@ -1,0 +1,31 @@
+---
+import { formatShortDate } from '../../lib/utils';
+
+interface Props {
+  id: string;
+  title: string;
+  date: Date;
+  category: string;
+  excerpt?: string;
+  pinned?: boolean;
+}
+
+const { id, title, date, category, excerpt, pinned } = Astro.props;
+---
+
+<a href={`/news/${id}`} class="block group py-2">
+  <div class="flex items-start gap-2">
+    <span class="news-bullet shrink-0 mt-1.5 text-sm"></span>
+    <div class="min-w-0">
+      <span class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
+        {title}
+      </span>
+      {pinned && (
+        <span class="ms-1 text-xs text-primary-600 dark:text-accent-400">📌</span>
+      )}
+      <div class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">
+        {formatShortDate(date)}
+      </div>
+    </div>
+  </div>
+</a>

@@ -1,0 +1,27 @@
+# RenderCV Configuration (Phase 4)
+# This file will be used to generate a PDF CV
+
+cv:
+  name: "Prof. Jane Smith"
+  location: "City, Country"
+  email: "jane.smith@example.com"
+  phone: "+1-555-0100"
+  website: "https://example.com"
+
+  sections:
+    education:
+      - institution: "University of Example"
+        area: "Computer Science"
+        degree: "Ph.D."
+        startDate: "2010"
+        endDate: "2015"
+
+    experience:
+      - company: "University of Technology"
+        position: "Associate Professor"
+        startDate: "2020"
+        endDate: "present"
+
+    publications: []
+    awards: []
+    skills: []

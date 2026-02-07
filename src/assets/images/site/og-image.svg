@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#4f46e5"/>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1200" y2="630">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <text x="600" y="280" text-anchor="middle" fill="white" font-family="system-ui" font-size="72" font-weight="bold">Research Lab</text>
+  <text x="600" y="360" text-anchor="middle" fill="#c7d2fe" font-family="system-ui" font-size="32">University of Technology</text>
+</svg>

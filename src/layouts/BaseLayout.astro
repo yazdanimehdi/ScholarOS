@@ -1,0 +1,52 @@
+---
+import BaseHead from '../components/astro/BaseHead.astro';
+import { ClientRouter } from 'astro:transitions';
+import { getSiteConfig } from '../lib/config';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description, ogImage } = Astro.props;
+const config = getSiteConfig();
+const lang = config.lang ?? 'en';
+const dir = config.direction ?? 'ltr';
+const defaultTheme = config.defaultTheme ?? 'system';
+---
+
+<!doctype html>
+<html lang={lang} dir={dir} class="scroll-smooth" data-default-theme={defaultTheme}>
+  <head>
+    <BaseHead title={title} description={description} ogImage={ogImage} />
+    <ClientRouter />
+    <script is:inline>
+      // Apply theme from localStorage or configured default
+      function applyTheme() {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else if (saved === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          // No saved preference — use configured default
+          var d = document.documentElement.getAttribute('data-default-theme') || 'system';
+          if (d === 'dark' || (d === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      }
+      // Apply on initial load
+      applyTheme();
+      // Re-apply after ViewTransitions page swap
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <slot />
+  </body>
+</html>

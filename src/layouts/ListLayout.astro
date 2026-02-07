@@ -1,0 +1,46 @@
+---
+import PageLayout from './PageLayout.astro';
+import SectionHeading from '../components/astro/SectionHeading.astro';
+import Pagination from '../components/astro/Pagination.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  subtitle?: string;
+  currentPage?: number;
+  totalPages?: number;
+  baseUrl?: string;
+}
+
+const {
+  title,
+  description,
+  heading,
+  subtitle,
+  currentPage = 1,
+  totalPages = 1,
+  baseUrl = '',
+} = Astro.props;
+---
+
+<PageLayout title={title} description={description}>
+  <div class="mb-8">
+    <SectionHeading title={heading} />
+    {subtitle && (
+      <p class="mt-2 text-lg text-surface-600 dark:text-surface-300">{subtitle}</p>
+    )}
+  </div>
+
+  <slot />
+
+  {totalPages > 1 && (
+    <div class="mt-12">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl={baseUrl}
+      />
+    </div>
+  )}
+</PageLayout>

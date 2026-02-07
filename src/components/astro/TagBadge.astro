@@ -1,0 +1,22 @@
+---
+interface Props {
+  tag: string;
+  size?: 'sm' | 'md';
+  href?: string;
+}
+
+const { tag, size = 'md', href } = Astro.props;
+const Tag = href ? 'a' : 'span';
+const sizeClass = size === 'sm' ? 'text-xs' : 'text-xs';
+---
+
+<Tag
+  href={href}
+  class:list={[
+    'inline-block font-normal text-surface-500 dark:text-[#8b949e]',
+    sizeClass,
+    href && 'hover:text-primary-600 dark:hover:text-accent-400 transition-colors',
+  ]}
+>
+  #{tag}
+</Tag>

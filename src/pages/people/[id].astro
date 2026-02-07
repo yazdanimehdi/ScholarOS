@@ -1,0 +1,156 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import SocialLinks from '../../components/astro/SocialLinks.astro';
+import SEO from '../../components/astro/SEO.astro';
+import { Image } from 'astro:assets';
+import { getCollection, getEntry, render } from 'astro:content';
+import { getRoleName } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const people = await getCollection('people');
+  return people.map(person => ({
+    params: { id: person.id },
+    props: { person },
+  }));
+}
+
+const { person } = Astro.props;
+const { Content } = await render(person);
+
+const publications = (await getCollection('publications'))
+  .filter(p => p.data.authors.some(a => a.toLowerCase().includes(person.data.name.split(' ')[1]?.toLowerCase() || '')))
+  .sort((a, b) => b.data.year - a.data.year);
+
+const projects = (await getCollection('projects'))
+  .filter(p => p.data.team?.includes(person.id));
+---
+
+<PageLayout title={person.data.name} description={`${person.data.name} - ${getRoleName(person.data.role)}`}>
+  <SEO type="profile" title={person.data.name} />
+
+  <!-- Profile header: Photo + Info side by side -->
+  <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 border-b border-surface-200 dark:border-[#21262d]">
+    <!-- Photo -->
+    <div class="shrink-0">
+      <div class="w-40 h-48 sm:w-44 sm:h-52 overflow-hidden bg-surface-100 dark:bg-[#161b22] rounded">
+        {person.data.photo ? (
+          <Image
+            src={person.data.photo}
+            alt={person.data.name}
+            width={176}
+            height={208}
+            class="w-full h-full object-cover"
+          />
+        ) : (
+          <div class="w-full h-full flex items-center justify-center text-4xl font-light text-surface-300 dark:text-[#30363d] font-serif">
+            {person.data.name.split(' ').map(n => n[0]).join('')}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="flex-1">
+      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-1">
+        {person.data.name}
+      </h1>
+      <p class="text-surface-500 dark:text-[#8b949e] mb-4">
+        {person.data.title || getRoleName(person.data.role)}
+      </p>
+
+      {person.data.email && (
+        <div class="flex items-center gap-2 mb-2 text-sm">
+          <svg class="w-4 h-4 text-surface-400 dark:text-[#484f58]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <a href={`mailto:${person.data.email}`} class="text-primary-600 dark:text-accent-400 hover:underline">
+            {person.data.email}
+          </a>
+        </div>
+      )}
+
+      {person.data.socials && (
+        <div class="flex items-center gap-2 mb-4 text-sm">
+          {Object.entries(person.data.socials).filter(([_, v]) => v).map(([key, value]) => (
+            <a
+              href={value!}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary-600 dark:text-accent-400 hover:underline capitalize"
+            >
+              {key === 'scholar' ? 'Google Scholar' : key.charAt(0).toUpperCase() + key.slice(1)}
+            </a>
+          )).reduce((acc: any[], link: any, i: number) => {
+            if (i > 0) acc.push(<span class="text-surface-300 dark:text-[#30363d]">|</span>);
+            acc.push(link);
+            return acc;
+          }, [])}
+        </div>
+      )}
+
+      {person.data.researchInterests && person.data.researchInterests.length > 0 && (
+        <div>
+          <h3 class="text-sm font-medium text-surface-700 dark:text-[#c9d1d9] mb-1">Research Interests</h3>
+          <ul class="list-disc list-inside text-sm text-surface-600 dark:text-[#8b949e] space-y-0.5">
+            {person.data.researchInterests.map(interest => (
+              <li>{interest}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Bio content -->
+  <div class="prose mb-8">
+    <Content />
+  </div>
+
+  <!-- Selected Publications -->
+  {publications.length > 0 && (
+    <section class="mb-8">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-3">
+        Selected Publications
+      </h2>
+      <ul class="space-y-2">
+        {publications.map(pub => (
+          <li class="text-sm">
+            <a
+              href={pub.data.url || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-primary-600 dark:text-accent-400 hover:underline"
+            >
+              {pub.data.title}
+            </a>
+            <br />
+            <span class="text-surface-500 dark:text-[#8b949e]">
+              {pub.data.authors.join(', ')}, {pub.data.venue}, {pub.data.year}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Projects -->
+  {projects.length > 0 && (
+    <section>
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-3">
+        Projects
+      </h2>
+      <ul class="space-y-1">
+        {projects.map(p => (
+          <li class="text-sm">
+            <a href={`/projects/${p.id}`} class="text-primary-600 dark:text-accent-400 hover:underline">
+              {p.data.title}
+            </a>
+            {p.data.excerpt && (
+              <span class="text-surface-500 dark:text-[#8b949e]"> — {p.data.excerpt}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</PageLayout>

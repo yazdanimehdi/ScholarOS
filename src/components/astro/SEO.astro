@@ -1,0 +1,71 @@
+---
+import { getSiteConfig, isPersonalMode, getSiteName } from '../../lib/config';
+
+interface Props {
+  type?: 'website' | 'article' | 'profile';
+  title: string;
+  description?: string;
+  datePublished?: Date;
+  dateModified?: Date;
+  author?: string;
+}
+
+const config = getSiteConfig();
+const { type = 'website', title, description = config.description, datePublished, dateModified, author } = Astro.props;
+
+const jsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+};
+
+const personal = isPersonalMode();
+
+if (type === 'website') {
+  if (personal) {
+    Object.assign(jsonLd, {
+      '@type': 'Person',
+      name: config.author,
+      jobTitle: config.title,
+      description: config.description,
+      url: config.siteUrl,
+      affiliation: {
+        '@type': 'CollegeOrUniversity',
+        name: config.university,
+      },
+    });
+  } else {
+    Object.assign(jsonLd, {
+      '@type': 'ResearchOrganization',
+      name: config.labName,
+      description: config.description,
+      url: config.siteUrl,
+      parentOrganization: {
+        '@type': 'CollegeOrUniversity',
+        name: config.university,
+      },
+    });
+  }
+} else if (type === 'article') {
+  Object.assign(jsonLd, {
+    '@type': 'ScholarlyArticle',
+    headline: title,
+    description,
+    datePublished: datePublished?.toISOString(),
+    dateModified: dateModified?.toISOString() || datePublished?.toISOString(),
+    author: author ? { '@type': 'Person', name: author } : undefined,
+    publisher: personal
+      ? { '@type': 'Person', name: config.author }
+      : { '@type': 'ResearchOrganization', name: config.labName },
+  });
+} else if (type === 'profile') {
+  Object.assign(jsonLd, {
+    '@type': 'Person',
+    name: title,
+    description,
+    affiliation: personal
+      ? { '@type': 'CollegeOrUniversity', name: config.university }
+      : { '@type': 'ResearchOrganization', name: config.labName },
+  });
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

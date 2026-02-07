@@ -1,0 +1,37 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import ProjectCard from '../../components/astro/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { isPersonalMode } from '../../lib/config';
+
+const personal = isPersonalMode();
+
+const projects = (await getCollection('projects')).sort((a, b) => {
+  const statusOrder = { active: 0, upcoming: 1, completed: 2 };
+  const aOrder = statusOrder[a.data.status as keyof typeof statusOrder] ?? 3;
+  const bOrder = statusOrder[b.data.status as keyof typeof statusOrder] ?? 3;
+  return aOrder - bOrder;
+});
+---
+
+<PageLayout title="Projects" description={personal ? "My research projects, tools, and datasets." : "Our research projects, tools, and datasets."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Projects</h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-6">
+    {personal ? "My research projects, open-source tools, and datasets." : "Explore our research projects, open-source tools, and datasets."}
+  </p>
+
+  <div class="space-y-3">
+    {projects.map(p => (
+      <ProjectCard
+        id={p.id}
+        title={p.data.title}
+        type={p.data.type}
+        status={p.data.status}
+        excerpt={p.data.excerpt}
+        tags={p.data.tags}
+        url={p.data.url}
+        repoUrl={p.data.repoUrl}
+      />
+    ))}
+  </div>
+</PageLayout>

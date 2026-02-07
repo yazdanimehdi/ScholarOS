@@ -1,0 +1,58 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ContactForm from '../components/vue/ContactForm.vue';
+import SocialLinks from '../components/astro/SocialLinks.astro';
+import { getSiteConfig, getSiteName, isPersonalMode } from '../lib/config';
+
+const config = getSiteConfig();
+const siteName = getSiteName();
+const personal = isPersonalMode();
+---
+
+<PageLayout title="Contact" description={personal ? "Get in touch." : "Get in touch with our research lab."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Contact Us</h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8">
+    Have questions about our research or interested in collaboration? Get in touch.
+  </p>
+
+  <div class="grid lg:grid-cols-[1fr_280px] gap-8">
+    <!-- Contact Form -->
+    <div>
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+        Send a Message
+      </h2>
+      <ContactForm client:visible />
+    </div>
+
+    <!-- Contact Info -->
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] mb-2">{personal ? "Contact Information" : "Lab Information"}</h3>
+        <div class="space-y-2 text-sm text-surface-500 dark:text-[#8b949e]">
+          <div>
+            <span class="text-surface-900 dark:text-[#e6edf3]">{siteName}</span><br />
+            {config.department}<br />
+            {config.university}
+          </div>
+          <div>
+            <span class="text-surface-700 dark:text-[#c9d1d9]">Email:</span><br />
+            <a href={`mailto:${config.socials.email}`} class="text-primary-600 dark:text-accent-400 hover:underline">
+              {config.socials.email}
+            </a>
+          </div>
+          <div>
+            <span class="text-surface-700 dark:text-[#c9d1d9]">Address:</span><br />
+            Room 123, CS Building<br />
+            123 University Ave<br />
+            City, State 12345
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-surface-200 dark:border-[#21262d]">
+        <h3 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] mb-2">Follow Us</h3>
+        <SocialLinks socials={config.socials} />
+      </div>
+    </div>
+  </div>
+</PageLayout>

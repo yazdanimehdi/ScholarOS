@@ -1,0 +1,61 @@
+---
+import PageLayout from './PageLayout.astro';
+import Breadcrumb from '../components/astro/Breadcrumb.astro';
+import TableOfContents from '../components/astro/TableOfContents.astro';
+import FormattedDate from '../components/astro/FormattedDate.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  date?: Date;
+  author?: string;
+  tags?: string[];
+  headings?: { depth: number; slug: string; text: string }[];
+}
+
+const { title, description, date, author, tags, headings = [] } = Astro.props;
+const showToc = headings.length > 2;
+---
+
+<PageLayout title={title} description={description}>
+  <Breadcrumb />
+
+  <article class="mt-4">
+    <header class="mb-6 pb-4 border-b border-surface-200 dark:border-[#21262d]">
+      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+        {title}
+      </h1>
+      {description && (
+        <p class="text-surface-500 dark:text-[#8b949e] mb-3">{description}</p>
+      )}
+      <div class="flex flex-wrap items-center gap-3 text-sm text-surface-400 dark:text-[#484f58]">
+        {date && <FormattedDate date={date} />}
+        {author && (
+          <>
+            <span>&middot;</span>
+            <a href={`/people/${author}`} class="text-primary-600 dark:text-accent-400 hover:underline">{author}</a>
+          </>
+        )}
+      </div>
+      {tags && tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mt-3">
+          {tags.map(tag => (
+            <span class="text-xs text-surface-400 dark:text-[#484f58]">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class={showToc ? 'lg:grid lg:grid-cols-[1fr_200px] lg:gap-8' : ''}>
+      <div class="prose">
+        <slot />
+      </div>
+
+      {showToc && (
+        <aside class="hidden lg:block">
+          <TableOfContents headings={headings} />
+        </aside>
+      )}
+    </div>
+  </article>
+</PageLayout>

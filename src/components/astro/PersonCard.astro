@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import SocialLinks from './SocialLinks.astro';
+import { getRoleName } from '../../lib/utils';
+
+interface Props {
+  id: string;
+  name: string;
+  role: string;
+  title?: string;
+  photo?: ImageMetadata;
+  email?: string;
+  socials?: Record<string, string | undefined>;
+  startDate?: Date;
+  showDate?: boolean;
+}
+
+const { id, name, role, title, photo, email, socials, startDate, showDate = false } = Astro.props;
+const displayTitle = title || getRoleName(role);
+---
+
+<a href={`/people/${id}`} class="block text-center group">
+  <!-- Photo -->
+  <div class="w-[140px] h-[170px] mx-auto mb-3 overflow-hidden bg-surface-100 dark:bg-[#161b22]">
+    {photo ? (
+      <Image
+        src={photo}
+        alt={name}
+        width={140}
+        height={170}
+        class="w-full h-full object-cover"
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center text-2xl font-light text-surface-400 dark:text-[#484f58] font-serif">
+        {name.split(' ').map(n => n[0]).join('')}
+      </div>
+    )}
+  </div>
+
+  <!-- Name & title -->
+  <h3 class="font-medium text-sm text-surface-900 dark:text-[#e6edf3] group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
+    {name}
+  </h3>
+  <p class="text-xs text-surface-500 dark:text-[#8b949e] mt-0.5">
+    {displayTitle}
+  </p>
+  {showDate && startDate && (
+    <p class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">
+      {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+    </p>
+  )}
+</a>

@@ -1,0 +1,28 @@
+---
+import { getSiteConfig } from '../../lib/config';
+
+const config = getSiteConfig();
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
+---
+
+<nav class="flex items-center gap-0.5">
+  {config.nav.map((item) => (
+    <a
+      href={item.href}
+      class:list={[
+        'px-2.5 py-1.5 text-sm transition-colors',
+        isActive(item.href)
+          ? 'font-medium text-primary-600 dark:text-accent-400'
+          : 'text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400',
+      ]}
+      aria-current={isActive(item.href) ? 'page' : undefined}
+    >
+      {item.label}
+    </a>
+  ))}
+</nav>

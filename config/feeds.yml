@@ -1,0 +1,14 @@
+# RSS Feed Configuration (Phase 3)
+# Add RSS/Atom feed URLs to aggregate content from lab members
+
+feeds:
+  - name: "Jane Smith's Blog"
+    url: "https://example.com/feed.xml"
+    author: "jane-smith"
+  - name: "Lab Medium Publication"
+    url: "https://medium.com/feed/@example-lab"
+    author: null
+
+# Sync settings
+syncInterval: "daily"
+maxItemsPerFeed: 20

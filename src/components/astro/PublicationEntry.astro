@@ -1,0 +1,105 @@
+---
+interface Props {
+  title: string;
+  authors: string[];
+  venue: string;
+  year: number;
+  doi?: string;
+  url?: string;
+  pdf?: string;
+  bibtex?: string;
+  type: string;
+  featured?: boolean;
+  highlightAuthors?: string[];
+}
+
+const { title, authors, venue, year, doi, url, pdf, bibtex, type, featured, highlightAuthors = [] } = Astro.props;
+
+function isHighlighted(author: string): boolean {
+  return highlightAuthors.some(h =>
+    author.toLowerCase().includes(h.toLowerCase())
+  );
+}
+
+// Short venue abbreviation for badge
+function getVenueAbbr(venue: string): string {
+  const parts = venue.split(' ');
+  if (parts.length === 1) return venue;
+  // Take first word or known abbreviation
+  return parts[0].replace(/[^A-Za-z]/g, '');
+}
+---
+
+<div class="flex gap-3 py-3">
+  <!-- Venue badge -->
+  <div class="shrink-0 pt-0.5">
+    <span class="pub-badge">{getVenueAbbr(venue)}</span>
+  </div>
+
+  <!-- Content -->
+  <div class="flex-1 min-w-0">
+    <h3 class="text-[0.95rem] leading-snug font-medium text-surface-900 dark:text-[#e6edf3]">
+      {url ? (
+        <a href={url} target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
+          {title}
+        </a>
+      ) : title}
+    </h3>
+
+    <p class="mt-1 text-sm text-surface-500 dark:text-[#8b949e]">
+      {authors.map((author, i) => (
+        <>
+          <span class:list={[
+            isHighlighted(author) && 'font-medium text-surface-800 dark:text-[#c9d1d9]'
+          ]}>
+            {author}
+          </span>
+          {i < authors.length - 1 && ', '}
+        </>
+      ))}
+    </p>
+
+    <p class="mt-0.5 text-sm text-surface-500 dark:text-[#8b949e]">
+      {venue}, {year}
+    </p>
+
+    <!-- Action links -->
+    <div class="mt-2 flex flex-wrap gap-1.5">
+      {pdf && (
+        <a href={pdf} target="_blank" rel="noopener noreferrer" class="action-btn">PDF</a>
+      )}
+      {url && (
+        <a href={url} target="_blank" rel="noopener noreferrer" class="action-btn">Paper</a>
+      )}
+      {doi && (
+        <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer" class="action-btn">DOI</a>
+      )}
+      {bibtex && (
+        <button
+          class="action-btn bibtex-copy"
+          data-bibtex={bibtex}
+          title="Copy BibTeX"
+        >
+          <span class="bibtex-label">BibTeX</span>
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.bibtex-copy') as HTMLElement | null;
+    if (!btn) return;
+    const bibtex = btn.getAttribute('data-bibtex');
+    if (bibtex) {
+      navigator.clipboard.writeText(bibtex).then(() => {
+        const label = btn.querySelector('.bibtex-label');
+        if (label) label.textContent = 'Copied!';
+        setTimeout(() => {
+          if (label) label.textContent = 'BibTeX';
+        }, 2000);
+      });
+    }
+  });
+</script>

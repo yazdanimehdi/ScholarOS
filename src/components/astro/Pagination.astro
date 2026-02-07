@@ -1,0 +1,58 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+function getPageUrl(page: number): string {
+  if (page === 1) return baseUrl || '/';
+  return `${baseUrl}/${page}`;
+}
+
+function getPageNumbers(): (number | '...')[] {
+  const pages: (number | '...')[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (currentPage > 3) pages.push('...');
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      pages.push(i);
+    }
+    if (currentPage < totalPages - 2) pages.push('...');
+    pages.push(totalPages);
+  }
+  return pages;
+}
+---
+
+<nav aria-label="Pagination" class="flex items-center justify-center gap-1 text-sm">
+  {currentPage > 1 ? (
+    <a href={getPageUrl(currentPage - 1)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400 transition-colors">
+      ← Previous
+    </a>
+  ) : (
+    <span class="px-3 py-1.5 text-surface-300 dark:text-[#30363d]">← Previous</span>
+  )}
+
+  {getPageNumbers().map(page =>
+    page === '...' ? (
+      <span class="px-2 py-1.5 text-surface-400">...</span>
+    ) : page === currentPage ? (
+      <span class="px-3 py-1.5 font-medium text-primary-600 dark:text-accent-400 border-b-2 border-primary-600 dark:border-accent-400" aria-current="page">{page}</span>
+    ) : (
+      <a href={getPageUrl(page)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400 transition-colors">{page}</a>
+    )
+  )}
+
+  {currentPage < totalPages ? (
+    <a href={getPageUrl(currentPage + 1)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400 transition-colors">
+      Next →
+    </a>
+  ) : (
+    <span class="px-3 py-1.5 text-surface-300 dark:text-[#30363d]">Next →</span>
+  )}
+</nav>

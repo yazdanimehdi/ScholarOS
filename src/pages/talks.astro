@@ -1,0 +1,93 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { isPersonalMode } from '../lib/config';
+
+const personal = isPersonalMode();
+
+const talks = [
+  {
+    title: 'Adaptive Fine-Tuning for Low-Resource NLP',
+    event: 'EMNLP 2024',
+    date: 'November 2024',
+    location: 'Miami, FL',
+    type: 'Conference Talk',
+    slidesUrl: '#',
+    videoUrl: '#',
+  },
+  {
+    title: 'Building Fair Multilingual Language Models',
+    event: 'ACL 2024',
+    date: 'August 2024',
+    location: 'Bangkok, Thailand',
+    type: 'Invited Talk',
+    slidesUrl: '#',
+  },
+  {
+    title: 'The Future of Human-AI Collaboration',
+    event: 'University Seminar Series',
+    date: 'March 2024',
+    location: 'Virtual',
+    type: 'Seminar',
+    videoUrl: '#',
+  },
+  {
+    title: 'Open-Source Tools for NLP Research',
+    event: 'PyData Conference',
+    date: 'January 2024',
+    location: 'New York, NY',
+    type: 'Tutorial',
+    slidesUrl: '#',
+    videoUrl: '#',
+  },
+];
+---
+
+<PageLayout title="Talks & Presentations" description={personal ? "Recent talks, invited lectures, and tutorials." : "Recent talks, presentations, and tutorials by our lab members."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Talks & Presentations</h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-6">
+    {personal ? "Recent talks, invited lectures, and tutorials." : "Recent talks, invited lectures, and tutorials by our lab members."}
+  </p>
+
+  <div class="divide-y divide-surface-100 dark:divide-[#21262d]">
+    {talks.map(talk => (
+      <div class="py-4 first:pt-0">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs text-surface-400 dark:text-[#484f58] uppercase tracking-wide">
+                {talk.type}
+              </span>
+            </div>
+            <h3 class="text-base font-medium text-surface-900 dark:text-[#e6edf3] mb-0.5">{talk.title}</h3>
+            <p class="text-sm text-surface-500 dark:text-[#8b949e]">
+              {talk.event} &middot; {talk.location}
+            </p>
+            <p class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">{talk.date}</p>
+          </div>
+
+          <div class="flex gap-2 shrink-0 text-xs">
+            {talk.slidesUrl && (
+              <a
+                href={talk.slidesUrl}
+                class="text-primary-600 dark:text-accent-400 hover:underline"
+              >
+                Slides
+              </a>
+            )}
+            {talk.slidesUrl && talk.videoUrl && (
+              <span class="text-surface-300 dark:text-[#30363d]">|</span>
+            )}
+            {talk.videoUrl && (
+              <a
+                href={talk.videoUrl}
+                class="text-primary-600 dark:text-accent-400 hover:underline"
+              >
+                Video
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</PageLayout>

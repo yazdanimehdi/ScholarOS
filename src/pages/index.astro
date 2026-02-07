@@ -1,0 +1,121 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import HeroSection from '../components/astro/HeroSection.astro';
+import SectionHeading from '../components/astro/SectionHeading.astro';
+import AnnouncementCard from '../components/astro/AnnouncementCard.astro';
+import PublicationEntry from '../components/astro/PublicationEntry.astro';
+import PostCard from '../components/astro/PostCard.astro';
+import FeedItem from '../components/astro/FeedItem.astro';
+import SEO from '../components/astro/SEO.astro';
+import { getCollection } from 'astro:content';
+import { getSiteConfig, getSiteName, isPersonalMode } from '../lib/config';
+
+const config = getSiteConfig();
+const personal = isPersonalMode();
+const siteName = getSiteName();
+
+const announcements = (await getCollection('announcements'))
+  .sort((a, b) => {
+    if (a.data.pinned && !b.data.pinned) return -1;
+    if (!a.data.pinned && b.data.pinned) return 1;
+    return b.data.date.getTime() - a.data.date.getTime();
+  })
+  .slice(0, 4);
+
+const publications = (await getCollection('publications'))
+  .sort((a, b) => b.data.year - a.data.year)
+  .slice(0, 4);
+
+const posts = (await getCollection('posts'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const feeds = (await getCollection('feeds'))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 2);
+---
+
+<PageLayout title={config.title} fullWidth>
+  <SEO type="website" title={config.title} />
+
+  <HeroSection
+    title={siteName}
+    subtitle={config.description}
+    ctaText={personal ? "View Publications" : "Explore Research"}
+    ctaHref={personal ? "/publications" : "/research"}
+    secondaryCtaText={personal ? "Download CV" : "Join the Lab"}
+    secondaryCtaHref={personal ? "/cv" : "/join"}
+  />
+
+  <!-- Three-column section: News / Publications / Blog -->
+  <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Latest Announcements -->
+      <div>
+        <SectionHeading title={personal ? "Recent Updates" : "Latest Announcements"} viewAllHref="/news" />
+        <div class="mt-3 space-y-0">
+          {announcements.map(a => (
+            <AnnouncementCard
+              id={a.id}
+              title={a.data.title}
+              date={a.data.date}
+              category={a.data.category}
+              excerpt={a.data.excerpt}
+              pinned={a.data.pinned}
+            />
+          ))}
+        </div>
+      </div>
+
+      <!-- Recent Publications -->
+      <div>
+        <SectionHeading title={personal ? "Latest Publications" : "Recent Publications"} viewAllHref="/publications" />
+        <div class="mt-3 divide-y divide-surface-100 dark:divide-[#21262d]">
+          {publications.map(pub => (
+            <div class="py-2">
+              <a href={pub.data.url || '#'} target="_blank" rel="noopener noreferrer" class="block group">
+                <h4 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug line-clamp-2">
+                  {pub.data.title}
+                </h4>
+                <p class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">
+                  {pub.data.venue}, {pub.data.year}
+                </p>
+                <div class="flex gap-1.5 mt-1">
+                  {pub.data.url && <span class="text-xs text-primary-600 dark:text-accent-400">PDF</span>}
+                  {pub.data.bibtex && <span class="text-xs text-surface-400 dark:text-[#484f58]">| BibTeX</span>}
+                </div>
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- From Our Blog -->
+      <div>
+        <SectionHeading title={personal ? "Recent Posts" : "From Our Blog"} viewAllHref="/blog" />
+        <div class="mt-3">
+          {posts.map(post => (
+            <PostCard
+              id={post.id}
+              title={post.data.title}
+              date={post.data.date}
+              excerpt={post.data.excerpt}
+              tags={post.data.tags}
+              author={post.data.author}
+            />
+          ))}
+          {feeds.slice(0, 1).map(feed => (
+            <FeedItem
+              title={feed.data.title}
+              link={feed.data.link}
+              date={feed.data.date}
+              source={feed.data.source}
+              excerpt={feed.data.excerpt}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</PageLayout>

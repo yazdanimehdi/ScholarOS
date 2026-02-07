@@ -1,0 +1,107 @@
+# Site Configuration
+# Edit this file to customize your academic website
+
+# "personal" = individual academic site, "lab" = research group site
+siteMode: "lab"
+
+# Language and direction
+lang: "en"             # BCP 47 language tag (e.g. "en", "fa", "ar", "zh")
+direction: "ltr"       # "ltr" (left-to-right) or "rtl" (right-to-left)
+
+# Default theme when no user preference is saved
+defaultTheme: "light"  # "light" | "dark" | "system"
+
+# Top bar (thin bar above header)
+topBar:
+  enabled: true
+  text: "Department of Computer Science, University of Technology"
+  links:
+    - label: "Apply Now"
+      href: "/positions"
+    - label: "Campus Map"
+      href: "https://university.edu/map"
+      external: true
+
+# Hero background configuration
+hero:
+  type: "animation"  # "image" | "video" | "pattern" | "animation" | "none"
+  light:
+    bgColor: "#ffffff"
+    bgImage: ""           # e.g. "/images/hero-light.jpg"
+  dark:
+    bgColor: "#0d1117"
+    bgImage: ""           # e.g. "/images/hero-dark.jpg"
+  video:
+    src: "/videos/hero-bg.mp4"
+    poster: "/images/hero-poster.jpg"
+  pattern:
+    name: "dots"          # "dots" | "grid" | "waves" | "diagonal" | "hexagons"
+  animation:
+    preset: "particles"   # "particles" | "gradient-morph" | "geometric" | "wave-lines" | "custom"
+    customScript: ""      # path to JS file in /public (when preset: "custom")
+
+title: "Research Lab"
+description: "Welcome to our research lab. We explore cutting-edge topics in computer science and artificial intelligence."
+author: "Prof. Jane Smith"
+labName: "Smith Research Lab"
+university: "University of Technology"
+department: "Department of Computer Science"
+siteUrl: "https://example.com"
+
+# Navigation items
+nav:
+  - label: "Home"
+    href: "/"
+  - label: "Research"
+    href: "/research"
+  - label: "People"
+    href: "/people"
+  - label: "Publications"
+    href: "/publications"
+  - label: "Projects"
+    href: "/projects"
+  - label: "News"
+    href: "/news"
+  - label: "Blog"
+    href: "/blog"
+  - label: "Positions"
+    href: "/positions"
+  - label: "Contact"
+    href: "/contact"
+
+# Social links
+socials:
+  email: "lab@example.com"
+  github: "https://github.com/example-lab"
+  scholar: "https://scholar.google.com/citations?user=EXAMPLE"
+  twitter: "https://twitter.com/example_lab"
+  linkedin: "https://linkedin.com/company/example-lab"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+
+# Footer
+footer:
+  text: "Built with Astro"
+  links:
+    - label: "Privacy"
+      href: "/privacy"
+    - label: "Sitemap"
+      href: "/sitemap-index.xml"
+
+# --- Personal mode example ---
+# siteMode: "personal"
+# title: "Jane Smith"
+# description: "Associate Professor of Computer Science at University of Technology. My research focuses on NLP, multimodal learning, and AI safety."
+# author: "Jane Smith"
+# nav:
+#   - label: "Home"
+#     href: "/"
+#   - label: "Research"
+#     href: "/research"
+#   - label: "Publications"
+#     href: "/publications"
+#   - label: "CV"
+#     href: "/cv"
+#   - label: "Blog"
+#     href: "/blog"
+#   - label: "Contact"
+#     href: "/contact"

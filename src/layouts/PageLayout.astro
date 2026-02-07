@@ -1,0 +1,32 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TopBar from '../components/astro/TopBar.astro';
+import Header from '../components/astro/Header.astro';
+import Footer from '../components/astro/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  fullWidth?: boolean;
+}
+
+const { title, description, ogImage, fullWidth = false } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage}>
+  <div class="sticky top-0 z-40">
+    <TopBar />
+    <Header />
+  </div>
+  <main id="main-content" class="flex-1">
+    {fullWidth ? (
+      <slot />
+    ) : (
+      <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-8">
+        <slot />
+      </div>
+    )}
+  </main>
+  <Footer />
+</BaseLayout>

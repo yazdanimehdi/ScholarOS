@@ -1,0 +1,78 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getSiteConfig, isPersonalMode } from '../lib/config';
+
+const config = getSiteConfig();
+const personal = isPersonalMode();
+---
+
+<PageLayout title={personal ? "Prospective Students" : "Join Us"} description={personal ? "Interested in working with me? See open positions and opportunities." : "Open positions and opportunities to join our research lab."}>
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">{personal ? "Prospective Students" : "Join Our Lab"}</h1>
+  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8 max-w-2xl">
+    {personal
+      ? "Interested in working with me? I'm always looking for talented and motivated students and collaborators."
+      : "We're always looking for talented and motivated researchers to join our team."}
+  </p>
+
+  <!-- Lab Culture -->
+  <section class="mb-10">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      {personal ? "Working With Me" : "Our Culture"}
+    </h2>
+    <div class="grid sm:grid-cols-3 gap-6">
+      {[
+        { title: 'Rigorous Research', desc: 'We pursue high-impact research with scientific rigor and intellectual honesty.' },
+        { title: 'Collaborative Spirit', desc: 'We believe the best research comes from diverse perspectives and open collaboration.' },
+        { title: 'Growth & Mentorship', desc: 'We invest in the development of every team member through mentorship and support.' },
+      ].map(item => (
+        <div>
+          <h3 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] mb-1">{item.title}</h3>
+          <p class="text-sm text-surface-500 dark:text-[#8b949e]">{item.desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Open Positions Link -->
+  <section class="mb-10">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      Open Positions
+    </h2>
+    <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-3">
+      {personal
+        ? "I have several open positions for students and researchers at various levels."
+        : "We have several open positions for researchers at various levels."}
+    </p>
+    <a
+      href="/positions"
+      class="inline-flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-accent-400 hover:underline"
+    >
+      View all positions and apply
+      <span aria-hidden="true">&rarr;</span>
+    </a>
+  </section>
+
+  <!-- How to Apply -->
+  <section>
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      How to Apply
+    </h2>
+    <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-3">
+      {personal ? "To apply, please visit the" : "To apply for a position in our lab, please visit the"}{' '}
+      <a href="/positions" class="text-primary-600 dark:text-accent-400 hover:underline">positions page</a>{' '}
+      and use the application form on the relevant position, or send the following materials to{' '}
+      <a href={`mailto:${config.socials.email}`} class="text-primary-600 dark:text-accent-400 hover:underline">
+        {config.socials.email}
+      </a>:
+    </p>
+    <ol class="list-decimal list-inside text-sm text-surface-500 dark:text-[#8b949e] space-y-1.5 mb-4">
+      <li>Your CV/resume</li>
+      <li>A brief statement of research interests (1-2 paragraphs)</li>
+      <li>Relevant publications or writing samples (if available)</li>
+      <li>Names and contact information for 2-3 references</li>
+    </ol>
+    <p class="text-xs text-surface-400 dark:text-[#484f58]">
+      Please use the subject line: <code class="bg-surface-100 dark:bg-[#161b22] px-1.5 py-0.5 rounded text-xs font-mono">[Position Type] Application - Your Name</code>
+    </p>
+  </section>
+</PageLayout>

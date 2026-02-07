@@ -1,0 +1,561 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Academic Navy - Primary accent (al-folio inspired) */
+  --color-primary-50: #eff3fb;
+  --color-primary-100: #dae3f5;
+  --color-primary-200: #b8c9eb;
+  --color-primary-300: #8ba8dd;
+  --color-primary-400: #6389cd;
+  --color-primary-500: #456eb5;
+  --color-primary-600: #2c5282;
+  --color-primary-700: #244578;
+  --color-primary-800: #1e3a5f;
+  --color-primary-900: #192f4d;
+  --color-primary-950: #101d30;
+
+  /* Teal accent for dark mode links & highlights */
+  --color-accent-50: #ecfeff;
+  --color-accent-100: #cffafe;
+  --color-accent-200: #a5f3fc;
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0891b2;
+  --color-accent-700: #0e7490;
+  --color-accent-800: #155e75;
+  --color-accent-900: #164e63;
+  --color-accent-950: #083344;
+
+  /* Neutral surface colors */
+  --color-surface-50: #f9fafb;
+  --color-surface-100: #f3f4f6;
+  --color-surface-200: #e5e7eb;
+  --color-surface-300: #d1d5db;
+  --color-surface-400: #9ca3af;
+  --color-surface-500: #6b7280;
+  --color-surface-600: #4b5563;
+  --color-surface-700: #374151;
+  --color-surface-800: #1f2937;
+  --color-surface-900: #111827;
+  --color-surface-950: #030712;
+
+  /* Font families */
+  --font-sans: "Roboto", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Roboto Slab", ui-serif, Georgia, serif;
+  --font-mono: "Roboto Mono", ui-monospace, monospace;
+}
+
+/* ===== Base styles ===== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #fff;
+    color: var(--color-surface-800);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  /* ===== Dark mode ===== */
+  html.dark body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+  }
+
+  /* ===== Typography ===== */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    color: var(--color-surface-900);
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  html.dark h1,
+  html.dark h2,
+  html.dark h3,
+  html.dark h4,
+  html.dark h5,
+  html.dark h6 {
+    color: #e6edf3;
+  }
+
+  a {
+    color: var(--color-primary-600);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  a:hover {
+    color: var(--color-primary-800);
+  }
+
+  html.dark a {
+    color: var(--color-accent-400);
+  }
+
+  html.dark a:hover {
+    color: var(--color-accent-300);
+  }
+
+  /* ===== Horizontal rules ===== */
+  hr {
+    border: none;
+    border-top: 1px solid var(--color-surface-200);
+    margin: 1.5rem 0;
+  }
+
+  html.dark hr {
+    border-top-color: #21262d;
+  }
+}
+
+/* ===== Prose (markdown content) ===== */
+@layer components {
+.prose {
+  max-width: none;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.prose h1 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-surface-900);
+}
+
+.prose h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-surface-900);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--color-surface-200);
+}
+
+.prose h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-surface-900);
+}
+
+.prose p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-surface-700);
+}
+
+.prose a {
+  color: var(--color-primary-600);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--color-primary-300);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.prose a:hover {
+  border-bottom-style: solid;
+  color: var(--color-primary-700);
+}
+
+.prose ul {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-inline-start: 1.25rem;
+  list-style-type: disc;
+}
+
+.prose ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-inline-start: 1.25rem;
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  color: var(--color-surface-700);
+}
+
+.prose blockquote {
+  border-inline-start: 3px solid var(--color-primary-400);
+  padding-inline-start: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--color-surface-500);
+}
+
+.prose code {
+  background-color: var(--color-surface-100);
+  color: var(--color-primary-700);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  font-size: 0.875em;
+  font-family: var(--font-mono);
+}
+
+.prose pre {
+  background-color: var(--color-surface-900);
+  color: var(--color-surface-100);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.prose pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.prose img {
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.prose hr {
+  margin: 2rem 0;
+  border-top-color: var(--color-surface-200);
+}
+
+.prose table {
+  width: 100%;
+  margin: 1.5rem 0;
+  font-size: 0.925rem;
+  border-collapse: collapse;
+}
+
+.prose th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--color-surface-300);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-surface-600);
+}
+
+.prose td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-surface-200);
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--color-surface-900);
+}
+
+/* Dark mode prose */
+html.dark .prose h1,
+html.dark .prose h2,
+html.dark .prose h3 {
+  color: #e6edf3;
+}
+
+html.dark .prose h2 {
+  border-bottom-color: #21262d;
+}
+
+html.dark .prose p,
+html.dark .prose li {
+  color: #c9d1d9;
+}
+
+html.dark .prose strong {
+  color: #e6edf3;
+}
+
+html.dark .prose a {
+  color: var(--color-accent-400);
+  border-bottom-color: var(--color-accent-800);
+}
+
+html.dark .prose a:hover {
+  color: var(--color-accent-300);
+}
+
+html.dark .prose blockquote {
+  color: #8b949e;
+  border-inline-start-color: var(--color-accent-700);
+}
+
+html.dark .prose code {
+  background-color: #161b22;
+  color: var(--color-accent-300);
+}
+
+html.dark .prose pre {
+  background-color: #161b22;
+}
+
+html.dark .prose hr {
+  border-top-color: #21262d;
+}
+
+html.dark .prose th {
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+html.dark .prose td {
+  border-color: #21262d;
+}
+} /* end @layer components for prose */
+
+@layer components {
+/* ===== Skip link ===== */
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.skip-link:focus {
+  position: fixed;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  top: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 50;
+  background-color: var(--color-primary-600);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+/* ===== Focus ===== */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+html.dark :focus-visible {
+  outline-color: var(--color-accent-500);
+}
+
+/* ===== Section dividers ===== */
+.section-divider {
+  border-top: 1px solid var(--color-surface-200);
+  margin: 2rem 0;
+}
+
+html.dark .section-divider {
+  border-top-color: #21262d;
+}
+
+/* ===== Publication badge (venue abbreviation) ===== */
+.pub-badge {
+  display: inline-block;
+  min-width: 60px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
+  background-color: var(--color-primary-600);
+  color: white;
+}
+
+html.dark .pub-badge {
+  background-color: var(--color-accent-700);
+}
+
+/* ===== Dark mode hero with cosmic bg ===== */
+.hero-cosmic {
+  position: relative;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a2332 60%, #0d1117 100%);
+}
+
+.hero-cosmic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 15% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.25) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ===== Action link buttons (PDF, Code, BibTeX) ===== */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--color-surface-300);
+  border-radius: 3px;
+  color: var(--color-surface-600);
+  background: transparent;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  background: transparent;
+}
+
+html.dark .action-btn {
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+html.dark .action-btn:hover {
+  color: var(--color-accent-400);
+  border-color: var(--color-accent-500);
+}
+
+/* ===== News item bullet ===== */
+.news-bullet::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary-600);
+  margin-inline-end: 0.5rem;
+  vertical-align: middle;
+}
+
+html.dark .news-bullet::before {
+  background-color: var(--color-accent-500);
+}
+
+/* ===== Hero CSS patterns ===== */
+.hero-pattern {
+  pointer-events: none;
+}
+
+/* Dots */
+.hero-pattern--dots {
+  background-image: radial-gradient(circle, var(--color-surface-300) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+html.dark .hero-pattern--dots {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+}
+
+/* Grid */
+.hero-pattern--grid {
+  background-image:
+    linear-gradient(var(--color-surface-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-surface-200) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+html.dark .hero-pattern--grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+}
+
+/* Waves */
+.hero-pattern--waves {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      var(--color-surface-200) 30px,
+      var(--color-surface-200) 31px
+    );
+  background-size: 100% 60px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'%3E%3Cpath d='M0,30 Q50,0 100,30 Q150,60 200,30 L200,60 L0,60Z' fill='white'/%3E%3C/svg%3E");
+  mask-size: 200px 60px;
+  mask-repeat: repeat;
+}
+
+html.dark .hero-pattern--waves {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      rgba(255,255,255,0.06) 30px,
+      rgba(255,255,255,0.06) 31px
+    );
+}
+
+/* Diagonal */
+.hero-pattern--diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    var(--color-surface-200) 10px,
+    var(--color-surface-200) 11px
+  );
+}
+
+html.dark .hero-pattern--diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255,255,255,0.06) 10px,
+    rgba(255,255,255,0.06) 11px
+  );
+}
+
+/* Hexagons */
+.hero-pattern--hexagons {
+  background-color: transparent;
+  background-image:
+    linear-gradient(30deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
+    linear-gradient(150deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
+    linear-gradient(30deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
+    linear-gradient(150deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
+    linear-gradient(60deg, var(--color-surface-100) 25%, transparent 25.5%, transparent 75%, var(--color-surface-100) 75%, var(--color-surface-100)),
+    linear-gradient(60deg, var(--color-surface-100) 25%, transparent 25.5%, transparent 75%, var(--color-surface-100) 75%, var(--color-surface-100));
+  background-size: 40px 70px;
+  background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+}
+
+html.dark .hero-pattern--hexagons {
+  background-image:
+    linear-gradient(30deg, rgba(255,255,255,0.06) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.06) 87.5%, rgba(255,255,255,0.06)),
+    linear-gradient(150deg, rgba(255,255,255,0.06) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.06) 87.5%, rgba(255,255,255,0.06)),
+    linear-gradient(30deg, rgba(255,255,255,0.06) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.06) 87.5%, rgba(255,255,255,0.06)),
+    linear-gradient(150deg, rgba(255,255,255,0.06) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.06) 87.5%, rgba(255,255,255,0.06)),
+    linear-gradient(60deg, rgba(255,255,255,0.03) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.03) 75%, rgba(255,255,255,0.03)),
+    linear-gradient(60deg, rgba(255,255,255,0.03) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.03) 75%, rgba(255,255,255,0.03));
+}
+} /* end @layer components */

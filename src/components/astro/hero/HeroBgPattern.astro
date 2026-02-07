@@ -1,0 +1,18 @@
+---
+import type { HeroPatternName, HeroModeConfig } from '../../../lib/types';
+
+interface Props {
+  name: HeroPatternName;
+  light: HeroModeConfig;
+  dark: HeroModeConfig;
+}
+
+const { name, light, dark } = Astro.props;
+---
+
+{/* Light mode base color */}
+<div class="absolute inset-0 dark:hidden" style={`background-color: ${light.bgColor};`}></div>
+{/* Dark mode base color */}
+<div class="absolute inset-0 hidden dark:block" style={`background-color: ${dark.bgColor};`}></div>
+{/* Pattern overlay */}
+<div class={`absolute inset-0 hero-pattern hero-pattern--${name}`}></div>

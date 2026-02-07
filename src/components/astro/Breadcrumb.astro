@@ -1,0 +1,38 @@
+---
+const path = Astro.url.pathname;
+const segments = path.split('/').filter(Boolean);
+
+interface Crumb {
+  label: string;
+  href: string;
+  current: boolean;
+}
+
+const crumbs: Crumb[] = [
+  { label: 'Home', href: '/', current: false },
+  ...segments.map((seg, i) => ({
+    label: seg
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase()),
+    href: '/' + segments.slice(0, i + 1).join('/'),
+    current: i === segments.length - 1,
+  })),
+];
+---
+
+{crumbs.length > 1 && (
+  <nav aria-label="Breadcrumb" class="text-sm text-surface-400 dark:text-[#484f58]">
+    <ol class="flex items-center gap-1">
+      {crumbs.map((crumb, i) => (
+        <li class="flex items-center gap-1">
+          {i > 0 && <span>/</span>}
+          {crumb.current ? (
+            <span class="text-surface-600 dark:text-[#8b949e]" aria-current="page">{crumb.label}</span>
+          ) : (
+            <a href={crumb.href} class="hover:text-primary-600 dark:hover:text-accent-400 transition-colors">{crumb.label}</a>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

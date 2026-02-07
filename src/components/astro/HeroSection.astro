@@ -1,0 +1,95 @@
+---
+import { getSiteConfig } from '../../lib/config';
+import HeroBgImage from './hero/HeroBgImage.astro';
+import HeroBgVideo from './hero/HeroBgVideo.astro';
+import HeroBgPattern from './hero/HeroBgPattern.astro';
+import HeroBgAnimation from '../vue/HeroBgAnimation.vue';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  secondaryCtaText?: string;
+  secondaryCtaHref?: string;
+}
+
+const { title, subtitle, ctaText, ctaHref, secondaryCtaText, secondaryCtaHref } = Astro.props;
+
+const config = getSiteConfig();
+const hero = config.hero ?? {
+  type: 'none' as const,
+  light: { bgColor: '#ffffff' },
+  dark: { bgColor: '#0d1117' },
+};
+
+const lightBg = hero.light?.bgColor ?? '#ffffff';
+const darkBg = hero.dark?.bgColor ?? '#0d1117';
+---
+
+<section
+  class="relative overflow-hidden border-b border-surface-200 dark:border-[#21262d]"
+  style={`--hero-bg-light: ${lightBg}; --hero-bg-dark: ${darkBg};`}
+>
+  {/* Background layer */}
+  <div class="absolute inset-0 z-0">
+    {hero.type === 'none' && (
+      <>
+        <div class="absolute inset-0 dark:hidden" style={`background-color: ${lightBg};`}></div>
+        <div class="absolute inset-0 hidden dark:block" style={`background-color: ${darkBg};`}></div>
+      </>
+    )}
+
+    {hero.type === 'image' && (
+      <HeroBgImage light={hero.light} dark={hero.dark} />
+    )}
+
+    {hero.type === 'video' && hero.video && (
+      <HeroBgVideo video={hero.video} />
+    )}
+
+    {hero.type === 'pattern' && hero.pattern && (
+      <HeroBgPattern name={hero.pattern.name} light={hero.light} dark={hero.dark} />
+    )}
+
+    {hero.type === 'animation' && hero.animation && (
+      <HeroBgAnimation
+        client:load
+        preset={hero.animation.preset}
+        customScript={hero.animation.customScript || undefined}
+        lightBgColor={lightBg}
+        darkBgColor={darkBg}
+      />
+    )}
+  </div>
+
+  {/* Foreground content */}
+  <div class="relative z-10 max-w-[930px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <h1 class="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-normal text-surface-900 dark:text-[#e6edf3] leading-tight mb-4">
+      {title}
+    </h1>
+    {subtitle && (
+      <p class="text-base sm:text-lg text-surface-500 dark:text-[#8b949e] mb-6 max-w-2xl leading-relaxed">
+        {subtitle}
+      </p>
+    )}
+    <div class="flex flex-wrap gap-3">
+      {ctaText && ctaHref && (
+        <a
+          href={ctaHref}
+          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-primary-600 dark:bg-accent-600 text-white hover:bg-primary-700 dark:hover:bg-accent-500 transition-colors"
+        >
+          {ctaText}
+        </a>
+      )}
+      {secondaryCtaText && secondaryCtaHref && (
+        <a
+          href={secondaryCtaHref}
+          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded border border-surface-300 dark:border-[#30363d] text-surface-700 dark:text-[#c9d1d9] hover:border-surface-400 dark:hover:border-[#8b949e] hover:text-surface-900 dark:hover:text-white transition-colors"
+        >
+          {secondaryCtaText}
+        </a>
+      )}
+    </div>
+  </div>
+</section>

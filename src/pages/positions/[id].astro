@@ -1,0 +1,114 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Breadcrumb from '../../components/astro/Breadcrumb.astro';
+import TagBadge from '../../components/astro/TagBadge.astro';
+import ApplicationForm from '../../components/vue/ApplicationForm.vue';
+import { getCollection, render } from 'astro:content';
+import { getSiteConfig } from '../../lib/config';
+
+export async function getStaticPaths() {
+  const positions = await getCollection('positions');
+  return positions.map(position => ({
+    params: { id: position.id },
+    props: { position },
+  }));
+}
+
+const { position } = Astro.props;
+const { Content } = await render(position);
+const config = getSiteConfig();
+
+const contactEmail = position.data.contact || config.socials.email || '';
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatType(type: string): string {
+  const labels: Record<string, string> = {
+    phd: 'PhD',
+    postdoc: 'Postdoc',
+    masters: 'Masters',
+    undergrad: 'Undergrad',
+    'research-assistant': 'Research Assistant',
+    visiting: 'Visiting',
+    other: 'Other',
+  };
+  return labels[type] || type;
+}
+---
+
+<PageLayout title={position.data.title} description={position.data.excerpt}>
+  <Breadcrumb />
+
+  <div class="mt-4">
+    <!-- Status & type badges -->
+    <div class="flex items-center gap-2 mb-3 text-xs">
+      <span class:list={[
+        'px-2 py-0.5 rounded',
+        position.data.status === 'open'
+          ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+          : 'bg-surface-100 text-surface-500 dark:bg-[#161b22] dark:text-[#8b949e]',
+      ]}>
+        {position.data.status === 'open' ? 'Open' : 'Closed'}
+      </span>
+      <span class="px-2 py-0.5 rounded bg-surface-100 text-surface-600 dark:bg-[#161b22] dark:text-[#8b949e]">
+        {formatType(position.data.type)}
+      </span>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+      {position.data.title}
+    </h1>
+
+    {position.data.excerpt && (
+      <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-4">{position.data.excerpt}</p>
+    )}
+
+    <!-- Deadline -->
+    {position.data.deadline && (
+      <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-4">
+        <span class="font-medium text-surface-700 dark:text-[#c9d1d9]">Application Deadline:</span>{' '}
+        {formatDate(position.data.deadline)}
+      </p>
+    )}
+
+    <!-- Tags -->
+    {position.data.tags && position.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-6">
+        {position.data.tags.map(tag => (
+          <TagBadge tag={tag} />
+        ))}
+      </div>
+    )}
+
+    <!-- Content -->
+    <div class="prose mb-8">
+      <Content />
+    </div>
+
+    <!-- Application Form (only for open positions) -->
+    {position.data.status === 'open' && (
+      <section class="pt-6 border-t border-surface-200 dark:border-[#21262d]">
+        <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-4">Apply for This Position</h2>
+        <ApplicationForm
+          client:visible
+          positionTitle={position.data.title}
+          contactEmail={contactEmail}
+        />
+      </section>
+    )}
+
+    <!-- Closed position notice -->
+    {position.data.status === 'closed' && (
+      <section class="pt-6 border-t border-surface-200 dark:border-[#21262d]">
+        <p class="text-sm text-surface-500 dark:text-[#8b949e]">
+          This position is currently closed. For general inquiries, please contact{' '}
+          <a href={`mailto:${contactEmail}`} class="text-primary-600 dark:text-accent-400 hover:underline">
+            {contactEmail}
+          </a>.
+        </p>
+      </section>
+    )}
+  </div>
+</PageLayout>

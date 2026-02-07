@@ -1,0 +1,21 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+  padding?: boolean;
+}
+
+const { href, class: className = '', padding = true } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href}
+  class:list={[
+    'block',
+    padding && 'p-4',
+    className,
+  ]}
+>
+  <slot />
+</Tag>

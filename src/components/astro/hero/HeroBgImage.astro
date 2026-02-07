@@ -1,0 +1,34 @@
+---
+import type { HeroModeConfig } from '../../../lib/types';
+
+interface Props {
+  light: HeroModeConfig;
+  dark: HeroModeConfig;
+}
+
+const { light, dark } = Astro.props;
+---
+
+{/* Light mode image */}
+<div class="absolute inset-0 dark:hidden" style={`background-color: ${light.bgColor};`}>
+  {light.bgImage && (
+    <img
+      src={light.bgImage}
+      alt=""
+      class="w-full h-full object-cover"
+      loading="eager"
+    />
+  )}
+</div>
+
+{/* Dark mode image */}
+<div class="absolute inset-0 hidden dark:block" style={`background-color: ${dark.bgColor};`}>
+  {dark.bgImage && (
+    <img
+      src={dark.bgImage}
+      alt=""
+      class="w-full h-full object-cover"
+      loading="eager"
+    />
+  )}
+</div>

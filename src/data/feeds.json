@@ -1,0 +1,29 @@
+[
+  {
+    "id": "feed-1",
+    "title": "The Future of Multilingual AI: Challenges and Opportunities",
+    "link": "https://medium.com/@janesmith/future-multilingual-ai",
+    "date": "2024-08-15",
+    "source": "Medium",
+    "excerpt": "An exploration of the key challenges facing multilingual AI systems and the opportunities that lie ahead for making NLP truly global.",
+    "author": "jane-smith"
+  },
+  {
+    "id": "feed-2",
+    "title": "Getting Started with Parameter-Efficient Fine-Tuning",
+    "link": "https://blog.example.com/peft-guide",
+    "date": "2024-07-20",
+    "source": "Lab Blog (External)",
+    "excerpt": "A practical guide to using LoRA, QLoRA, and other parameter-efficient methods for fine-tuning large language models on a budget.",
+    "author": "alex-chen"
+  },
+  {
+    "id": "feed-3",
+    "title": "My First Year as a PhD Student: Lessons Learned",
+    "link": "https://mariagarcia.dev/phd-year-one",
+    "date": "2024-06-10",
+    "source": "Personal Blog",
+    "excerpt": "Reflections on the first year of a PhD journey, including tips on research, time management, and maintaining work-life balance.",
+    "author": "maria-garcia"
+  }
+]
