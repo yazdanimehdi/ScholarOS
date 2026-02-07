@@ -1,17 +1,16 @@
-# Decap CMS Configuration
-# See: https://decapcms.org/docs/configuration-options/
+# Sveltia CMS Configuration (drop-in replacement for Decap CMS)
+# See: https://github.com/sveltia/sveltia-cms
 
 backend:
   name: github
-  repo: "your-username/your-repo"   # <-- CHANGE THIS
+  repo: "your-username/your-repo"   # <-- CHANGE THIS (auto-configured on template init)
   branch: main
-  auth_type: pkce                   # Client-side OAuth (works on GitHub Pages without a proxy)
-  app_id: ""                        # <-- GitHub OAuth App Client ID (see README)
+  # base_url: ""                    # <-- Set this to your Cloudflare Worker URL for OAuth login
+                                    #     (e.g. https://sveltia-cms-auth.your-name.workers.dev)
+                                    #     Or leave commented out and use "Sign in with Token" instead
 
 media_folder: "src/assets/images"
 public_folder: "/src/assets/images"
-
-publish_mode: editorial_workflow
 
 slug:
   encoding: "ascii"

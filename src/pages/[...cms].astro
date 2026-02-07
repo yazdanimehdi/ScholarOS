@@ -1,11 +1,9 @@
 ---
 // Dynamic CMS admin page — path is read from config/site.yml → adminPath
-// The is:inline directive prevents Astro from bundling the CDN script as a module
-import { getSiteConfig, loadYamlConfig } from '../lib/config';
+// Uses Sveltia CMS (drop-in replacement for Decap CMS) with is:inline to prevent module bundling
+import { getSiteConfig } from '../lib/config';
 
 const config = getSiteConfig();
-const cmsConfig = loadYamlConfig<{ backend?: Record<string, unknown> }>('cms.yml');
-const backend = cmsConfig.backend || {};
 
 export function getStaticPaths() {
   const config = getSiteConfig();
@@ -26,10 +24,9 @@ export function getStaticPaths() {
 <body>
   <div id="cms-config"
     data-admin-users={JSON.stringify(config.adminUsers || [])}
-    data-backend={JSON.stringify(backend)}
     style="display:none"></div>
   <script is:inline>window.CMS_MANUAL_INIT = true;</script>
-  <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script is:inline src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
   <script is:inline>
   (function() {
     var adminUsers = JSON.parse(
@@ -47,22 +44,15 @@ export function getStaticPaths() {
       return null;
     }
 
-    function getLoggedInGitHubUser() {
-      try {
-        var s = localStorage.getItem('netlify-cms-user');
-        if (s) return JSON.parse(s).login || null;
-      } catch(e) {}
-      return null;
-    }
-
     if (window.CMS) {
       window.CMS.registerEventListener({
         name: 'preSave',
         handler: function(args) {
           var entry = args.entry;
+          var author = args.author;
           if (entry.get('collection') !== 'people') return;
 
-          var loggedInUser = getLoggedInGitHubUser();
+          var loggedInUser = (author && author.login) || null;
           if (!loggedInUser) {
             alert('Could not determine your GitHub identity. Please log out and log back in.');
             throw new Error('Unknown GitHub identity');
@@ -246,15 +236,7 @@ export function getStaticPaths() {
   </script>
   <script is:inline>
   (function() {
-    if (!window.CMS) return;
-    var el = document.getElementById('cms-config');
-    var backendData = el && el.dataset.backend ? JSON.parse(el.dataset.backend) : {};
-    // Only init with config if we have backend data
-    if (Object.keys(backendData).length > 0) {
-      window.CMS.init({ config: { backend: backendData } });
-    } else {
-      window.CMS.init();
-    }
+    if (window.CMS) window.CMS.init();
   })();
   </script>
 </body>

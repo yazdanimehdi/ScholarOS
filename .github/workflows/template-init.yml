@@ -87,37 +87,46 @@ jobs:
 
             await github.rest.issues.create({
               ...context.repo,
-              title: 'Setup: Enable CMS login with GitHub',
+              title: 'Setup: Enable CMS & GitHub Pages',
               labels: ['setup'],
-              body: `## Enable the CMS admin panel
+              body: `## 1. Enable GitHub Pages
 
-            Your site has been auto-configured, but the CMS needs a **GitHub OAuth App** to enable the "Login with GitHub" button.
+            Set GitHub Pages to deploy via **GitHub Actions** (not Jekyll):
 
-            ### Steps
+            > **[Settings > Pages](https://github.com/${context.repo.owner}/${context.repo.repo}/settings/pages)** > Build and deployment > Source > **GitHub Actions**
 
-            1. Go to **[GitHub Developer Settings > OAuth Apps > New OAuth App](https://github.com/settings/applications/new)**
-            2. Fill in:
+            ## 2. Access the CMS
+
+            Your site uses [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Go to **[${adminUrl}](${adminUrl})** after your first deploy completes.
+
+            ### Option A: Sign in with a Personal Access Token (simplest)
+
+            1. Create a [GitHub Personal Access Token](https://github.com/settings/tokens/new) with \`repo\` scope
+            2. On the CMS login screen, click **"Sign in with GitHub"**, then use the token option
+            3. Paste your token — you're in!
+
+            ### Option B: OAuth via Cloudflare Worker (for team use)
+
+            For a proper "Login with GitHub" button (recommended for multiple editors):
+
+            1. **Deploy the auth worker** — go to [sveltia-cms-auth](https://github.com/sveltia/sveltia-cms-auth) and click "Deploy to Cloudflare Workers"
+            2. **Create a GitHub OAuth App** at [Developer Settings > OAuth Apps](https://github.com/settings/applications/new):
                - **Application name:** \`${owner} site CMS\`
                - **Homepage URL:** \`${siteUrl}\`
-               - **Authorization callback URL:** \`${adminUrl}\`
-            3. Click **Register application**
-            4. Copy the **Client ID** (you do NOT need the client secret)
-            5. Edit \`config/cms.yml\` in this repo and set the \`app_id\`:
+               - **Authorization callback URL:** \`https://sveltia-cms-auth.YOUR_SUBDOMAIN.workers.dev/callback\`
+            3. **Set Worker environment variables** in the Cloudflare dashboard:
+               - \`GITHUB_CLIENT_ID\` — your OAuth App Client ID
+               - \`GITHUB_CLIENT_SECRET\` — your OAuth App Client Secret (encrypt it)
+               - \`ALLOWED_DOMAINS\` — \`${context.repo.owner}.github.io\`
+            4. **Update \`config/cms.yml\`** — uncomment and set \`base_url\`:
                \`\`\`yaml
                backend:
                  name: github
                  repo: "${context.repo.owner}/${context.repo.repo}"
                  branch: main
-                 auth_type: pkce
-                 app_id: "YOUR_CLIENT_ID_HERE"
+                 base_url: "https://sveltia-cms-auth.YOUR_SUBDOMAIN.workers.dev"
                \`\`\`
-            6. Commit the change — after the site rebuilds, go to [${adminUrl}](${adminUrl}) and click **Login with GitHub**
-
-            ### Also required: GitHub Pages source
-
-            Make sure GitHub Pages is set to deploy via **GitHub Actions** (not Jekyll):
-
-            > [Settings > Pages](https://github.com/${context.repo.owner}/${context.repo.repo}/settings/pages) > Build and deployment > Source > **GitHub Actions**
+            5. Commit and push — after rebuild, the login button will use your OAuth worker
 
             ---
             *This issue was created automatically by the template initialization workflow. Close it once setup is complete.*`
