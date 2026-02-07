@@ -103,7 +103,7 @@ socials:
   orcid: "https://orcid.org/0000-0000-0000-0000"
 
 # Footer
-footer:the h
+footer:
   text: "Built with Astro"
   links:
     - label: "Privacy"

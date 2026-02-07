@@ -1,6 +1,8 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
+import { getCollection } from 'astro:content';
+import { getRoleName } from '../lib/utils';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
@@ -15,17 +17,43 @@ const { username, stats, trophies, pinnedRepos } = github;
 const statsBase = (github.statsBaseUrl ?? 'https://github-readme-stats.vercel.app').replace(/\/$/, '');
 const trophyBase = (github.trophyBaseUrl ?? 'https://github-profile-trophy.vercel.app').replace(/\/$/, '');
 
-const statsUrl = (theme: string) =>
-  `${statsBase}/api?username=${username}&show_icons=true&theme=${theme}`;
-const langsUrl = (theme: string) =>
-  `${statsBase}/api/top-langs/?username=${username}&layout=compact&theme=${theme}`;
-const repoUrl = (repo: string, theme: string) =>
-  `${statsBase}/api/pin/?username=${username}&repo=${repo}&theme=${theme}`;
+const statsUrl = (user: string, theme: string) =>
+  `${statsBase}/api?username=${user}&show_icons=true&theme=${theme}`;
+const langsUrl = (user: string, theme: string) =>
+  `${statsBase}/api/top-langs/?username=${user}&layout=compact&theme=${theme}`;
+const repoUrl = (user: string, repo: string, theme: string) =>
+  `${statsBase}/api/pin/?username=${user}&repo=${repo}&theme=${theme}`;
 const trophyUrl = (theme: string) =>
   `${trophyBase}/?username=${username}&theme=${theme}&no-frame=true&column=-1`;
 
 const lightTheme = 'default';
 const darkTheme = 'github_dark';
+
+// Extract GitHub username from a profile URL like "https://github.com/username"
+function extractGitHubUsername(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'github.com') {
+      const parts = parsed.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+      return parts.length === 1 ? parts[0] : null;
+    }
+  } catch {}
+  return null;
+}
+
+// Get all active people who have a GitHub link
+const members = (await getCollection('people'))
+  .filter(p => p.data.active && p.data.socials?.github)
+  .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
+  .map(p => ({
+    name: p.data.name,
+    role: p.data.role,
+    title: p.data.title,
+    id: p.id,
+    githubUsername: extractGitHubUsername(p.data.socials!.github!),
+    githubUrl: p.data.socials!.github!,
+  }))
+  .filter(m => m.githubUsername !== null);
 ---
 
 <PageLayout title="Repositories" description={personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}>
@@ -44,12 +72,12 @@ const darkTheme = 'github_dark';
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <img class="dark:hidden w-full" src={statsUrl(lightTheme)} alt="GitHub Stats" loading="lazy" />
-          <img class="hidden dark:block w-full" src={statsUrl(darkTheme)} alt="GitHub Stats" loading="lazy" />
+          <img class="dark:hidden w-full" src={statsUrl(username, lightTheme)} alt="GitHub Stats" loading="lazy" />
+          <img class="hidden dark:block w-full" src={statsUrl(username, darkTheme)} alt="GitHub Stats" loading="lazy" />
         </div>
         <div>
-          <img class="dark:hidden w-full" src={langsUrl(lightTheme)} alt="Top Languages" loading="lazy" />
-          <img class="hidden dark:block w-full" src={langsUrl(darkTheme)} alt="Top Languages" loading="lazy" />
+          <img class="dark:hidden w-full" src={langsUrl(username, lightTheme)} alt="Top Languages" loading="lazy" />
+          <img class="hidden dark:block w-full" src={langsUrl(username, darkTheme)} alt="Top Languages" loading="lazy" />
         </div>
       </div>
     </section>
@@ -77,9 +105,43 @@ const darkTheme = 'github_dark';
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {pinnedRepos.map((repo) => (
           <a href={`https://github.com/${username}/${repo}`} target="_blank" rel="noopener noreferrer" class="block">
-            <img class="dark:hidden w-full" src={repoUrl(repo, lightTheme)} alt={repo} loading="lazy" />
-            <img class="hidden dark:block w-full" src={repoUrl(repo, darkTheme)} alt={repo} loading="lazy" />
+            <img class="dark:hidden w-full" src={repoUrl(username, repo, lightTheme)} alt={repo} loading="lazy" />
+            <img class="hidden dark:block w-full" src={repoUrl(username, repo, darkTheme)} alt={repo} loading="lazy" />
           </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* Team Members */}
+  {!personal && members.length > 0 && (
+    <section class="mb-10">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+        Team Members
+      </h2>
+      <div class="space-y-8">
+        {members.map((member) => (
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <a href={`/people/${member.id}`} class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
+                {member.name}
+              </a>
+              <span class="text-xs text-surface-400 dark:text-[#484f58]">{member.title || getRoleName(member.role)}</span>
+              <a href={member.githubUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-primary-600 dark:text-accent-400 hover:underline">
+                @{member.githubUsername}
+              </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <img class="dark:hidden w-full" src={statsUrl(member.githubUsername!, lightTheme)} alt={`${member.name} GitHub Stats`} loading="lazy" />
+                <img class="hidden dark:block w-full" src={statsUrl(member.githubUsername!, darkTheme)} alt={`${member.name} GitHub Stats`} loading="lazy" />
+              </div>
+              <div>
+                <img class="dark:hidden w-full" src={langsUrl(member.githubUsername!, lightTheme)} alt={`${member.name} Top Languages`} loading="lazy" />
+                <img class="hidden dark:block w-full" src={langsUrl(member.githubUsername!, darkTheme)} alt={`${member.name} Top Languages`} loading="lazy" />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </section>
