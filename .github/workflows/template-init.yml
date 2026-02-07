@@ -75,6 +75,13 @@ jobs:
             const adminUrl = process.env.ADMIN_URL;
             const owner = context.repo.owner;
 
+            // Ensure the label exists before using it
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: 'setup' });
+            } catch {
+              await github.rest.issues.createLabel({ ...context.repo, name: 'setup', color: '0075ca' });
+            }
+
             await github.rest.issues.create({
               ...context.repo,
               title: 'Setup: Enable CMS login with GitHub',
