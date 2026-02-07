@@ -10,8 +10,6 @@ permissions:
 jobs:
   init:
     runs-on: ubuntu-latest
-    # Only run if marker file doesn't exist
-    if: hashFiles('.template-initialized') == ''
     steps:
       - uses: actions/checkout@v4
 
