@@ -12,12 +12,12 @@ const siteName = getSiteName();
   <div class="max-w-[930px] mx-auto px-4 sm:px-6">
     <div class="flex h-14 items-center justify-between">
       <!-- Logo / Lab name -->
-      <a href="/" class="text-base font-medium text-surface-900 dark:text-[#e6edf3] hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
+      <a href="/" class="shrink-0 whitespace-nowrap text-base font-medium text-surface-900 dark:text-[#e6edf3] hover:text-primary-600 dark:hover:text-accent-400 transition-colors" data-nav-logo>
         {siteName}
       </a>
 
       <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-1">
+      <div class="hidden md:flex items-center gap-1 min-w-0">
         <Nav />
         <div class="ms-2 ps-2 border-s border-surface-200 dark:border-[#21262d]">
           <ThemeToggle client:load />
