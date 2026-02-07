@@ -18,6 +18,7 @@ const people = defineCollection({
           linkedin: z.string().url().optional(),
           orcid: z.string().url().optional(),
           mastodon: z.string().url().optional(),
+          bluesky: z.string().url().optional(),
           website: z.string().url().optional(),
         })
         .optional(),

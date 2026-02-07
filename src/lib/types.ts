@@ -11,6 +11,7 @@ export interface SocialLinks {
   linkedin?: string;
   orcid?: string;
   mastodon?: string;
+  bluesky?: string;
   website?: string;
 }
 

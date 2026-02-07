@@ -102,6 +102,7 @@ socials:
   linkedin: "https://linkedin.com/company/example-lab"
   orcid: "https://orcid.org/0000-0000-0000-0000"
   # mastodon: "https://mastodon.social/@example"
+  # bluesky: "https://bsky.app/profile/example.bsky.social"
 
 # Analytics (all disabled by default, opt-in)
 analytics:
