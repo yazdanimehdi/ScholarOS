@@ -3,7 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import ProjectCard from '../components/astro/ProjectCard.astro';
 import PublicationEntry from '../components/astro/PublicationEntry.astro';
 import { getCollection } from 'astro:content';
-import { isPersonalMode } from '../lib/config';
+import { isPersonalMode, loadYamlConfig } from '../lib/config';
 
 const personal = isPersonalMode();
 
@@ -13,31 +13,25 @@ const publications = (await getCollection('publications'))
   .sort((a, b) => b.data.year - a.data.year)
   .slice(0, 5);
 
-const researchAreas = [
-  {
-    title: 'Natural Language Processing',
-    description: 'Developing models that understand and generate human language, with a focus on multilingual and low-resource settings.',
-    tags: ['Language Models', 'Multilingual NLP', 'Text Generation'],
-  },
-  {
-    title: 'Computer Vision & Multimodal Learning',
-    description: 'Building systems that combine visual and textual understanding for tasks like image captioning, visual QA, and cross-modal retrieval.',
-    tags: ['Vision-Language Models', 'Image Understanding', 'Multimodal Reasoning'],
-  },
-  {
-    title: 'AI Safety & Robustness',
-    description: 'Ensuring AI systems are safe, fair, and reliable through formal verification, alignment techniques, and robust evaluation methodologies.',
-    tags: ['Alignment', 'Fairness', 'Robustness'],
-  },
-];
+interface ResearchConfig {
+  description?: string;
+  areas: { title: string; description: string; tags?: string[] }[];
+}
+
+let researchConfig: ResearchConfig = { areas: [] };
+try {
+  researchConfig = loadYamlConfig<ResearchConfig>('research.yml');
+} catch {}
+const researchAreas = researchConfig.areas || [];
+const researchDescription = researchConfig.description || '';
 ---
 
 <PageLayout title="Research" description={personal ? "My research areas and current projects." : "Our research areas and current projects."}>
   <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Research</h1>
   <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8 max-w-2xl">
-    {personal
+    {researchDescription || (personal
       ? "My research focuses on artificial intelligence, with an emphasis on building systems that are capable, safe, and beneficial."
-      : "Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial."}
+      : "Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial.")}
   </p>
 
   <!-- Research Areas -->
@@ -50,11 +44,13 @@ const researchAreas = [
         <div class="pb-5 border-b border-surface-100 dark:border-[#21262d] last:border-0">
           <h3 class="text-base font-medium text-surface-900 dark:text-[#e6edf3] mb-1">{area.title}</h3>
           <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-2">{area.description}</p>
-          <div class="flex flex-wrap gap-1.5">
-            {area.tags.map(tag => (
-              <span class="text-xs text-surface-400 dark:text-[#484f58]">#{tag.toLowerCase().replace(/\s+/g, '-')}</span>
-            ))}
-          </div>
+          {area.tags && area.tags.length > 0 && (
+            <div class="flex flex-wrap gap-1.5">
+              {area.tags.map(tag => (
+                <span class="text-xs text-surface-400 dark:text-[#484f58]">#{tag.toLowerCase().replace(/\s+/g, '-')}</span>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </div>

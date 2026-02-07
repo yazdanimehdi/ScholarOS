@@ -288,7 +288,7 @@ collections:
             options:
               - { label: "Lab / Research Group", value: "lab" }
               - { label: "Personal Academic Site", value: "personal" }
-          - { label: "Language", name: "lang", widget: "string", default: "en" }
+          - { label: "Language", name: "lang", widget: "string", default: "en", hint: "BCP 47 language tag (e.g. en, fa, ar, zh)" }
           - label: "Text Direction"
             name: "direction"
             widget: "select"
@@ -316,15 +316,6 @@ collections:
               - { label: "Rectangular", value: "rectangular" }
               - { label: "Circular", value: "circular" }
               - { label: "Oval", value: "oval" }
-          - label: "About Section"
-            name: "about"
-            widget: "object"
-            collapsed: true
-            fields:
-              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
-              - { label: "Title", name: "title", widget: "string" }
-              - { label: "Text", name: "text", widget: "text" }
-              - { label: "Image", name: "image", widget: "string", required: false }
           - label: "Top Bar"
             name: "topBar"
             widget: "object"
@@ -339,6 +330,109 @@ collections:
                   - { label: "Label", name: "label", widget: "string" }
                   - { label: "URL", name: "href", widget: "string" }
                   - { label: "External", name: "external", widget: "boolean", required: false, default: false }
+          - label: "Hero Background"
+            name: "hero"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Background Type"
+                name: "type"
+                widget: "select"
+                options:
+                  - { label: "Animation", value: "animation" }
+                  - { label: "Image", value: "image" }
+                  - { label: "Video", value: "video" }
+                  - { label: "Pattern", value: "pattern" }
+                  - { label: "None", value: "none" }
+              - label: "Light Mode"
+                name: "light"
+                widget: "object"
+                fields:
+                  - { label: "Background Color", name: "bgColor", widget: "string", default: "#ffffff", hint: "Hex color (e.g. #ffffff)" }
+                  - { label: "Background Image", name: "bgImage", widget: "image", required: false, hint: "Optional background image for light mode" }
+              - label: "Dark Mode"
+                name: "dark"
+                widget: "object"
+                fields:
+                  - { label: "Background Color", name: "bgColor", widget: "string", default: "#0d1117", hint: "Hex color (e.g. #0d1117)" }
+                  - { label: "Background Image", name: "bgImage", widget: "image", required: false, hint: "Optional background image for dark mode" }
+              - label: "Video Settings"
+                name: "video"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Video Source", name: "src", widget: "string", required: false, hint: "Path to video file (e.g. /videos/hero-bg.mp4)" }
+                  - { label: "Poster Image", name: "poster", widget: "string", required: false, hint: "Fallback image while video loads" }
+              - label: "Pattern Settings"
+                name: "pattern"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - label: "Pattern Name"
+                    name: "name"
+                    widget: "select"
+                    options:
+                      - { label: "Dots", value: "dots" }
+                      - { label: "Grid", value: "grid" }
+                      - { label: "Waves", value: "waves" }
+                      - { label: "Diagonal", value: "diagonal" }
+                      - { label: "Hexagons", value: "hexagons" }
+                    default: "dots"
+              - label: "Animation Settings"
+                name: "animation"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - label: "Animation Preset"
+                    name: "preset"
+                    widget: "select"
+                    options:
+                      - { label: "Particles", value: "particles" }
+                      - { label: "Gradient Morph", value: "gradient-morph" }
+                      - { label: "Geometric", value: "geometric" }
+                      - { label: "Wave Lines", value: "wave-lines" }
+                      - { label: "Custom", value: "custom" }
+                    default: "particles"
+                  - { label: "Custom Script", name: "customScript", widget: "string", required: false, hint: "Path to custom JS file in /public (only when preset is 'custom')" }
+          - label: "About Section"
+            name: "about"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Text", name: "text", widget: "text" }
+              - { label: "Image", name: "image", widget: "image", required: false }
+          - label: "Typography"
+            name: "fonts"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - label: "Font Families"
+                name: "families"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Sans-serif (body text)", name: "sans", widget: "string", required: false, default: "Roboto", hint: "Google Fonts name for body text and UI" }
+                  - { label: "Serif (headings)", name: "serif", widget: "string", required: false, default: "Roboto Slab", hint: "Google Fonts name for headings" }
+                  - { label: "Monospace (code)", name: "mono", widget: "string", required: false, default: "Roboto Mono", hint: "Google Fonts name for code blocks" }
+              - label: "Font Sizes"
+                name: "sizes"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Base", name: "base", widget: "string", required: false, default: "1rem", hint: "Body text (default: 1rem / 16px)" }
+                  - { label: "Small", name: "sm", widget: "string", required: false, default: "0.875rem", hint: "Meta text, dates, tags (default: 0.875rem / 14px)" }
+                  - { label: "Large", name: "lg", widget: "string", required: false, default: "1.125rem", hint: "Lead paragraphs (default: 1.125rem / 18px)" }
+                  - { label: "Heading 1", name: "h1", widget: "string", required: false, default: "2rem", hint: "Page titles (default: 2rem / 32px)" }
+                  - { label: "Heading 2", name: "h2", widget: "string", required: false, default: "1.5rem", hint: "Section headings (default: 1.5rem / 24px)" }
+                  - { label: "Heading 3", name: "h3", widget: "string", required: false, default: "1.25rem", hint: "Subsection headings (default: 1.25rem / 20px)" }
           - label: "Navigation"
             name: "nav"
             widget: "list"
@@ -358,6 +452,7 @@ collections:
               - { label: "ORCID", name: "orcid", widget: "string", required: false }
               - { label: "Mastodon", name: "mastodon", widget: "string", required: false }
               - { label: "Bluesky", name: "bluesky", widget: "string", required: false }
+              - { label: "Website", name: "website", widget: "string", required: false }
           - label: "GitHub Repositories"
             name: "github"
             widget: "object"
@@ -371,6 +466,29 @@ collections:
                 widget: "list"
                 required: false
                 field: { label: "Repo Name", name: "repo", widget: "string" }
+              - { label: "Stats Base URL", name: "statsBaseUrl", widget: "string", required: false, hint: "Self-hosted github-readme-stats URL (leave empty for default)" }
+              - { label: "Trophy Base URL", name: "trophyBaseUrl", widget: "string", required: false, hint: "Self-hosted github-profile-trophy URL (leave empty for default)" }
+          - label: "Analytics"
+            name: "analytics"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Google Analytics", name: "googleAnalytics", widget: "string", required: false, hint: "Measurement ID (e.g. G-XXXXXXXXXX)" }
+              - { label: "Google Tag Manager", name: "googleTagManager", widget: "string", required: false, hint: "Container ID (e.g. GTM-XXXXXXX)" }
+              - { label: "Cronitor", name: "cronitor", widget: "string", required: false, hint: "Site ID" }
+              - { label: "OpenPanel", name: "openpanel", widget: "string", required: false, hint: "Client UUID" }
+              - { label: "Pirsch", name: "pirsch", widget: "string", required: false, hint: "Site ID" }
+              - { label: "Microsoft Clarity", name: "microsoftClarity", widget: "string", required: false, hint: "Project ID" }
+          - label: "SEO"
+            name: "seo"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Keywords", name: "keywords", widget: "string", required: false, hint: "Comma-separated keywords for meta tags" }
+              - { label: "Google Site Verification", name: "googleSiteVerification", widget: "string", required: false, hint: "Google Search Console verification code" }
+              - { label: "Bing Site Verification", name: "bingSiteVerification", widget: "string", required: false, hint: "Bing Webmaster verification code" }
           - label: "Footer"
             name: "footer"
             widget: "object"
@@ -524,3 +642,101 @@ collections:
               - { label: "Daily", value: "daily" }
               - { label: "Weekly", value: "weekly" }
           - { label: "Max Items per Feed", name: "maxItemsPerFeed", widget: "number", default: 20, value_type: "int" }
+
+      - name: "scholar"
+        label: "Google Scholar Sync"
+        file: "config/scholar.yml"
+        fields:
+          - label: "Authors"
+            name: "authors"
+            widget: "list"
+            hint: "Google Scholar authors to sync publications from"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Scholar ID", name: "scholar_id", widget: "string", hint: "Google Scholar author ID (from the URL)" }
+          - label: "Sync Interval"
+            name: "syncInterval"
+            widget: "select"
+            options:
+              - { label: "Daily", value: "daily" }
+              - { label: "Weekly", value: "weekly" }
+              - { label: "Monthly", value: "monthly" }
+            default: "weekly"
+          - { label: "Max Results", name: "maxResults", widget: "number", default: 100, value_type: "int", hint: "Maximum publications to fetch per author" }
+
+      - name: "publications-override"
+        label: "Publication Overrides"
+        file: "config/publications.override.yml"
+        fields:
+          - label: "Manual Additions"
+            name: "additions"
+            widget: "list"
+            required: false
+            hint: "Publications not on Google Scholar that you want to add manually"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - label: "Authors"
+                name: "authors"
+                widget: "list"
+                field: { label: "Author", name: "author", widget: "string" }
+              - { label: "Venue", name: "venue", widget: "string" }
+              - { label: "Year", name: "year", widget: "number", value_type: "int" }
+              - { label: "DOI", name: "doi", widget: "string", required: false }
+              - { label: "URL", name: "url", widget: "string", required: false }
+              - { label: "PDF", name: "pdf", widget: "string", required: false }
+              - label: "Type"
+                name: "type"
+                widget: "select"
+                options:
+                  - { label: "Journal", value: "journal" }
+                  - { label: "Conference", value: "conference" }
+                  - { label: "Preprint", value: "preprint" }
+                  - { label: "Workshop", value: "workshop" }
+                  - { label: "Thesis", value: "thesis" }
+                  - { label: "Book Chapter", value: "book-chapter" }
+              - { label: "Featured", name: "featured", widget: "boolean", default: false }
+              - { label: "Abstract", name: "abstract", widget: "text", required: false }
+          - label: "Excluded DOIs"
+            name: "exclude"
+            widget: "list"
+            required: false
+            hint: "DOIs of synced publications to hide from the site"
+            field: { label: "DOI", name: "doi", widget: "string" }
+          - label: "Field Overrides"
+            name: "overrides"
+            widget: "list"
+            required: false
+            hint: "Override specific fields on synced publications (matched by DOI)"
+            fields:
+              - { label: "DOI", name: "doi", widget: "string" }
+              - label: "Fields to Set"
+                name: "set"
+                widget: "object"
+                fields:
+                  - { label: "Featured", name: "featured", widget: "boolean", required: false }
+                  - { label: "PDF URL", name: "pdf", widget: "string", required: false }
+                  - { label: "URL", name: "url", widget: "string", required: false }
+                  - { label: "Type", name: "type", widget: "string", required: false }
+                  - { label: "Abstract", name: "abstract", widget: "text", required: false }
+
+      - name: "research"
+        label: "Research Areas"
+        file: "config/research.yml"
+        fields:
+          - label: "Research Page Description"
+            name: "description"
+            widget: "text"
+            required: false
+            hint: "Introductory text shown at the top of the Research page"
+          - label: "Research Areas"
+            name: "areas"
+            widget: "list"
+            hint: "Define your research focus areas shown on the Research page"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - label: "Tags"
+                name: "tags"
+                widget: "list"
+                required: false
+                field: { label: "Tag", name: "tag", widget: "string" }
