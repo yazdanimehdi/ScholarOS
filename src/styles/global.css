@@ -340,6 +340,43 @@ html.dark .prose td {
 .tikz-container { text-align: center; margin: 1.5rem 0; }
 .tikz-container svg { max-width: 100%; height: auto; }
 html.dark .tikz-container svg { filter: invert(1) hue-rotate(180deg); }
+
+/* ===== Responsive post grid ===== */
+.post-grid { display: grid; gap: 1rem; margin: 1.5rem 0; }
+.post-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.post-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.post-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.post-grid.gap-sm { gap: 0.5rem; }
+.post-grid.gap-md { gap: 1rem; }
+.post-grid.gap-lg { gap: 1.5rem; }
+@media (max-width: 768px) {
+  .post-grid.cols-2, .post-grid.cols-3, .post-grid.cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+.post-grid img { width: 100%; height: auto; border-radius: 4px; object-fit: cover; }
+.post-grid figure { margin: 0; }
+.post-grid figcaption { font-size: 0.8rem; color: var(--color-surface-500); margin-top: 0.25rem; text-align: center; }
+
+/* ===== Figure with caption ===== */
+.post-figure { margin: 1.5rem 0; text-align: center; }
+.post-figure img { border-radius: 4px; max-width: 100%; height: auto; }
+.post-figure figcaption { font-size: 0.85rem; color: var(--color-surface-500); margin-top: 0.5rem; }
+html.dark .post-figure figcaption { color: #8b949e; }
+html.dark .post-grid figcaption { color: #8b949e; }
+
+/* ===== Video embed ===== */
+.video-embed { margin: 1.5rem 0; }
+.video-embed iframe, .video-embed video { width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px; }
+.video-embed .video-caption { display: block; font-size: 0.85rem; color: var(--color-surface-500); margin-top: 0.5rem; text-align: center; }
+html.dark .video-embed .video-caption { color: #8b949e; }
+
+/* ===== Audio embed ===== */
+.audio-embed { margin: 1.5rem 0; padding: 1rem; background: var(--color-surface-50); border-radius: 4px; border: 1px solid var(--color-surface-200); }
+.audio-embed audio { width: 100%; }
+.audio-embed .audio-caption { display: block; font-size: 0.85rem; color: var(--color-surface-500); margin-top: 0.5rem; }
+html.dark .audio-embed { background: #161b22; border-color: #21262d; }
+html.dark .audio-embed .audio-caption { color: #8b949e; }
 } /* end @layer components for prose */
 
 @layer components {

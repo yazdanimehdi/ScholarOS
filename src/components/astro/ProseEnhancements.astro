@@ -210,9 +210,67 @@
     });
   }
 
+  /* ── Video Embeds ─────────────────────────────────────────── */
+
+  function renderVideoEmbeds() {
+    const containers = document.querySelectorAll<HTMLDivElement>('.video-embed');
+    containers.forEach((container) => {
+      if (container.dataset.enhanced) return;
+      // Skip if already has iframe or video element
+      if (container.querySelector('iframe') || container.querySelector('video')) return;
+
+      // Look for a plain text URL inside the container
+      const text = container.textContent?.trim() ?? '';
+      if (!text) return;
+
+      container.dataset.enhanced = 'true';
+      let mediaEl: HTMLElement | null = null;
+
+      // YouTube URL patterns
+      const ytMatch = text.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+      if (ytMatch) {
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${ytMatch[1]}`;
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('loading', 'lazy');
+        mediaEl = iframe;
+      }
+
+      // Vimeo URL patterns
+      if (!mediaEl) {
+        const vimeoMatch = text.match(/vimeo\.com\/(\d+)/);
+        if (vimeoMatch) {
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+          iframe.setAttribute('allowfullscreen', '');
+          iframe.setAttribute('loading', 'lazy');
+          mediaEl = iframe;
+        }
+      }
+
+      // Self-hosted video (file path / URL ending in video extension)
+      if (!mediaEl && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(text)) {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.src = text;
+        mediaEl = video;
+      }
+
+      if (mediaEl) {
+        // Preserve any caption span
+        const caption = container.querySelector('.video-caption');
+        // Clear container and insert media
+        while (container.firstChild) container.removeChild(container.firstChild);
+        container.appendChild(mediaEl);
+        if (caption) container.appendChild(caption);
+      }
+    });
+  }
+
   /* ── Master init ───────────────────────────────────────────── */
 
   async function initProseEnhancements() {
+    renderVideoEmbeds();
     await Promise.allSettled([
       renderMath(),
       renderCharts(),

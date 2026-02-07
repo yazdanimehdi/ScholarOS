@@ -82,5 +82,161 @@ export function getStaticPaths() {
     }
   })();
   </script>
+  <script is:inline>
+  (function() {
+    if (!window.CMS) return;
+
+    // ── Image Grid ──────────────────────────────────────────────
+    window.CMS.registerEditorComponent({
+      id: 'image-grid',
+      label: 'Image Grid',
+      fields: [
+        {
+          name: 'columns',
+          label: 'Columns',
+          widget: 'select',
+          options: ['2', '3', '4'],
+          default: '2'
+        },
+        {
+          name: 'gap',
+          label: 'Gap Size',
+          widget: 'select',
+          options: [
+            { label: 'Small', value: 'gap-sm' },
+            { label: 'Medium', value: 'gap-md' },
+            { label: 'Large', value: 'gap-lg' }
+          ],
+          default: 'gap-md'
+        },
+        {
+          name: 'images',
+          label: 'Images',
+          widget: 'list',
+          fields: [
+            { name: 'src', label: 'Image', widget: 'image' },
+            { name: 'alt', label: 'Alt Text', widget: 'string', default: '' },
+            { name: 'caption', label: 'Caption', widget: 'string', required: false, default: '' }
+          ]
+        }
+      ],
+      pattern: /^<div class="post-grid cols-(\d) (gap-\w+)">\n([\s\S]*?)\n<\/div>$/,
+      fromBlock: function(match) {
+        var figures = [];
+        var re = /<figure>\s*<img src="([^"]*)" alt="([^"]*)">\s*(?:<figcaption>([^<]*)<\/figcaption>\s*)?<\/figure>/g;
+        var m;
+        while ((m = re.exec(match[3])) !== null) {
+          figures.push({ src: m[1], alt: m[2], caption: m[3] || '' });
+        }
+        return { columns: match[1], gap: match[2], images: figures };
+      },
+      toBlock: function(data) {
+        var imgs = (data.images || []).map(function(img) {
+          var cap = img.caption ? '\n  <figcaption>' + img.caption + '</figcaption>' : '';
+          return '<figure>\n  <img src="' + (img.src || '') + '" alt="' + (img.alt || '') + '">' + cap + '\n</figure>';
+        }).join('\n');
+        return '<div class="post-grid cols-' + (data.columns || '2') + ' ' + (data.gap || 'gap-md') + '">\n' + imgs + '\n</div>';
+      },
+      toPreview: function(data) {
+        var imgs = (data.images || []).map(function(img) {
+          return '<figure style="margin:0"><img src="' + (img.src || '') + '" alt="' + (img.alt || '') + '" style="width:100%;border-radius:4px">' +
+            (img.caption ? '<figcaption style="font-size:0.8rem;text-align:center;margin-top:0.25rem">' + img.caption + '</figcaption>' : '') +
+            '</figure>';
+        }).join('');
+        return '<div style="display:grid;grid-template-columns:repeat(' + (data.columns || 2) + ',1fr);gap:1rem">' + imgs + '</div>';
+      }
+    });
+
+    // ── Video Embed ─────────────────────────────────────────────
+    window.CMS.registerEditorComponent({
+      id: 'video-embed',
+      label: 'Video Embed',
+      fields: [
+        { name: 'url', label: 'Video URL', widget: 'string', hint: 'YouTube/Vimeo URL or path to video file' },
+        { name: 'caption', label: 'Caption', widget: 'string', required: false, default: '' }
+      ],
+      pattern: /^<div class="video-embed">\n\s*(?:<iframe src="([^"]*)"[^>]*><\/iframe>|<video controls src="([^"]*)"><\/video>)\n?\s*(?:<span class="video-caption">([^<]*)<\/span>\n)?\s*<\/div>$/,
+      fromBlock: function(match) {
+        return {
+          url: match[1] || match[2] || '',
+          caption: match[3] || ''
+        };
+      },
+      toBlock: function(data) {
+        var url = data.url || '';
+        var inner = '';
+        var ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+        var vimeoMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
+        if (ytMatch) {
+          inner = '<iframe src="https://www.youtube.com/embed/' + ytMatch[1] + '" allowfullscreen loading="lazy"></iframe>';
+        } else if (vimeoMatch) {
+          inner = '<iframe src="https://player.vimeo.com/video/' + vimeoMatch[1] + '" allowfullscreen loading="lazy"></iframe>';
+        } else {
+          inner = '<video controls src="' + url + '"></video>';
+        }
+        var cap = data.caption ? '\n  <span class="video-caption">' + data.caption + '</span>' : '';
+        return '<div class="video-embed">\n  ' + inner + cap + '\n</div>';
+      },
+      toPreview: function(data) {
+        var url = data.url || '';
+        var inner = '';
+        var ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+        var vimeoMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
+        if (ytMatch) {
+          inner = '<iframe src="https://www.youtube.com/embed/' + ytMatch[1] + '" style="width:100%;aspect-ratio:16/9;border:none" allowfullscreen></iframe>';
+        } else if (vimeoMatch) {
+          inner = '<iframe src="https://player.vimeo.com/video/' + vimeoMatch[1] + '" style="width:100%;aspect-ratio:16/9;border:none" allowfullscreen></iframe>';
+        } else {
+          inner = '<video controls src="' + url + '" style="width:100%;aspect-ratio:16/9"></video>';
+        }
+        var cap = data.caption ? '<p style="font-size:0.85rem;text-align:center;margin-top:0.5rem">' + data.caption + '</p>' : '';
+        return '<div>' + inner + cap + '</div>';
+      }
+    });
+
+    // ── Audio Embed ─────────────────────────────────────────────
+    window.CMS.registerEditorComponent({
+      id: 'audio-embed',
+      label: 'Audio Embed',
+      fields: [
+        { name: 'src', label: 'Audio File', widget: 'string', hint: 'Path to audio file (e.g. /src/assets/images/podcast.mp3)' },
+        { name: 'caption', label: 'Caption', widget: 'string', required: false, default: '' }
+      ],
+      pattern: /^<div class="audio-embed">\n\s*<audio controls src="([^"]*)"><\/audio>\n?\s*(?:<span class="audio-caption">([^<]*)<\/span>\n)?\s*<\/div>$/,
+      fromBlock: function(match) {
+        return { src: match[1] || '', caption: match[2] || '' };
+      },
+      toBlock: function(data) {
+        var cap = data.caption ? '\n  <span class="audio-caption">' + data.caption + '</span>' : '';
+        return '<div class="audio-embed">\n  <audio controls src="' + (data.src || '') + '"></audio>' + cap + '\n</div>';
+      },
+      toPreview: function(data) {
+        var cap = data.caption ? '<p style="font-size:0.85rem;margin-top:0.5rem">' + data.caption + '</p>' : '';
+        return '<div style="padding:1rem;background:#f9fafb;border-radius:4px;border:1px solid #e5e7eb"><audio controls src="' + (data.src || '') + '" style="width:100%"></audio>' + cap + '</div>';
+      }
+    });
+
+    // ── Figure with Caption ─────────────────────────────────────
+    window.CMS.registerEditorComponent({
+      id: 'figure-caption',
+      label: 'Figure with Caption',
+      fields: [
+        { name: 'src', label: 'Image', widget: 'image' },
+        { name: 'alt', label: 'Alt Text', widget: 'string', default: '' },
+        { name: 'caption', label: 'Caption', widget: 'string', default: '' }
+      ],
+      pattern: /^<figure class="post-figure">\n\s*<img src="([^"]*)" alt="([^"]*)">\n\s*<figcaption>([^<]*)<\/figcaption>\n<\/figure>$/,
+      fromBlock: function(match) {
+        return { src: match[1], alt: match[2], caption: match[3] };
+      },
+      toBlock: function(data) {
+        return '<figure class="post-figure">\n  <img src="' + (data.src || '') + '" alt="' + (data.alt || '') + '">\n  <figcaption>' + (data.caption || '') + '</figcaption>\n</figure>';
+      },
+      toPreview: function(data) {
+        return '<figure style="text-align:center;margin:1.5rem 0"><img src="' + (data.src || '') + '" alt="' + (data.alt || '') + '" style="max-width:100%;border-radius:4px"><figcaption style="font-size:0.85rem;margin-top:0.5rem">' + (data.caption || '') + '</figcaption></figure>';
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
