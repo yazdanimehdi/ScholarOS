@@ -60,7 +60,7 @@ function getHref(key: string, value: string): string {
 }
 ---
 
-<div class:list={['flex items-center gap-1.5', inline && 'inline-flex']}>
+<div class:list={['flex items-center gap-1', inline && 'inline-flex']}>
   {Object.entries(socials).map(([key, value]) => {
     if (!value || !socialIcons[key]) return null;
     const social = socialIcons[key];
@@ -69,7 +69,7 @@ function getHref(key: string, value: string): string {
         href={getHref(key, value)}
         target={key === 'email' ? undefined : '_blank'}
         rel={key === 'mastodon' ? 'me noopener noreferrer' : key === 'email' ? undefined : 'noopener noreferrer'}
-        class="inline-flex items-center justify-center text-surface-500 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors"
+        class="inline-flex items-center justify-center p-2 text-surface-500 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors"
         title={social.label}
         aria-label={social.label}
       >

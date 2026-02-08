@@ -37,7 +37,7 @@ function getVenueAbbr(venue: string): string {
   <!-- Thumbnail (if image exists) -->
   {image ? (
     <div class="shrink-0 pt-0.5">
-      <img src={image.src} alt={title} class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-dm-border-alt" loading="lazy" />
+      <img src={image.src} alt={title} width="64" height="64" class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-dm-border-alt" loading="lazy" />
     </div>
   ) : (
     <div class="shrink-0 pt-0.5">

@@ -15,7 +15,7 @@ interface Props {
 const { id, title, date, category, excerpt, pinned, image, emoji } = Astro.props;
 ---
 
-<a href={`/news/${id}`} class="block group py-2">
+<a href={`/news/${id}`} class="block group py-2" title={title}>
   <div class="flex items-start gap-2">
     {emoji ? (
       <span class="shrink-0 mt-0.5 w-7 h-7 flex items-center justify-center text-lg leading-none">{emoji}</span>
@@ -25,7 +25,7 @@ const { id, title, date, category, excerpt, pinned, image, emoji } = Astro.props
       <span class="news-bullet shrink-0 mt-1.5 text-sm"></span>
     )}
     <div class="min-w-0">
-      <span class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
+      <span class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors line-clamp-1">
         {title}
       </span>
       {pinned && (

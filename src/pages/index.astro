@@ -44,7 +44,7 @@ const publicationsRaw = sections.includes('publications')
 const publications = await Promise.all(publicationsRaw.map(async (pub) => {
   let imageUrl: string | undefined;
   if (pub.data.image) {
-    const resolved = await getImage({ src: pub.data.image, width: 400 });
+    const resolved = await getImage({ src: pub.data.image, width: 80 });
     imageUrl = resolved.src;
   }
   return { ...pub, imageUrl };
@@ -139,9 +139,9 @@ const feeds = sections.includes('blog')
                               </span>
                             )}
                             <div class="min-w-0">
-                              <h4 class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug line-clamp-2">
+                              <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug line-clamp-2">
                                 {pub.data.title}
-                              </h4>
+                              </h3>
                               <p class="text-xs text-surface-500 dark:text-dm-muted mt-0.5">
                                 {pub.data.venue}, {pub.data.year}
                               </p>

@@ -14,7 +14,7 @@ const publications = (await getCollection('publications'))
 const pubData = await Promise.all(publications.map(async p => {
   let imageUrl: string | undefined;
   if (p.data.image) {
-    const resolved = await getImage({ src: p.data.image, width: 400 });
+    const resolved = await getImage({ src: p.data.image, width: 128 });
     imageUrl = resolved.src;
   }
   return {
