@@ -516,6 +516,17 @@ function copyImages(
     }
   }
 
+  // Copy favicon if present in al-folio project
+  const faviconNames = ['favicon.ico', 'favicon.svg', 'favicon.png'];
+  for (const name of faviconNames) {
+    const src = path.join(cloneDir, 'assets/img', name);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, path.join(ROOT, 'public', name));
+      console.log(`  Copied favicon: ${name}`);
+      break;
+    }
+  }
+
   return { profileDest, pubCount };
 }
 
