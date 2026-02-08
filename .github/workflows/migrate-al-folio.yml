@@ -65,3 +65,16 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: migrate content from al-folio"
           git pull --rebase
           git push
+
+      - name: Trigger post-migration workflows
+        if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Wait for push to propagate
+          sleep 5
+          # Trigger deploy, feed sync, CV render, and SEO generation
+          gh workflow run deploy.yml --ref main || true
+          gh workflow run sync-feeds.yml --ref main || true
+          gh workflow run render-cv.yml --ref main || true
+          gh workflow run generate-seo.yml --ref main || true

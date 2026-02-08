@@ -254,6 +254,7 @@ interface AlFolioConfig {
   google_analytics?: string;
   enable_darkmode?: boolean;
   orcid_id?: string;
+  external_sources?: Array<{ name: string; rss_url: string }>;
   [key: string]: unknown;
 }
 
@@ -515,6 +516,18 @@ function cleanExistingContent(): number {
     const fullDir = path.join(ROOT, "src/content", dir);
     total += rmMdFiles(fullDir);
   }
+  // Clear feeds.json so stale example data doesn't appear
+  const feedsJson = path.join(ROOT, "src/data/feeds.json");
+  if (fs.existsSync(feedsJson)) {
+    fs.writeFileSync(feedsJson, "[]\n");
+    console.log("  Cleared src/data/feeds.json");
+  }
+  // Clear feeds.yml of example entries
+  const feedsYmlPath = path.join(ROOT, "config", "feeds.yml");
+  if (fs.existsSync(feedsYmlPath)) {
+    fs.writeFileSync(feedsYmlPath, yamlDump({ mediumUrl: "", feeds: [], syncInterval: "daily", maxItemsPerFeed: 20 }));
+    console.log("  Cleared config/feeds.yml");
+  }
   return total;
 }
 
@@ -530,21 +543,15 @@ function writeSiteConfig(
 ): void {
   const fullName = [config.first_name, config.last_name].filter(Boolean).join(" ") || "Academic";
 
-  // Build nav — always include People
+  // Build nav — filter out People (personal site doesn't need it)
   const nav = navItems.length > 0
-    ? navItems.map(({ label, href }) => ({ label, href }))
+    ? navItems.filter((n) => n.href !== "/people").map(({ label, href }) => ({ label, href }))
     : [
-        { label: "People", href: "/people" },
         { label: "Publications", href: "/publications" },
         { label: "Blog", href: "/blog" },
         { label: "CV", href: "/cv" },
         { label: "Contact", href: "/contact" },
       ];
-
-  // Ensure People link exists
-  if (!nav.some((n) => n.href === "/people")) {
-    nav.splice(0, 0, { label: "People", href: "/people" });
-  }
 
   // Build socials
   const socials: Record<string, string> = {};
@@ -685,14 +692,44 @@ function writeScholarConfig(config: AlFolioConfig, fullName: string): void {
   console.log("  Wrote config/scholar.yml");
 }
 
-function writeFeedsConfig(config: AlFolioConfig): void {
-  const mediumUrl = config.medium_username
-    ? `https://medium.com/feed/@${config.medium_username}`
-    : "";
+function writeFeedsConfig(config: AlFolioConfig, personSlug: string): void {
+  const feeds: Array<{ name: string; url: string; author: string | null; tags: string[] }> = [];
+
+  // Parse external_sources from al-folio _config.yml
+  const extSources = config.external_sources || [];
+  for (const src of extSources) {
+    if (!src.rss_url) continue;
+    const isMedium = src.rss_url.includes("medium.com");
+    feeds.push({
+      name: src.name || (isMedium ? "Medium" : "External Blog"),
+      url: src.rss_url,
+      author: personSlug,
+      tags: isMedium ? ["medium"] : ["blog"],
+    });
+  }
+
+  // Determine mediumUrl
+  let mediumUrl = "";
+  if (config.medium_username) {
+    mediumUrl = `https://medium.com/feed/@${config.medium_username}`;
+    // Add Medium feed if not already present from external_sources
+    if (!feeds.some((f) => f.url.includes("medium.com"))) {
+      feeds.push({
+        name: "Medium",
+        url: mediumUrl,
+        author: personSlug,
+        tags: ["medium"],
+      });
+    }
+  } else {
+    // Check if any external source is medium
+    const mediumFeed = feeds.find((f) => f.url.includes("medium.com"));
+    if (mediumFeed) mediumUrl = mediumFeed.url;
+  }
 
   const feedsYml: Record<string, unknown> = {
     mediumUrl,
-    feeds: [],
+    feeds,
     syncInterval: "daily",
     maxItemsPerFeed: 20,
   };
@@ -1184,13 +1221,33 @@ async function main() {
     const { profileDest, pubCount } = copyImages(cloneDir, profileImage, pubPreviews);
     console.log(`  Publication preview images: ${pubCount}`);
 
+    // 14b. Copy CNAME if present
+    const cnameSrc = path.join(cloneDir, "CNAME");
+    if (fs.existsSync(cnameSrc)) {
+      fs.copyFileSync(cnameSrc, path.join(ROOT, "public", "CNAME"));
+      console.log("  Copied CNAME file");
+    }
+
     // 15. Write all config and content
     console.log("\nStep 6: Writing config files...");
     writeSiteConfig(config, about, repos, navItems, profileDest, personSlug);
     writeScholarConfig(config, fullName);
-    writeFeedsConfig(config);
+    writeFeedsConfig(config, personSlug);
     writeCvConfig(resume, config, fullName);
     writeResearchConfig(config);
+
+    // 15b. Sync RSS feeds to populate src/data/feeds.json with real data
+    console.log("\n  Syncing RSS feeds...");
+    try {
+      execFileSync(
+        process.execPath,
+        ["--import", "tsx", path.join(ROOT, "scripts/sync-feeds.ts")],
+        { cwd: ROOT, stdio: "pipe", timeout: 30_000 },
+      );
+      console.log("  Feeds synced successfully");
+    } catch {
+      console.warn("  Warning: Feed sync failed (will retry via GitHub Actions)");
+    }
 
     console.log("\nStep 7: Writing remaining content...");
     writePerson(config, about, profileDest, personSlug);
