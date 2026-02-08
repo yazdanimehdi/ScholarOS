@@ -96,6 +96,24 @@ export interface AnalyticsConfig {
   microsoftClarity?: string;
 }
 
+export interface Web3FormsConfig {
+  accessKey?: string;
+}
+
+export interface NewsletterConfig {
+  enabled?: boolean;
+  accessKey?: string;
+  heading?: string;
+  text?: string;
+}
+
+export type HomepageSectionId = 'hero' | 'about' | 'news' | 'publications' | 'blog';
+
+export interface HomepageSectionEntry {
+  id: HomepageSectionId;
+  enabled: boolean;
+}
+
 export interface SeoConfig {
   keywords?: string;
   googleSiteVerification?: string;
@@ -122,6 +140,26 @@ export interface FontsConfig {
   sizes?: FontSizesConfig;
 }
 
+export interface ColorModeConfig {
+  primary?: string;
+  secondary?: string;
+}
+
+export interface BackgroundModeConfig {
+  color?: string;
+  image?: string;
+}
+
+export interface ColorsConfig {
+  light?: ColorModeConfig;
+  dark?: ColorModeConfig;
+}
+
+export interface BackgroundConfig {
+  light?: BackgroundModeConfig;
+  dark?: BackgroundModeConfig;
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   title: string;
@@ -140,12 +178,17 @@ export interface SiteConfig {
   topBar?: TopBarConfig;
   hero?: HeroConfig;
   about?: AboutConfig;
+  homepageSections?: HomepageSectionEntry[];
   imageShape?: ImageShape;
   github?: GitHubConfig;
   analytics?: AnalyticsConfig;
+  web3forms?: Web3FormsConfig;
+  newsletter?: NewsletterConfig;
   seo?: SeoConfig;
   cookieConsent?: boolean;
   fonts?: FontsConfig;
+  colors?: ColorsConfig;
+  background?: BackgroundConfig;
   adminPath?: string;
   adminUsers?: string[];
 }

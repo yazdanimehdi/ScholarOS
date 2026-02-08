@@ -2,33 +2,52 @@
 import Nav from './Nav.astro';
 import ThemeToggle from '../vue/ThemeToggle.vue';
 import MobileNav from '../vue/MobileNav.vue';
+import SearchDialog from '../vue/SearchDialog.vue';
 import { getSiteConfig, getSiteName } from '../../lib/config';
+import { getSearchItems } from '../../lib/search';
 
 const config = getSiteConfig();
 const siteName = getSiteName();
+const searchItems = await getSearchItems();
 ---
 
-<header class="w-full bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm border-b border-surface-200 dark:border-[#21262d]">
+<header class="w-full bg-white/95 dark:bg-dm/95 backdrop-blur-sm border-b border-surface-200 dark:border-dm-border">
   <div class="max-w-[930px] mx-auto px-4 sm:px-6">
-    <div class="flex h-14 items-center justify-between">
+    <div class="flex h-16 items-center justify-between">
       <!-- Logo / Lab name -->
-      <a href="/" class="shrink-0 whitespace-nowrap text-base font-medium text-surface-900 dark:text-[#e6edf3] hover:text-primary-600 dark:hover:text-accent-400 transition-colors" data-nav-logo>
+      <a href="/" class="shrink-0 whitespace-nowrap text-base font-medium text-surface-900 dark:text-dm-heading hover:text-primary-600 dark:hover:text-accent-400 transition-colors me-6" data-nav-logo>
         {siteName}
       </a>
 
       <!-- Desktop Nav -->
       <div class="hidden md:flex items-center gap-1 min-w-0">
         <Nav />
-        <div class="ms-2 ps-2 border-s border-surface-200 dark:border-[#21262d]">
+        <SearchDialog client:load items={searchItems} />
+        <div class="ms-2 ps-2 border-s border-surface-200 dark:border-dm-border">
           <ThemeToggle client:load />
         </div>
       </div>
 
-      <!-- Mobile: theme toggle + hamburger -->
+      <!-- Mobile: search + theme toggle + hamburger -->
       <div class="flex items-center gap-1 md:hidden">
+        <button
+          id="mobile-search-btn"
+          class="p-2 text-surface-500 dark:text-dm-muted hover:text-surface-700 dark:hover:text-dm-text transition-colors"
+          aria-label="Search"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
         <ThemeToggle client:load />
         <MobileNav navItems={config.nav} client:only="vue" />
       </div>
     </div>
   </div>
 </header>
+
+<script>
+  document.getElementById('mobile-search-btn')?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('open-search'));
+  });
+</script>

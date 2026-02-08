@@ -91,6 +91,7 @@ collections:
       - { label: "Pinned", name: "pinned", widget: "boolean", default: false }
       - { label: "Featured", name: "featured", widget: "boolean", default: false }
       - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "Emoji Icon", name: "emoji", widget: "string", required: false, hint: "Optional emoji shown as icon (e.g. 🏆 📄 🎉). Used when no image is set." }
       - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
       - label: "People"
         name: "people"
@@ -227,6 +228,32 @@ collections:
       - { label: "Contact", name: "contact", widget: "string", required: false }
       - { label: "Sort Order", name: "sortOrder", widget: "number", default: 99, value_type: "int" }
       - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "talks"
+    label: "Talks"
+    folder: "src/content/talks"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Event", name: "event", widget: "string" }
+      - { label: "Date", name: "date", widget: "string", hint: "Display date (e.g. November 2024)" }
+      - { label: "Location", name: "location", widget: "string", required: false }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Conference Talk", value: "Conference Talk" }
+          - { label: "Invited Talk", value: "Invited Talk" }
+          - { label: "Seminar", value: "Seminar" }
+          - { label: "Tutorial", value: "Tutorial" }
+          - { label: "Workshop", value: "Workshop" }
+          - { label: "Keynote", value: "Keynote" }
+          - { label: "Panel", value: "Panel" }
+      - { label: "Slides URL", name: "slidesUrl", widget: "string", required: false }
+      - { label: "Video URL", name: "videoUrl", widget: "string", required: false }
+      - { label: "Sort Date", name: "sortDate", widget: "datetime", required: false, hint: "Used for ordering. If empty, talks appear in file order." }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
 
   - name: "person-cvs"
     label: "Person CVs"
@@ -440,6 +467,22 @@ collections:
               - { label: "Title", name: "title", widget: "string" }
               - { label: "Text", name: "text", widget: "text" }
               - { label: "Image", name: "image", widget: "image", required: false }
+          - label: "Homepage Sections"
+            name: "homepageSections"
+            widget: "list"
+            hint: "Drag to reorder homepage sections. Toggle enabled to show/hide."
+            collapsed: false
+            fields:
+              - label: "Section"
+                name: "id"
+                widget: "select"
+                options:
+                  - { label: "Hero", value: "hero" }
+                  - { label: "About", value: "about" }
+                  - { label: "News / Announcements", value: "news" }
+                  - { label: "Publications", value: "publications" }
+                  - { label: "Blog", value: "blog" }
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
           - label: "Typography"
             name: "fonts"
             widget: "object"
@@ -467,6 +510,50 @@ collections:
                   - { label: "Heading 1", name: "h1", widget: "string", required: false, default: "2rem", hint: "Page titles (default: 2rem / 32px)" }
                   - { label: "Heading 2", name: "h2", widget: "string", required: false, default: "1.5rem", hint: "Section headings (default: 1.5rem / 24px)" }
                   - { label: "Heading 3", name: "h3", widget: "string", required: false, default: "1.25rem", hint: "Subsection headings (default: 1.25rem / 20px)" }
+          - label: "Colors"
+            name: "colors"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - label: "Light Mode"
+                name: "light"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Primary Color", name: "primary", widget: "string", required: false, default: "#2c5282", hint: "Hex color for primary accent in light mode (e.g. #2c5282)" }
+                  - { label: "Secondary Color", name: "secondary", widget: "string", required: false, default: "#06b6d4", hint: "Hex color for secondary accent in light mode (e.g. #06b6d4)" }
+              - label: "Dark Mode"
+                name: "dark"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Primary Color", name: "primary", widget: "string", required: false, default: "#22d3ee", hint: "Hex color for primary accent in dark mode (e.g. #22d3ee)" }
+                  - { label: "Secondary Color", name: "secondary", widget: "string", required: false, default: "#2c5282", hint: "Hex color for secondary accent in dark mode (e.g. #2c5282)" }
+          - label: "Background"
+            name: "background"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - label: "Light Mode"
+                name: "light"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Background Color", name: "color", widget: "string", required: false, default: "#ffffff", hint: "Hex color for page background in light mode" }
+                  - { label: "Background Image", name: "image", widget: "image", required: false, hint: "Optional background image for light mode" }
+              - label: "Dark Mode"
+                name: "dark"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - { label: "Background Color", name: "color", widget: "string", required: false, default: "#0d1117", hint: "Hex color for page background in dark mode" }
+                  - { label: "Background Image", name: "image", widget: "image", required: false, hint: "Optional background image for dark mode" }
           - label: "Navigation"
             name: "nav"
             widget: "list"
@@ -514,6 +601,23 @@ collections:
               - { label: "OpenPanel", name: "openpanel", widget: "string", required: false, hint: "Client UUID" }
               - { label: "Pirsch", name: "pirsch", widget: "string", required: false, hint: "Site ID" }
               - { label: "Microsoft Clarity", name: "microsoftClarity", widget: "string", required: false, hint: "Project ID" }
+          - label: "Web3Forms"
+            name: "web3forms"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Access Key", name: "accessKey", widget: "string", required: false, hint: "Get your free access key at https://web3forms.com — leave empty to disable contact and application forms" }
+          - label: "Newsletter"
+            name: "newsletter"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: false }
+              - { label: "Access Key", name: "accessKey", widget: "string", required: false, hint: "Web3Forms access key for newsletter signups" }
+              - { label: "Heading", name: "heading", widget: "string", required: false, default: "Stay Updated" }
+              - { label: "Description", name: "text", widget: "string", required: false }
           - label: "SEO"
             name: "seo"
             widget: "object"
@@ -661,7 +765,6 @@ collections:
         label: "Feed Sources"
         file: "config/feeds.yml"
         fields:
-          - { label: "Medium RSS URL", name: "mediumUrl", widget: "string", required: false, hint: "Your Medium profile or publication RSS feed (e.g. https://medium.com/feed/@username)" }
           - label: "Feeds"
             name: "feeds"
             widget: "list"

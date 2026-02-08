@@ -2,6 +2,7 @@
 title: "NSF Grant Awarded for AI Safety Research"
 date: 2024-08-01
 category: "grant"
+emoji: "💰"
 pinned: false
 featured: true
 excerpt: "The lab has received a $1.2M NSF grant to study safety and alignment in AI systems."

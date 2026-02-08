@@ -120,12 +120,18 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
+function handleOpenSearch() {
+  openDialog();
+}
+
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown);
+  document.addEventListener('open-search', handleOpenSearch);
 });
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown);
+  document.removeEventListener('open-search', handleOpenSearch);
 });
 </script>
 

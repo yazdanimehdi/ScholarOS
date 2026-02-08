@@ -24,7 +24,7 @@ const circular = isCircularShape();
 
 <a href={`/people/${id}`} class="block text-center group">
   <!-- Photo -->
-  <div class:list={["mx-auto mb-3 overflow-hidden bg-surface-100 dark:bg-[#161b22]", shapeClass, circular ? "w-[140px] h-[140px]" : "w-[140px] h-[170px]"]}>
+  <div class:list={["mx-auto mb-3 overflow-hidden bg-surface-100 dark:bg-dm-alt", shapeClass, circular ? "w-[140px] h-[140px]" : "w-[140px] h-[170px]"]}>
     {photo ? (
       <Image
         src={photo}
@@ -34,21 +34,21 @@ const circular = isCircularShape();
         class="w-full h-full object-cover"
       />
     ) : (
-      <div class="w-full h-full flex items-center justify-center text-2xl font-light text-surface-400 dark:text-[#484f58] font-serif">
+      <div class="w-full h-full flex items-center justify-center text-2xl font-light text-surface-400 dark:text-dm-faint font-serif">
         {name.split(' ').map(n => n[0]).join('')}
       </div>
     )}
   </div>
 
   <!-- Name & title -->
-  <h3 class="font-medium text-sm text-surface-900 dark:text-[#e6edf3] group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
+  <h3 class="font-medium text-sm text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
     {name}
   </h3>
-  <p class="text-xs text-surface-500 dark:text-[#8b949e] mt-0.5">
+  <p class="text-xs text-surface-500 dark:text-dm-muted mt-0.5">
     {displayTitle}
   </p>
   {showDate && startDate && (
-    <p class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">
+    <p class="text-xs text-surface-400 dark:text-dm-faint mt-0.5">
       {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
     </p>
   )}

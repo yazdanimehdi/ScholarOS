@@ -2,29 +2,39 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import AnnouncementCard from '../../components/astro/AnnouncementCard.astro';
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import { isPersonalMode } from '../../lib/config';
 
 const personal = isPersonalMode();
 
-const announcements = (await getCollection('announcements'))
+const announcementsRaw = (await getCollection('announcements'))
   .sort((a, b) => {
     if (a.data.pinned && !b.data.pinned) return -1;
     if (!a.data.pinned && b.data.pinned) return 1;
     return b.data.date.getTime() - a.data.date.getTime();
   });
 
+const announcements = await Promise.all(announcementsRaw.map(async (a) => {
+  let imageUrl: string | undefined;
+  if (a.data.image) {
+    const resolved = await getImage({ src: a.data.image, width: 200 });
+    imageUrl = resolved.src;
+  }
+  return { ...a, imageUrl };
+}));
+
 const categories = [...new Set(announcements.map(a => a.data.category))].sort();
 ---
 
 <PageLayout title="News" description={personal ? "Latest updates and announcements." : "Latest announcements, publications, grants, and awards."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">News</h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-6">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">News</h1>
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
     {personal ? "Latest updates and announcements." : "Latest announcements from our lab."}
   </p>
 
   <!-- Category filters -->
   <div class="flex flex-wrap items-center gap-1 mb-6 text-sm">
-    <span class="text-surface-400 dark:text-[#484f58] me-1">Filter:</span>
+    <span class="text-surface-400 dark:text-dm-faint me-1">Filter:</span>
     <a
       href="/news"
       class="px-2 py-1 font-medium text-primary-600 dark:text-accent-400 border-b-2 border-primary-600 dark:border-accent-400"
@@ -34,14 +44,14 @@ const categories = [...new Set(announcements.map(a => a.data.category))].sort();
     {categories.map(cat => (
       <a
         href={`/news/category/${cat}`}
-        class="px-2 py-1 text-surface-500 dark:text-[#8b949e] hover:text-surface-700 dark:hover:text-[#c9d1d9] border-b-2 border-transparent capitalize transition-colors"
+        class="px-2 py-1 text-surface-500 dark:text-dm-muted hover:text-surface-700 dark:hover:text-[#c9d1d9] border-b-2 border-transparent capitalize transition-colors"
       >
         {cat}
       </a>
     ))}
   </div>
 
-  <div class="divide-y divide-surface-100 dark:divide-[#21262d]">
+  <div class="divide-y divide-surface-100 dark:divide-dm-border">
     {announcements.map(a => (
       <AnnouncementCard
         id={a.id}
@@ -50,6 +60,8 @@ const categories = [...new Set(announcements.map(a => a.data.category))].sort();
         category={a.data.category}
         excerpt={a.data.excerpt}
         pinned={a.data.pinned}
+        image={a.imageUrl}
+        emoji={a.data.emoji}
       />
     ))}
   </div>

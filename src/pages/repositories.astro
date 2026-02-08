@@ -45,17 +45,17 @@ const members = (await getCollection('people'))
 ---
 
 <PageLayout title="Repositories" description={personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
     Repositories
   </h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8">
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8">
     {personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}
   </p>
 
   {/* GitHub Stats */}
   {stats && (
     <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
         GitHub Stats
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -74,7 +74,7 @@ const members = (await getCollection('people'))
   {/* Trophies */}
   {trophies && (
     <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
         Trophies
       </h2>
       <div class="overflow-x-auto">
@@ -87,7 +87,7 @@ const members = (await getCollection('people'))
   {/* Pinned Repositories */}
   {pinnedRepos && pinnedRepos.length > 0 && (
     <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
         Pinned Repositories
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,17 +104,17 @@ const members = (await getCollection('people'))
   {/* Team Members */}
   {!personal && members.length > 0 && (
     <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
         Team Members
       </h2>
       <div class="space-y-8">
         {members.map((member) => (
           <div>
             <div class="flex items-center gap-3 mb-3">
-              <a href={`/people/${member.id}`} class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
+              <a href={`/people/${member.id}`} class="text-sm font-medium text-surface-900 dark:text-dm-heading hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
                 {member.name}
               </a>
-              <span class="text-xs text-surface-400 dark:text-[#484f58]">{member.title || getRoleName(member.role)}</span>
+              <span class="text-xs text-surface-400 dark:text-dm-faint">{member.title || getRoleName(member.role)}</span>
               <a href={member.githubUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-primary-600 dark:text-accent-400 hover:underline">
                 @{member.githubUsername}
               </a>
@@ -136,7 +136,7 @@ const members = (await getCollection('people'))
   )}
 
   {/* GitHub Profile Link */}
-  <div class="text-center pt-4 border-t border-surface-200 dark:border-[#21262d]">
+  <div class="text-center pt-4 border-t border-surface-200 dark:border-dm-border">
     <a
       href={`https://github.com/${username}`}
       target="_blank"

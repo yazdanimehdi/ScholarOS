@@ -37,7 +37,7 @@ function getVenueAbbr(venue: string): string {
   <!-- Thumbnail (if image exists) -->
   {image ? (
     <div class="shrink-0 pt-0.5">
-      <img src={image.src} alt={title} class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-[#30363d]" loading="lazy" />
+      <img src={image.src} alt={title} class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-dm-border-alt" loading="lazy" />
     </div>
   ) : (
     <div class="shrink-0 pt-0.5">
@@ -47,7 +47,7 @@ function getVenueAbbr(venue: string): string {
 
   <!-- Content -->
   <div class="flex-1 min-w-0">
-    <h3 class="text-[0.95rem] leading-snug font-medium text-surface-900 dark:text-[#e6edf3]">
+    <h3 class="text-[0.95rem] leading-snug font-medium text-surface-900 dark:text-dm-heading">
       {url ? (
         <a href={url} target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
           {title}
@@ -55,11 +55,11 @@ function getVenueAbbr(venue: string): string {
       ) : title}
     </h3>
 
-    <p class="mt-1 text-sm text-surface-500 dark:text-[#8b949e]">
+    <p class="mt-1 text-sm text-surface-500 dark:text-dm-muted">
       {authors.map((author, i) => (
         <>
           <span class:list={[
-            isHighlighted(author) && 'font-medium text-surface-800 dark:text-[#c9d1d9]'
+            isHighlighted(author) && 'font-medium text-surface-800 dark:text-dm-text'
           ]}>
             {author}
           </span>
@@ -68,7 +68,7 @@ function getVenueAbbr(venue: string): string {
       ))}
     </p>
 
-    <p class="mt-0.5 text-sm text-surface-500 dark:text-[#8b949e]">
+    <p class="mt-0.5 text-sm text-surface-500 dark:text-dm-muted">
       {venue}, {year}
     </p>
 

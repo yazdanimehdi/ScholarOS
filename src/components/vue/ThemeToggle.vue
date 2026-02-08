@@ -1,7 +1,7 @@
 <template>
   <button
     @click="toggle"
-    class="inline-flex items-center justify-center w-8 h-8 rounded text-[var(--color-surface-500)] hover:text-[var(--color-primary-600)] dark:text-[#8b949e] dark:hover:text-[var(--color-accent-400)] transition-colors"
+    class="inline-flex items-center justify-center w-8 h-8 rounded text-[var(--color-surface-500)] hover:text-[var(--color-primary-600)] dark:text-dm-muted dark:hover:text-[var(--color-accent-400)] transition-colors"
     :aria-label="`Switch to ${isDark ? 'light' : 'dark'} mode`"
     :title="`Switch to ${isDark ? 'light' : 'dark'} mode`"
   >

@@ -28,7 +28,7 @@ const darkBg = hero.dark?.bgColor ?? '#0d1117';
 ---
 
 <section
-  class="relative overflow-hidden border-b border-surface-200 dark:border-[#21262d]"
+  class="relative overflow-hidden border-b border-surface-200 dark:border-dm-border"
   style={`--hero-bg-light: ${lightBg}; --hero-bg-dark: ${darkBg};`}
 >
   {/* Background layer */}
@@ -65,11 +65,11 @@ const darkBg = hero.dark?.bgColor ?? '#0d1117';
 
   {/* Foreground content */}
   <div class="relative z-10 max-w-[930px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
-    <h1 class="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-normal text-surface-900 dark:text-[#e6edf3] leading-tight mb-4">
+    <h1 class="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-normal text-surface-900 dark:text-dm-heading leading-tight mb-4">
       {title}
     </h1>
     {subtitle && (
-      <p class="text-base sm:text-lg text-surface-500 dark:text-[#8b949e] mb-6 max-w-2xl leading-relaxed">
+      <p class="text-base sm:text-lg text-surface-500 dark:text-dm-muted mb-6 max-w-2xl leading-relaxed">
         {subtitle}
       </p>
     )}
@@ -85,7 +85,7 @@ const darkBg = hero.dark?.bgColor ?? '#0d1117';
       {secondaryCtaText && secondaryCtaHref && (
         <a
           href={secondaryCtaHref}
-          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded border border-surface-300 dark:border-[#30363d] text-surface-700 dark:text-[#c9d1d9] hover:border-surface-400 dark:hover:border-[#8b949e] hover:text-surface-900 dark:hover:text-white transition-colors"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded border border-surface-300 dark:border-dm-border-alt text-surface-700 dark:text-dm-text hover:border-surface-400 dark:hover:border-[#8b949e] hover:text-surface-900 dark:hover:text-white transition-colors"
         >
           {secondaryCtaText}
         </a>

@@ -9,116 +9,191 @@ import PostCard from '../components/astro/PostCard.astro';
 import FeedItem from '../components/astro/FeedItem.astro';
 import SEO from '../components/astro/SEO.astro';
 import { getCollection } from 'astro:content';
-import { getSiteConfig, getSiteName, isPersonalMode } from '../lib/config';
+import { getImage } from 'astro:assets';
+import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections, getGridColumnCount } from '../lib/config';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
 const siteName = getSiteName();
 
-const announcements = (await getCollection('announcements'))
-  .sort((a, b) => {
-    if (a.data.pinned && !b.data.pinned) return -1;
-    if (!a.data.pinned && b.data.pinned) return 1;
-    return b.data.date.getTime() - a.data.date.getTime();
-  })
-  .slice(0, 4);
+const sections = getHomepageSections();
+const gridColCount = getGridColumnCount();
+const gridClass = gridColCount >= 3 ? 'md:grid-cols-3' : gridColCount === 2 ? 'md:grid-cols-2' : '';
 
-const publications = (await getCollection('publications'))
-  .sort((a, b) => b.data.year - a.data.year)
-  .slice(0, 4);
+const GRID_IDS = ['news', 'publications', 'blog'] as const;
+const enabledGridSections = sections.filter(id => (GRID_IDS as readonly string[]).includes(id));
+const firstGridId = enabledGridSections[0] ?? null;
 
-const posts = (await getCollection('posts'))
-  .filter(p => !p.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3);
+// Only fetch data for enabled sections
+const announcements = sections.includes('news')
+  ? (await getCollection('announcements'))
+      .sort((a, b) => {
+        if (a.data.pinned && !b.data.pinned) return -1;
+        if (!a.data.pinned && b.data.pinned) return 1;
+        return b.data.date.getTime() - a.data.date.getTime();
+      })
+      .slice(0, 4)
+  : [];
 
-const feeds = (await getCollection('feeds'))
-  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
-  .slice(0, 2);
+const publicationsRaw = sections.includes('publications')
+  ? (await getCollection('publications'))
+      .sort((a, b) => b.data.year - a.data.year)
+      .slice(0, 4)
+  : [];
+
+const publications = await Promise.all(publicationsRaw.map(async (pub) => {
+  let imageUrl: string | undefined;
+  if (pub.data.image) {
+    const resolved = await getImage({ src: pub.data.image, width: 400 });
+    imageUrl = resolved.src;
+  }
+  return { ...pub, imageUrl };
+}));
+
+// Resolve announcement images
+const announcementData = await Promise.all(announcements.map(async (a) => {
+  let imageUrl: string | undefined;
+  if (a.data.image) {
+    const resolved = await getImage({ src: a.data.image, width: 200 });
+    imageUrl = resolved.src;
+  }
+  return { ...a, imageUrl };
+}));
+
+const posts = sections.includes('blog')
+  ? (await getCollection('posts'))
+      .filter(p => !p.data.draft)
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+      .slice(0, 3)
+  : [];
+
+const feeds = sections.includes('blog')
+  ? (await getCollection('feeds'))
+      .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+      .slice(0, 2)
+  : [];
 ---
 
 <PageLayout title={config.title} fullWidth>
   <SEO type="website" title={config.title} />
 
-  <HeroSection
-    title={siteName}
-    subtitle={config.description}
-    ctaText={personal ? "View Publications" : "Explore Research"}
-    ctaHref={personal ? "/publications" : "/research"}
-    secondaryCtaText={personal ? "Download CV" : "Join the Lab"}
-    secondaryCtaHref={personal ? "/cv" : "/join"}
-  />
+  {sections.map(id => {
+    if (id === 'hero') {
+      return (
+        <HeroSection
+          title={siteName}
+          subtitle={config.description}
+          ctaText={personal ? "View Publications" : "Explore Research"}
+          ctaHref={personal ? "/publications" : "/research"}
+          secondaryCtaText={personal ? "Download CV" : "Join the Lab"}
+          secondaryCtaHref={personal ? "/cv" : "/join"}
+        />
+      );
+    }
 
-  <AboutSection />
+    if (id === 'about') {
+      return <AboutSection />;
+    }
 
-  <!-- Three-column section: News / Publications / Blog -->
-  <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Latest Announcements -->
-      <div>
-        <SectionHeading title={personal ? "Recent Updates" : "Latest Announcements"} viewAllHref="/news" />
-        <div class="mt-3 space-y-0">
-          {announcements.map(a => (
-            <AnnouncementCard
-              id={a.id}
-              title={a.data.title}
-              date={a.data.date}
-              category={a.data.category}
-              excerpt={a.data.excerpt}
-              pinned={a.data.pinned}
-            />
-          ))}
+    // Render the grid wrapper at the position of the first grid section
+    if (id === firstGridId && enabledGridSections.length > 0) {
+      return (
+        <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-8">
+          <div class={`grid grid-cols-1 ${gridClass} gap-8`}>
+            {enabledGridSections.map(gridId => {
+              if (gridId === 'news') {
+                return (
+                  <div>
+                    <SectionHeading title={personal ? "Recent Updates" : "Latest Announcements"} viewAllHref="/news" />
+                    <div class="mt-3 space-y-0">
+                      {announcementData.map(a => (
+                        <AnnouncementCard
+                          id={a.id}
+                          title={a.data.title}
+                          date={a.data.date}
+                          category={a.data.category}
+                          excerpt={a.data.excerpt}
+                          pinned={a.data.pinned}
+                          image={a.imageUrl}
+                          emoji={a.data.emoji}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (gridId === 'publications') {
+                return (
+                  <div>
+                    <SectionHeading title={personal ? "Latest Publications" : "Recent Publications"} viewAllHref="/publications" />
+                    <div class="mt-3 divide-y divide-surface-100 dark:divide-dm-border">
+                      {publications.map(pub => (
+                        <div class="py-2">
+                          <a href={pub.data.url || '#'} target="_blank" rel="noopener noreferrer" class="flex items-start gap-3 group">
+                            {pub.imageUrl ? (
+                              <img src={pub.imageUrl} alt="" class="shrink-0 w-10 h-10 rounded object-cover mt-0.5" loading="lazy" />
+                            ) : (
+                              <span class="shrink-0 w-10 h-10 rounded bg-surface-100 dark:bg-dm-border flex items-center justify-center mt-0.5">
+                                <span class="text-[10px] font-semibold uppercase text-surface-500 dark:text-dm-muted leading-none">{pub.data.type === 'journal' ? 'J' : pub.data.type === 'conference' ? 'C' : pub.data.type === 'preprint' ? 'P' : pub.data.type === 'workshop' ? 'W' : pub.data.type === 'thesis' ? 'T' : 'B'}</span>
+                              </span>
+                            )}
+                            <div class="min-w-0">
+                              <h4 class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug line-clamp-2">
+                                {pub.data.title}
+                              </h4>
+                              <p class="text-xs text-surface-500 dark:text-dm-muted mt-0.5">
+                                {pub.data.venue}, {pub.data.year}
+                              </p>
+                              <div class="flex items-center gap-1.5 mt-1">
+                                <span class="inline-block px-1.5 py-0.5 text-[10px] font-medium uppercase rounded bg-surface-100 dark:bg-dm-border text-surface-600 dark:text-dm-muted">{pub.data.type}</span>
+                                {pub.data.pdf && <span class="text-xs text-primary-600 dark:text-accent-400">PDF</span>}
+                                {pub.data.bibtex && <span class="text-xs text-surface-500 dark:text-dm-muted">BibTeX</span>}
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (gridId === 'blog') {
+                return (
+                  <div>
+                    <SectionHeading title={personal ? "Recent Posts" : "From Our Blog"} viewAllHref="/blog" />
+                    <div class="mt-3">
+                      {posts.map(post => (
+                        <PostCard
+                          id={post.id}
+                          title={post.data.title}
+                          date={post.data.date}
+                          excerpt={post.data.excerpt}
+                          tags={post.data.tags}
+                          author={post.data.author}
+                        />
+                      ))}
+                      {feeds.slice(0, 1).map(feed => (
+                        <FeedItem
+                          title={feed.data.title}
+                          link={feed.data.link}
+                          date={feed.data.date}
+                          source={feed.data.source}
+                          excerpt={feed.data.excerpt}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+            })}
+          </div>
         </div>
-      </div>
+      );
+    }
 
-      <!-- Recent Publications -->
-      <div>
-        <SectionHeading title={personal ? "Latest Publications" : "Recent Publications"} viewAllHref="/publications" />
-        <div class="mt-3 divide-y divide-surface-100 dark:divide-[#21262d]">
-          {publications.map(pub => (
-            <div class="py-2">
-              <a href={pub.data.url || '#'} target="_blank" rel="noopener noreferrer" class="block group">
-                <h4 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug line-clamp-2">
-                  {pub.data.title}
-                </h4>
-                <p class="text-xs text-surface-400 dark:text-[#484f58] mt-0.5">
-                  {pub.data.venue}, {pub.data.year}
-                </p>
-                <div class="flex gap-1.5 mt-1">
-                  {pub.data.url && <span class="text-xs text-primary-600 dark:text-accent-400">PDF</span>}
-                  {pub.data.bibtex && <span class="text-xs text-surface-400 dark:text-[#484f58]">| BibTeX</span>}
-                </div>
-              </a>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- From Our Blog -->
-      <div>
-        <SectionHeading title={personal ? "Recent Posts" : "From Our Blog"} viewAllHref="/blog" />
-        <div class="mt-3">
-          {posts.map(post => (
-            <PostCard
-              id={post.id}
-              title={post.data.title}
-              date={post.data.date}
-              excerpt={post.data.excerpt}
-              tags={post.data.tags}
-              author={post.data.author}
-            />
-          ))}
-          {feeds.slice(0, 1).map(feed => (
-            <FeedItem
-              title={feed.data.title}
-              link={feed.data.link}
-              date={feed.data.date}
-              source={feed.data.source}
-              excerpt={feed.data.excerpt}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
+    // Subsequent grid IDs already rendered in the grid wrapper
+    return null;
+  })}
 </PageLayout>

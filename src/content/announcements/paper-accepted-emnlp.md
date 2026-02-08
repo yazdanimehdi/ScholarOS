@@ -2,6 +2,7 @@
 title: "Paper Accepted at EMNLP 2024"
 date: 2024-09-15
 category: "paper"
+emoji: "📄"
 pinned: true
 featured: true
 excerpt: "Our paper on adaptive language model fine-tuning has been accepted at EMNLP 2024."

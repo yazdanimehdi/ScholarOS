@@ -8,8 +8,8 @@ const personal = isPersonalMode();
 ---
 
 <PageLayout title={personal ? "Prospective Students" : "Join Us"} description={personal ? "Interested in working with me? See open positions and opportunities." : "Open positions and opportunities to join our research lab."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">{personal ? "Prospective Students" : "Join Our Lab"}</h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8 max-w-2xl">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">{personal ? "Prospective Students" : "Join Our Lab"}</h1>
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8 max-w-2xl">
     {personal
       ? "Interested in working with me? I'm always looking for talented and motivated students and collaborators."
       : "We're always looking for talented and motivated researchers to join our team."}
@@ -17,7 +17,7 @@ const personal = isPersonalMode();
 
   <!-- Lab Culture -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       {personal ? "Working With Me" : "Our Culture"}
     </h2>
     <div class="grid sm:grid-cols-3 gap-6">
@@ -27,8 +27,8 @@ const personal = isPersonalMode();
         { title: 'Growth & Mentorship', desc: 'We invest in the development of every team member through mentorship and support.' },
       ].map(item => (
         <div>
-          <h3 class="text-sm font-medium text-surface-900 dark:text-[#e6edf3] mb-1">{item.title}</h3>
-          <p class="text-sm text-surface-500 dark:text-[#8b949e]">{item.desc}</p>
+          <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading mb-1">{item.title}</h3>
+          <p class="text-sm text-surface-500 dark:text-dm-muted">{item.desc}</p>
         </div>
       ))}
     </div>
@@ -36,10 +36,10 @@ const personal = isPersonalMode();
 
   <!-- Open Positions Link -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       Open Positions
     </h2>
-    <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-3">
+    <p class="text-sm text-surface-600 dark:text-dm-muted mb-3">
       {personal
         ? "I have several open positions for students and researchers at various levels."
         : "We have several open positions for researchers at various levels."}
@@ -55,23 +55,23 @@ const personal = isPersonalMode();
 
   <!-- How to Apply -->
   <section>
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       How to Apply
     </h2>
-    <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-3">
+    <p class="text-sm text-surface-600 dark:text-dm-muted mb-3">
       {personal ? "To apply, please visit the" : "To apply for a position in our lab, please visit the"}{' '}
       <a href="/positions" class="text-primary-600 dark:text-accent-400 hover:underline">positions page</a>{' '}
       and use the application form on the relevant position, or send the following materials to{' '}
       <ObfuscatedEmail email={config.socials.email!} class="text-primary-600 dark:text-accent-400 hover:underline" />:
     </p>
-    <ol class="list-decimal list-inside text-sm text-surface-500 dark:text-[#8b949e] space-y-1.5 mb-4">
+    <ol class="list-decimal list-inside text-sm text-surface-500 dark:text-dm-muted space-y-1.5 mb-4">
       <li>Your CV/resume</li>
       <li>A brief statement of research interests (1-2 paragraphs)</li>
       <li>Relevant publications or writing samples (if available)</li>
       <li>Names and contact information for 2-3 references</li>
     </ol>
-    <p class="text-xs text-surface-400 dark:text-[#484f58]">
-      Please use the subject line: <code class="bg-surface-100 dark:bg-[#161b22] px-1.5 py-0.5 rounded text-xs font-mono">[Position Type] Application - Your Name</code>
+    <p class="text-xs text-surface-400 dark:text-dm-faint">
+      Please use the subject line: <code class="bg-surface-100 dark:bg-dm-alt px-1.5 py-0.5 rounded text-xs font-mono">[Position Type] Application - Your Name</code>
     </p>
   </section>
 </PageLayout>

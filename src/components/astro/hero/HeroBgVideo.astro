@@ -13,6 +13,9 @@ const { video } = Astro.props;
   muted
   loop
   playsinline
+  preload="auto"
+  width="1920"
+  height="600"
   class="absolute inset-0 w-full h-full object-cover"
   poster={video.poster || undefined}
 >
@@ -20,4 +23,4 @@ const { video } = Astro.props;
 </video>
 
 {/* Overlay for text readability */}
-<div class="absolute inset-0 bg-white/60 dark:bg-[#0d1117]/70"></div>
+<div class="absolute inset-0 bg-white/60 dark:bg-dm/70"></div>

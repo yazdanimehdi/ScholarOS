@@ -15,8 +15,12 @@ const { light, dark } = Astro.props;
     <img
       src={light.bgImage}
       alt=""
+      width="1920"
+      height="600"
       class="w-full h-full object-cover"
       loading="eager"
+      fetchpriority="high"
+      decoding="async"
     />
   )}
 </div>
@@ -27,8 +31,12 @@ const { light, dark } = Astro.props;
     <img
       src={dark.bgImage}
       alt=""
+      width="1920"
+      height="600"
       class="w-full h-full object-cover"
       loading="eager"
+      fetchpriority="high"
+      decoding="async"
     />
   )}
 </div>

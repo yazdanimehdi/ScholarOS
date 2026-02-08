@@ -1,22 +1,22 @@
 <template>
   <div>
     <!-- Filter bar -->
-    <div class="flex flex-col gap-3 mb-6 pb-3 border-b border-[var(--color-surface-200)] dark:border-[#21262d]">
+    <div class="flex flex-col gap-3 mb-6 pb-3 border-b border-[var(--color-surface-200)] dark:border-dm-border">
       <!-- Row 1: Search bar (always visible) -->
       <div class="relative">
-        <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-surface-400)] dark:text-[#484f58]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-surface-400)] dark:text-dm-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
           v-model="search"
           type="text"
           placeholder="Search publications..."
-          class="w-full ps-9 pe-8 py-1.5 text-sm rounded-md border border-[var(--color-surface-200)] dark:border-[#30363d] bg-white dark:bg-[#0d1117] text-[var(--color-surface-800)] dark:text-[#c9d1d9] placeholder-[var(--color-surface-400)] dark:placeholder-[#484f58] outline-none focus:border-[var(--color-primary-500)] dark:focus:border-[var(--color-accent-500)]"
+          class="w-full ps-9 pe-8 py-1.5 text-sm rounded-md border border-[var(--color-surface-200)] dark:border-dm-border-alt bg-white dark:bg-dm text-[var(--color-surface-800)] dark:text-dm-text placeholder-[var(--color-surface-400)] dark:placeholder-dm-faint outline-none focus:border-[var(--color-primary-500)] dark:focus:border-[var(--color-accent-500)]"
         />
         <button
           v-if="search"
           @click="search = ''"
-          class="absolute end-2 top-1/2 -translate-y-1/2 text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-[#484f58] dark:hover:text-[#8b949e] text-lg leading-none"
+          class="absolute end-2 top-1/2 -translate-y-1/2 text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-dm-faint dark:hover:text-[#8b949e] text-lg leading-none"
         >
           &times;
         </button>
@@ -25,14 +25,14 @@
       <!-- Row 2: Filter buttons + year + view toggle -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-1 text-sm">
-          <span class="text-[var(--color-surface-400)] dark:text-[#484f58] me-1">Filter by:</span>
+          <span class="text-[var(--color-surface-400)] dark:text-dm-faint me-1">Filter by:</span>
           <button
             @click="selectedType = ''"
             :class="[
               'px-2 py-0.5 text-sm transition-colors border-b-2',
               !selectedType
                 ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
-                : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
+                : 'text-[var(--color-surface-500)] dark:text-dm-muted border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
             ]"
           >
             All
@@ -45,14 +45,14 @@
               'px-2 py-0.5 text-sm capitalize transition-colors border-b-2',
               selectedType === t
                 ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
-                : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
+                : 'text-[var(--color-surface-500)] dark:text-dm-muted border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
             ]"
           >
             {{ t }}
           </button>
           <select
             v-model="selectedYear"
-            class="ms-2 px-2 py-0.5 text-sm bg-transparent text-[var(--color-surface-500)] dark:text-[#8b949e] border-b-2 border-transparent cursor-pointer outline-none"
+            class="ms-2 px-2 py-0.5 text-sm bg-transparent text-[var(--color-surface-500)] dark:text-dm-muted border-b-2 border-transparent cursor-pointer outline-none"
           >
             <option value="">Year</option>
             <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
@@ -67,7 +67,7 @@
               'p-1 rounded transition-colors',
               viewMode === 'list'
                 ? 'text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)]'
-                : 'text-[var(--color-surface-400)] dark:text-[#484f58] hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
+                : 'text-[var(--color-surface-400)] dark:text-dm-faint hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
             ]"
             title="List view"
           >
@@ -81,7 +81,7 @@
               'p-1 rounded transition-colors',
               viewMode === 'grid'
                 ? 'text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)]'
-                : 'text-[var(--color-surface-400)] dark:text-[#484f58] hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
+                : 'text-[var(--color-surface-400)] dark:text-dm-faint hover:text-[var(--color-surface-600)] dark:hover:text-[#8b949e]',
             ]"
             title="Grid view"
           >
@@ -94,12 +94,12 @@
     </div>
 
     <!-- Results count -->
-    <p v-if="search || selectedType || selectedYear" class="text-xs text-[var(--color-surface-400)] dark:text-[#484f58] mb-4">
+    <p v-if="search || selectedType || selectedYear" class="text-xs text-[var(--color-surface-400)] dark:text-dm-faint mb-4">
       {{ filteredPublications.length }} of {{ publications.length }} publications
     </p>
 
     <!-- List view -->
-    <div v-if="viewMode === 'list'" class="divide-y divide-[var(--color-surface-100)] dark:divide-[#21262d]">
+    <div v-if="viewMode === 'list'" class="divide-y divide-[var(--color-surface-100)] dark:divide-dm-border">
       <div
         v-for="pub in filteredPublications"
         :key="pub.id"
@@ -107,7 +107,7 @@
       >
         <!-- Thumbnail (if image exists) -->
         <div v-if="pub.image" class="shrink-0 pt-0.5">
-          <img :src="pub.image" :alt="pub.title" class="w-16 h-16 object-cover rounded border border-[var(--color-surface-200)] dark:border-[#30363d]" loading="lazy" />
+          <img :src="pub.image" :alt="pub.title" class="w-16 h-16 object-cover rounded border border-[var(--color-surface-200)] dark:border-dm-border-alt" loading="lazy" />
         </div>
 
         <!-- Venue badge (if no image) -->
@@ -117,7 +117,7 @@
 
         <!-- Content -->
         <div class="flex-1 min-w-0">
-          <h3 class="text-[0.95rem] leading-snug font-medium text-[var(--color-surface-900)] dark:text-[#e6edf3]">
+          <h3 class="text-[0.95rem] leading-snug font-medium text-[var(--color-surface-900)] dark:text-dm-heading">
             <a
               v-if="pub.url"
               :href="pub.url"
@@ -130,16 +130,16 @@
             <span v-else>{{ pub.title }}</span>
           </h3>
 
-          <p class="mt-1 text-sm text-[var(--color-surface-500)] dark:text-[#8b949e]">
+          <p class="mt-1 text-sm text-[var(--color-surface-500)] dark:text-dm-muted">
             <template v-for="(author, i) in pub.authors" :key="i">
-              <span :class="{ 'font-medium text-[var(--color-surface-800)] dark:text-[#c9d1d9]': isHighlighted(author) }">
+              <span :class="{ 'font-medium text-[var(--color-surface-800)] dark:text-dm-text': isHighlighted(author) }">
                 {{ author }}
               </span>
               <span v-if="i < pub.authors.length - 1">, </span>
             </template>
           </p>
 
-          <p class="mt-0.5 text-sm text-[var(--color-surface-500)] dark:text-[#8b949e]">
+          <p class="mt-0.5 text-sm text-[var(--color-surface-500)] dark:text-dm-muted">
             {{ pub.venue }}, {{ pub.year }}
           </p>
 
@@ -163,20 +163,20 @@
       <div
         v-for="pub in filteredPublications"
         :key="pub.id"
-        class="rounded-lg border border-[var(--color-surface-200)] dark:border-[#30363d] overflow-hidden bg-white dark:bg-[#161b22] hover:border-[var(--color-primary-400)] dark:hover:border-[var(--color-accent-500)] transition-colors"
+        class="rounded-lg border border-[var(--color-surface-200)] dark:border-dm-border-alt overflow-hidden bg-white dark:bg-dm-alt hover:border-[var(--color-primary-400)] dark:hover:border-[var(--color-accent-500)] transition-colors"
       >
         <!-- Card image or placeholder -->
-        <div class="relative h-36 bg-[var(--color-surface-100)] dark:bg-[#0d1117]">
+        <div class="relative h-36 bg-[var(--color-surface-100)] dark:bg-dm">
           <img v-if="pub.image" :src="pub.image" :alt="pub.title" class="w-full h-full object-cover" loading="lazy" />
           <div v-else class="w-full h-full flex items-center justify-center">
-            <span class="text-2xl font-bold text-[var(--color-surface-300)] dark:text-[#30363d]">{{ getVenueAbbr(pub.venue) }}</span>
+            <span class="text-2xl font-bold text-[var(--color-surface-300)] dark:text-dm-border-alt">{{ getVenueAbbr(pub.venue) }}</span>
           </div>
           <span class="absolute top-2 end-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white capitalize">{{ pub.type }}</span>
         </div>
 
         <!-- Card content -->
         <div class="p-3">
-          <h3 class="text-sm leading-snug font-medium text-[var(--color-surface-900)] dark:text-[#e6edf3] line-clamp-2">
+          <h3 class="text-sm leading-snug font-medium text-[var(--color-surface-900)] dark:text-dm-heading line-clamp-2">
             <a
               v-if="pub.url"
               :href="pub.url"
@@ -189,11 +189,11 @@
             <span v-else>{{ pub.title }}</span>
           </h3>
 
-          <p class="mt-1 text-xs text-[var(--color-surface-500)] dark:text-[#8b949e] truncate">
+          <p class="mt-1 text-xs text-[var(--color-surface-500)] dark:text-dm-muted truncate">
             {{ pub.authors.join(', ') }}
           </p>
 
-          <p class="mt-0.5 text-xs text-[var(--color-surface-500)] dark:text-[#8b949e]">
+          <p class="mt-0.5 text-xs text-[var(--color-surface-500)] dark:text-dm-muted">
             {{ pub.venue }}, {{ pub.year }}
           </p>
 
@@ -212,7 +212,7 @@
       </div>
     </div>
 
-    <p v-if="filteredPublications.length === 0" class="text-center py-12 text-sm text-[var(--color-surface-400)] dark:text-[#484f58]">
+    <p v-if="filteredPublications.length === 0" class="text-center py-12 text-sm text-[var(--color-surface-400)] dark:text-dm-faint">
       No publications match your filters.
     </p>
   </div>

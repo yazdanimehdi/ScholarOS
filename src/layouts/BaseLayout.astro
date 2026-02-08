@@ -4,6 +4,7 @@ import Analytics from '../components/astro/Analytics.astro';
 import CookieConsent from '../components/astro/CookieConsent.astro';
 import { ClientRouter } from 'astro:transitions';
 import { getSiteConfig } from '../lib/config';
+import { generateColorOverrides } from '../lib/colors';
 
 interface Props {
   title: string;
@@ -17,12 +18,14 @@ const config = getSiteConfig();
 const lang = config.lang ?? 'en';
 const dir = config.direction ?? 'ltr';
 const defaultTheme = config.defaultTheme ?? 'system';
+const colorCSS = generateColorOverrides(config);
 ---
 
 <!doctype html>
 <html lang={lang} dir={dir} class="scroll-smooth" data-default-theme={defaultTheme}>
   <head>
     <BaseHead title={title} description={description} ogImage={ogImage} keywords={keywords} />
+    {colorCSS && <style set:html={colorCSS} />}
     <ClientRouter />
     <script is:inline>
       // Apply theme from localStorage or configured default

@@ -66,7 +66,7 @@ const twitterUsername = twitterUrl ? (() => {
 {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary" />
+<meta property="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
 <meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={fullTitle} />
 <meta property="twitter:description" content={description} />

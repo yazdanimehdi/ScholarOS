@@ -8,6 +8,7 @@ import ProseEnhancements from '../components/astro/ProseEnhancements.astro';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
   date?: Date;
   author?: string;
   tags?: string[];
@@ -15,22 +16,22 @@ interface Props {
   headings?: { depth: number; slug: string; text: string }[];
 }
 
-const { title, description, date, author, tags, keywords, headings = [] } = Astro.props;
+const { title, description, ogImage, date, author, tags, keywords, headings = [] } = Astro.props;
 const showToc = headings.length > 2;
 ---
 
-<PageLayout title={title} description={description} keywords={keywords}>
+<PageLayout title={title} description={description} ogImage={ogImage} keywords={keywords}>
   <Breadcrumb />
 
   <article class="mt-4">
-    <header class="mb-6 pb-4 border-b border-surface-200 dark:border-[#21262d]">
-      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+    <header class="mb-6 pb-4 border-b border-surface-200 dark:border-dm-border">
+      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
         {title}
       </h1>
       {description && (
-        <p class="text-surface-500 dark:text-[#8b949e] mb-3">{description}</p>
+        <p class="text-surface-500 dark:text-dm-muted mb-3">{description}</p>
       )}
-      <div class="flex flex-wrap items-center gap-3 text-sm text-surface-400 dark:text-[#484f58]">
+      <div class="flex flex-wrap items-center gap-3 text-sm text-surface-400 dark:text-dm-faint">
         {date && <FormattedDate date={date} />}
         {author && (
           <>
@@ -42,7 +43,7 @@ const showToc = headings.length > 2;
       {tags && tags.length > 0 && (
         <div class="flex flex-wrap gap-2 mt-3">
           {tags.map(tag => (
-            <span class="text-xs text-surface-400 dark:text-[#484f58]">#{tag}</span>
+            <span class="text-xs text-surface-400 dark:text-dm-faint">#{tag}</span>
           ))}
         </div>
       )}

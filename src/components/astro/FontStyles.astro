@@ -98,9 +98,11 @@ if (hasSizeOverrides) {
 }
 ---
 
-<!-- Font loading -->
+<!-- Font loading (non-render-blocking) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href={googleFontsUrl} rel="stylesheet" />
+<link rel="preload" as="style" href={googleFontsUrl} />
+<link href={googleFontsUrl} rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href={googleFontsUrl} rel="stylesheet" /></noscript>
 
 {cssOverrides && <style set:html={cssOverrides} />}

@@ -19,7 +19,7 @@ function isActive(href: string): boolean {
           'px-2.5 py-1.5 text-sm transition-colors whitespace-nowrap',
           isActive(item.href)
             ? 'font-medium text-primary-600 dark:text-accent-400'
-            : 'text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400',
+            : 'text-surface-600 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400',
         ]}
         aria-current={isActive(item.href) ? 'page' : undefined}
         data-nav-item
@@ -33,7 +33,7 @@ function isActive(href: string): boolean {
   <div class="relative hidden" data-nav-more>
     <button
       type="button"
-      class="px-2.5 py-1.5 text-sm text-surface-600 hover:text-primary-600 dark:text-[#8b949e] dark:hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1"
+      class="px-2.5 py-1.5 text-sm text-surface-600 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1"
       data-nav-more-btn
       aria-expanded="false"
       aria-haspopup="true"
@@ -44,7 +44,7 @@ function isActive(href: string): boolean {
       </svg>
     </button>
     <div
-      class="absolute end-0 top-full mt-1 min-w-[160px] bg-white dark:bg-[#161b22] border border-surface-200 dark:border-[#30363d] rounded-md shadow-lg py-1 z-50 hidden"
+      class="absolute end-0 top-full mt-1 min-w-[160px] bg-white dark:bg-dm-alt border border-surface-200 dark:border-dm-border-alt rounded-md shadow-lg py-1 z-50 hidden"
       data-nav-more-menu
     >
       <!-- Overflow items inserted here by JS -->
@@ -112,10 +112,10 @@ function isActive(href: string): boolean {
           link.href = items[i].href;
           link.textContent = items[i].textContent?.trim() || '';
           if (items[i].getAttribute('aria-current') === 'page') {
-            link.className = 'block px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-accent-400 bg-surface-50 dark:bg-[#1c2128]';
+            link.className = 'block px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-accent-400 bg-surface-50 dark:bg-dm-hover';
             link.setAttribute('aria-current', 'page');
           } else {
-            link.className = 'block px-3 py-1.5 text-sm text-surface-600 hover:text-primary-600 hover:bg-surface-50 dark:text-[#8b949e] dark:hover:text-accent-400 dark:hover:bg-[#1c2128] transition-colors';
+            link.className = 'block px-3 py-1.5 text-sm text-surface-600 hover:text-primary-600 hover:bg-surface-50 dark:text-dm-muted dark:hover:text-accent-400 dark:hover:bg-[#1c2128] transition-colors';
           }
           moreMenu.appendChild(link);
         }

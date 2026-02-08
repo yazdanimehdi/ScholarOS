@@ -1,0 +1,163 @@
+name: Sync Template Updates
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Monday 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read template source
+        id: source
+        run: |
+          if [ -f .github/.template-source ]; then
+            echo "repo=$(cat .github/.template-source | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+          else
+            echo "repo=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for existing sync PR
+        if: steps.source.outputs.repo != ''
+        id: check_pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR=$(gh pr list --label "template-sync" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$PR" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch template and detect changes
+        if: steps.source.outputs.repo != '' && steps.check_pr.outputs.skip != 'true'
+        id: fetch
+        env:
+          SOURCE: ${{ steps.source.outputs.repo }}
+        run: |
+          git remote add template "https://github.com/${SOURCE}.git"
+          git fetch template main
+
+          TEMPLATE_SHA=$(git rev-parse template/main)
+          LAST_SHA=$(cat .github/.template-sync-sha 2>/dev/null | tr -d '[:space:]' || echo "")
+
+          if [ "$TEMPLATE_SHA" = "$LAST_SHA" ]; then
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_updates=true" >> "$GITHUB_OUTPUT"
+            echo "template_sha=$TEMPLATE_SHA" >> "$GITHUB_OUTPUT"
+            echo "last_sha=$LAST_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply template updates
+        if: steps.fetch.outputs.has_updates == 'true'
+        id: sync
+        env:
+          TEMPLATE_SHA: ${{ steps.fetch.outputs.template_sha }}
+          LAST_SHA: ${{ steps.fetch.outputs.last_sha }}
+        run: |
+          BRANCH="chore/template-sync-$(date +%Y%m%d)"
+          git checkout -b "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # --- Excluded paths (user content/config) ---
+          EXCLUDE=(
+            ':!config/'
+            ':!src/content/'
+            ':!src/data/'
+            ':!cv/'
+            ':!src/assets/images/people/'
+            ':!src/assets/images/projects/'
+            ':!src/assets/images/site/'
+            ':!public/images/'
+            ':!public/videos/'
+            ':!public/favicon.svg'
+            ':!README.md'
+            ':!LICENSE'
+            ':!.template-initialized'
+            ':!.github/.template-source'
+            ':!.github/.template-sync-sha'
+          )
+
+          if [ -n "$LAST_SHA" ] && git cat-file -t "$LAST_SHA" &>/dev/null; then
+            # Incremental sync: patch only what changed in the template
+            git diff "$LAST_SHA" "$TEMPLATE_SHA" -- . "${EXCLUDE[@]}" > /tmp/template.patch || true
+          else
+            # First sync or SHA lost: diff full template tree (excluding user paths)
+            EMPTY_TREE=$(git hash-object -t tree /dev/null)
+            git diff "$EMPTY_TREE" "$TEMPLATE_SHA" -- . "${EXCLUDE[@]}" > /tmp/template.patch || true
+          fi
+
+          if [ ! -s /tmp/template.patch ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Apply patch with 3-way merge for conflict resolution
+          git apply --3way /tmp/template.patch 2>/tmp/apply-errors.txt || true
+
+          # Resolve any remaining conflicts by preferring template version
+          git diff --name-only --diff-filter=U 2>/dev/null | while IFS= read -r file; do
+            git checkout --theirs -- "$file" 2>/dev/null || true
+            git add "$file" 2>/dev/null || true
+          done
+
+          # Update sync SHA
+          echo "$TEMPLATE_SHA" > .github/.template-sync-sha
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            STAT=$(git diff --cached --stat | tail -1)
+            echo "stat=$STAT" >> "$GITHUB_OUTPUT"
+            git commit -m "chore: sync with template updates"
+            git push -u origin "$BRANCH"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.sync.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.sync.outputs.branch }}
+          SOURCE: ${{ steps.source.outputs.repo }}
+          STAT: ${{ steps.sync.outputs.stat }}
+        run: |
+          gh label create "template-sync" --color "0075ca" \
+            --description "Updates from template repository" 2>/dev/null || true
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: sync with template updates" \
+            --label "template-sync" \
+            --body "$(cat <<EOF
+          ## Template Sync
+
+          Updates from [\`${SOURCE}\`](https://github.com/${SOURCE}).
+
+          **Changes:** ${STAT}
+
+          ### Review checklist
+          - [ ] Check for breaking changes in updated components
+          - [ ] Verify your customizations are preserved
+          - [ ] Run \`pnpm build\` locally to test
+
+          ---
+          *Created automatically by the [template sync workflow](.github/workflows/sync-template.yml). Close to skip this update.*
+          EOF
+          )"

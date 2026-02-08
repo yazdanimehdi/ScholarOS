@@ -1,6 +1,7 @@
 ---
 import MarkdownLayout from '../../layouts/MarkdownLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { getImage } from 'astro:assets';
 
 export async function getStaticPaths() {
   const announcements = await getCollection('announcements');
@@ -12,10 +13,18 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
+
+let ogImage: string | undefined;
+if (entry.data.image) {
+  const resolved = await getImage({ src: entry.data.image, width: 1200 });
+  ogImage = resolved.src;
+}
 ---
 
 <MarkdownLayout
   title={entry.data.title}
+  description={entry.data.excerpt}
+  ogImage={ogImage}
   date={entry.data.date}
   headings={headings}
 >

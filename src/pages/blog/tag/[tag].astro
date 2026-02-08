@@ -23,17 +23,17 @@ const { tag, posts } = Astro.props;
 ---
 
 <PageLayout title={`Posts tagged "${tag}"`} description={`Blog posts tagged with "${tag}".`}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
     #{tag.toLowerCase().replace(/\s+/g, '-')}
   </h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-2">
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-2">
     {posts.length} post{posts.length !== 1 ? 's' : ''} tagged with "{tag}".
   </p>
   <a href="/blog" class="inline-flex items-center gap-1 text-sm text-primary-600 dark:text-accent-400 hover:underline mb-6">
     &larr; Back to all posts
   </a>
 
-  <div class="divide-y divide-surface-100 dark:divide-[#21262d]">
+  <div class="divide-y divide-surface-100 dark:divide-dm-border">
     {posts.map(post => (
       <PostCard
         id={post.id}

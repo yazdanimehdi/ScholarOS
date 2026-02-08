@@ -10,7 +10,7 @@
           'px-2 py-1.5 text-sm transition-colors border-b-2',
           activeTab === tab
             ? 'font-medium text-[var(--color-primary-600)] dark:text-[var(--color-accent-400)] border-[var(--color-primary-600)] dark:border-[var(--color-accent-400)]'
-            : 'text-[var(--color-surface-500)] dark:text-[#8b949e] border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
+            : 'text-[var(--color-surface-500)] dark:text-dm-muted border-transparent hover:text-[var(--color-surface-700)] dark:hover:text-[#c9d1d9]',
         ]"
         role="tab"
         :aria-selected="activeTab === tab"
@@ -19,7 +19,7 @@
         {{ tab }}
         <span
           v-if="counts && counts[tab]"
-          class="ms-1 text-xs text-[var(--color-surface-400)] dark:text-[#484f58]"
+          class="ms-1 text-xs text-[var(--color-surface-400)] dark:text-dm-faint"
         >
           ({{ counts[tab] }})
         </span>

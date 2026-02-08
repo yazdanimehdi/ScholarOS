@@ -54,6 +54,24 @@ fonts:
     h2: "1.7rem"                 # Section headings in prose (default: 1.5rem / 24px)
     h3: "1.5rem"                # Subsection headings in prose (default: 1.25rem / 20px)
 
+# Colors
+colors:
+  light:
+    primary: "#2c5282"
+    secondary: "#06b6d4"
+  dark:
+    primary: "#22d3ee"
+    secondary: "#2c5282"
+
+# Page background
+background:
+  light:
+    color: "#ffffff"
+    image: ""
+  dark:
+    color: "#0d1117"
+    image: ""
+
 # Image shape for people photos and about section
 imageShape: "rectangular"   # "rectangular" | "circular" | "oval"
 
@@ -63,6 +81,20 @@ about:
   title: "About Our Lab"
   text: "We are a multidisciplinary research group dedicated to advancing the frontiers of computer science and artificial intelligence. Our work spans natural language processing, computer vision, and human–computer interaction, with a focus on building systems that are robust, interpretable, and socially responsible."
   image: "/images/about.jpg"
+
+# Homepage section order and visibility
+# Drag to reorder in the CMS; set enabled: false to hide a section
+homepageSections:
+  - id: hero
+    enabled: true
+  - id: about
+    enabled: true
+  - id: news
+    enabled: true
+  - id: publications
+    enabled: true
+  - id: blog
+    enabled: true
 
 title: "Research Lab"
 description: "Welcome to our research lab. We explore cutting-edge topics in computer science and artificial intelligence."
@@ -74,8 +106,6 @@ siteUrl: "https://example.com"
 
 # Navigation items
 nav:
-  - label: "Home"
-    href: "/"
   - label: "Research"
     href: "/research"
   - label: "People"
@@ -127,6 +157,18 @@ analytics:
   pirsch: ""                 # site ID
   microsoftClarity: ""       # project ID
 
+# Web3Forms (contact & application forms)
+# Get your free access key at https://web3forms.com
+web3forms:
+  accessKey: ""    # Your Web3Forms access key (leave empty to disable forms)
+
+# Newsletter signup
+newsletter:
+  enabled: false
+  accessKey: ""
+  heading: "Stay Updated"
+  text: "Subscribe to get notified about new publications and news."
+
 # SEO
 seo:
   keywords: "language, learning, natural, multimodal, multilingual, models, vision, robustness, nlp, computer, safety, 2024, processing, computer vision, multimodal learning, ai safety, research, training, benchmark, fairness, reinforcement, natural language, language processing, language models, multilingual nlp, text generation, vision multimodal, vision-language models, image understanding, multimodal reasoning"               # comma-separated keywords
@@ -144,7 +186,7 @@ cookieConsent: false
 
 # Footer
 footer:
-  text: "Built with Astro"
+  text: "Built with <a href=\"https://scholaros.com\">ScholarOS</a>"
   links:
     - label: "Privacy"
       href: "/privacy"

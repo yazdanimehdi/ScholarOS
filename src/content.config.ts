@@ -40,6 +40,7 @@ const announcements = defineCollection({
       pinned: z.boolean().default(false),
       featured: z.boolean().default(false),
       image: image().optional(),
+      emoji: z.string().optional(),
       excerpt: z.string().optional(),
       people: z.array(z.string()).optional(),
     }),
@@ -112,6 +113,20 @@ const positions = defineCollection({
   }),
 });
 
+const talks = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: 'src/content/talks' }),
+  schema: z.object({
+    title: z.string(),
+    event: z.string(),
+    date: z.string(),
+    location: z.string().optional(),
+    type: z.enum(['Conference Talk', 'Invited Talk', 'Seminar', 'Tutorial', 'Workshop', 'Keynote', 'Panel']),
+    slidesUrl: z.string().optional(),
+    videoUrl: z.string().optional(),
+    sortDate: z.coerce.date().optional(),
+  }),
+});
+
 const feeds = defineCollection({
   loader: file('src/data/feeds.json'),
   schema: z.object({
@@ -132,6 +147,7 @@ export const collections = {
   projects,
   posts,
   publications,
+  talks,
   feeds,
   positions,
 };

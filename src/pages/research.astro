@@ -27,8 +27,8 @@ const researchDescription = researchConfig.description || '';
 ---
 
 <PageLayout title="Research" description={personal ? "My research areas and current projects." : "Our research areas and current projects."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Research</h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-8 max-w-2xl">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Research</h1>
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8 max-w-2xl">
     {researchDescription || (personal
       ? "My research focuses on artificial intelligence, with an emphasis on building systems that are capable, safe, and beneficial."
       : "Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial.")}
@@ -36,18 +36,18 @@ const researchDescription = researchConfig.description || '';
 
   <!-- Research Areas -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       Research Areas
     </h2>
     <div class="space-y-6">
       {researchAreas.map(area => (
-        <div class="pb-5 border-b border-surface-100 dark:border-[#21262d] last:border-0">
-          <h3 class="text-base font-medium text-surface-900 dark:text-[#e6edf3] mb-1">{area.title}</h3>
-          <p class="text-sm text-surface-600 dark:text-[#8b949e] mb-2">{area.description}</p>
+        <div class="pb-5 border-b border-surface-100 dark:border-dm-border last:border-0">
+          <h3 class="text-base font-medium text-surface-900 dark:text-dm-heading mb-1">{area.title}</h3>
+          <p class="text-sm text-surface-600 dark:text-dm-muted mb-2">{area.description}</p>
           {area.tags && area.tags.length > 0 && (
             <div class="flex flex-wrap gap-1.5">
               {area.tags.map(tag => (
-                <span class="text-xs text-surface-400 dark:text-[#484f58]">#{tag.toLowerCase().replace(/\s+/g, '-')}</span>
+                <span class="text-xs text-surface-400 dark:text-dm-faint">#{tag.toLowerCase().replace(/\s+/g, '-')}</span>
               ))}
             </div>
           )}
@@ -58,7 +58,7 @@ const researchDescription = researchConfig.description || '';
 
   <!-- Current Projects -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       Current Projects
       <a href="/projects" class="float-right text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
     </h2>
@@ -80,7 +80,7 @@ const researchDescription = researchConfig.description || '';
 
   <!-- Key Publications -->
   <section>
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-[#e6edf3] pb-2 border-b border-surface-200 dark:border-[#21262d] mb-4">
+    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
       Key Publications
       <a href="/publications" class="float-right text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
     </h2>

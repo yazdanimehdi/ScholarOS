@@ -35,8 +35,8 @@ const pubData = await Promise.all(publications.map(async p => {
 ---
 
 <PageLayout title="Publications" description={personal ? "My published research papers and articles." : "Our published research papers and articles."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-[#e6edf3] mb-2">Publications</h1>
-  <p class="text-sm text-surface-500 dark:text-[#8b949e] mb-6">
+  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Publications</h1>
+  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
     {personal
       ? "Browse my research publications. Use the filters below to search by keyword, year, or type."
       : "Browse our research publications. Use the filters below to search by keyword, year, or type."}
