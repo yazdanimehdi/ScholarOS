@@ -193,6 +193,12 @@ footer:
     - label: "Sitemap"
       href: "/sitemap-index.xml"
 
+# Migration: al-folio
+# Set this to a GitHub URL of an al-folio site to auto-migrate all content on first push.
+# Example: "https://github.com/username/al-folio-site"
+# After migration completes, this field is cleared automatically.
+alfolioRepo: ""
+
 # --- Personal mode example ---
 # siteMode: "personal"
 # title: "Jane Smith"

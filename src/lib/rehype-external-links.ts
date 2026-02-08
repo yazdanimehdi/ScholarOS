@@ -1,4 +1,4 @@
-import type { Root, Element, ElementContent } from 'hast';
+import type { Root, Element, RootContent } from 'hast';
 
 /**
  * Rehype plugin that adds rel="nofollow noopener noreferrer" and target="_blank"
@@ -10,7 +10,7 @@ export function rehypeExternalLinks() {
   };
 }
 
-function walkNodes(nodes: ElementContent[]) {
+function walkNodes(nodes: RootContent[]) {
   for (const node of nodes) {
     if (node.type !== 'element') continue;
     const el = node as Element;

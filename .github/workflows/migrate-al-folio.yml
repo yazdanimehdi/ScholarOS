@@ -1,0 +1,67 @@
+name: Migrate al-folio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'config/site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: migrate-al-folio
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if migration is needed
+        id: check
+        run: |
+          REPO=$(grep '^alfolioRepo:' config/site.yml | sed 's/^alfolioRepo:\s*"\?\(.*\)"\?\s*$/\1/' | tr -d '"' | xargs)
+          if [ -n "$REPO" ]; then
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            echo "repo=$REPO" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        if: steps.check.outputs.needed == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        if: steps.check.outputs.needed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.check.outputs.needed == 'true'
+        run: pnpm install
+
+      - name: Run migration
+        if: steps.check.outputs.needed == 'true'
+        env:
+          ALFOLIO_REPO: ${{ steps.check.outputs.repo }}
+        run: pnpm migrate:al-folio "$ALFOLIO_REPO"
+
+      - name: Commit migrated content
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: migrate content from al-folio"
+          git pull --rebase
+          git push

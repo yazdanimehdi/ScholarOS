@@ -13,7 +13,8 @@
     "sync:feeds": "tsx scripts/sync-feeds.ts",
     "sync:scholar": "python3 scripts/sync-scholar.py",
     "render:cv": "python3 scripts/render-cv.py",
-    "generate:keywords": "tsx scripts/generate-seo-keywords.ts"
+    "generate:keywords": "tsx scripts/generate-seo-keywords.ts",
+    "migrate:al-folio": "tsx scripts/migrate-al-folio.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",
@@ -28,7 +29,9 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "@types/hast": "^3.0.4",
     "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.2.2",
     "js-yaml": "^4.1.0",
     "rss-parser": "^3.13.0",
     "sharp": "^0.33.0",
