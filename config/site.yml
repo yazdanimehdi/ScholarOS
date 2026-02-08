@@ -130,6 +130,7 @@ github:
   username: 'example-lab'
   stats: true
   trophies: true
+  showPinnedRepos: true
   pinnedRepos:
     - 'nlp-toolkit'
     - 'multilingual-benchmark'

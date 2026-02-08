@@ -796,6 +796,7 @@ collections:
               - { label: 'Username', name: 'username', widget: 'string' }
               - { label: 'Show Stats', name: 'stats', widget: 'boolean', default: true }
               - { label: 'Show Trophies', name: 'trophies', widget: 'boolean', default: true }
+              - { label: 'Show Pinned Repos', name: 'showPinnedRepos', widget: 'boolean', default: true }
               - label: 'Pinned Repos'
                 name: 'pinnedRepos'
                 widget: 'list'

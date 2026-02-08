@@ -82,6 +82,7 @@ export interface GitHubConfig {
   username: string;
   stats?: boolean;
   trophies?: boolean;
+  showPinnedRepos?: boolean;
   pinnedRepos?: string[];
   statsBaseUrl?: string;
   trophyBaseUrl?: string;

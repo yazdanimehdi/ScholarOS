@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: render-cv
@@ -60,6 +61,12 @@ jobs:
           if ! git diff --quiet src/data/cv-people.json 2>/dev/null; then
             changed=true
           fi
+          if ! git diff --quiet config/cv.yml 2>/dev/null; then
+            changed=true
+          fi
+          if ! git diff --quiet config/cv-upload.yml 2>/dev/null; then
+            changed=true
+          fi
           # Check for new untracked files
           if [ -n "$(git ls-files --others --exclude-standard public/cv.pdf src/data/cv.json public/cv/ src/data/cv-people.json)" ]; then
             changed=true
@@ -71,10 +78,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          for f in public/cv.pdf src/data/cv.json src/data/cv-people.json; do
+          for f in public/cv.pdf src/data/cv.json src/data/cv-people.json config/cv.yml config/cv-upload.yml; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d "public/cv" ] && git add public/cv/
           git diff --cached --quiet || git commit -m "chore: regenerate CV PDF"
           git pull --rebase
           git diff --cached --quiet 2>/dev/null || git push
+
+      - name: Trigger redeploy
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main || true

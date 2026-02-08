@@ -69,6 +69,43 @@ def convert_keys(obj):
     return obj
 
 
+def snake_to_camel(name: str) -> str:
+    """Convert snake_case to camelCase."""
+    parts = name.split("_")
+    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+
+
+def convert_keys_to_camel(obj):
+    """Recursively convert all dict keys from snake_case to camelCase."""
+    if isinstance(obj, dict):
+        return {snake_to_camel(k): convert_keys_to_camel(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [convert_keys_to_camel(item) for item in obj]
+    return obj
+
+
+def sync_upload_to_structured(uploaded: dict) -> None:
+    """Convert uploaded RenderCV data back to CMS-friendly format and write to config/cv.yml.
+
+    Also disables the upload in cv-upload.yml so the structured config takes over.
+    """
+    camel_data = convert_keys_to_camel(uploaded)
+
+    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(CONFIG_PATH, "w") as f:
+        yaml.dump(camel_data, f, default_flow_style=False, allow_unicode=True)
+    print(f"Synced upload to structured config at {CONFIG_PATH}")
+
+    # Disable the upload so structured config takes over
+    if UPLOAD_PATH.exists():
+        with open(UPLOAD_PATH, "r") as f:
+            upload_data = yaml.safe_load(f) or {}
+        upload_data["enabled"] = False
+        with open(UPLOAD_PATH, "w") as f:
+            yaml.dump(upload_data, f, default_flow_style=False, allow_unicode=True)
+        print("Disabled cv-upload.yml (enabled: false)")
+
+
 def transform_section_entries(sections: dict) -> dict:
     """Transform our CV section format to RenderCV entry types."""
     result = {}
@@ -333,6 +370,8 @@ def main():
     uploaded = load_upload()
 
     if uploaded:
+        # Sync upload to structured config and disable upload
+        sync_upload_to_structured(uploaded)
         # Raw upload is already in RenderCV-native format — use directly
         rendercv_input = uploaded
     else:

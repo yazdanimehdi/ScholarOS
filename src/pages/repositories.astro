@@ -12,7 +12,7 @@ if (!github) {
   return Astro.redirect('/');
 }
 
-const { username, stats, trophies, pinnedRepos } = github;
+const { username, stats, trophies, showPinnedRepos = true, pinnedRepos } = github;
 
 const statsBase = (github.statsBaseUrl ?? 'https://github-readme-stats.vercel.app').replace(/\/$/, '');
 const trophyBase = (github.trophyBaseUrl ?? 'https://github-profile-trophy.vercel.app').replace(/\/$/, '');
@@ -101,7 +101,7 @@ const members = (await getCollection('people'))
 
   {/* Pinned Repositories */}
   {
-    pinnedRepos && pinnedRepos.length > 0 && (
+    showPinnedRepos !== false && pinnedRepos && pinnedRepos.length > 0 && (
       <section class="mb-10">
         <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
           Pinned Repositories
