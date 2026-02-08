@@ -469,10 +469,13 @@ function copyImages(
     for (const src of srcPaths) {
       if (fs.existsSync(src)) {
         const ext = path.extname(src);
-        const destDir = path.join(ROOT, 'src/assets/images/people');
-        ensureDir(destDir);
-        const dest = path.join(destDir, `profile${ext}`);
-        fs.copyFileSync(src, dest);
+        const assetDir = path.join(ROOT, 'src/assets/images/people');
+        ensureDir(assetDir);
+        fs.copyFileSync(src, path.join(assetDir, `profile${ext}`));
+        // Also copy to public/ so the about section <img> can load it
+        const publicDir = path.join(ROOT, 'public/images/people');
+        ensureDir(publicDir);
+        fs.copyFileSync(src, path.join(publicDir, `profile${ext}`));
         profileDest = `../../assets/images/people/profile${ext}`;
         console.log(`  Copied profile photo: ${path.basename(src)}`);
         break;
@@ -487,10 +490,12 @@ function copyImages(
       const src = path.join(cloneDir, 'assets/img', name);
       if (fs.existsSync(src)) {
         const ext = path.extname(src);
-        const destDir = path.join(ROOT, 'src/assets/images/people');
-        ensureDir(destDir);
-        const dest = path.join(destDir, `profile${ext}`);
-        fs.copyFileSync(src, dest);
+        const assetDir = path.join(ROOT, 'src/assets/images/people');
+        ensureDir(assetDir);
+        fs.copyFileSync(src, path.join(assetDir, `profile${ext}`));
+        const publicDir = path.join(ROOT, 'public/images/people');
+        ensureDir(publicDir);
+        fs.copyFileSync(src, path.join(publicDir, `profile${ext}`));
         profileDest = `../../assets/images/people/profile${ext}`;
         console.log(`  Copied profile photo: ${name}`);
         break;
@@ -523,6 +528,22 @@ function copyImages(
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, path.join(ROOT, 'public', name));
       console.log(`  Copied favicon: ${name}`);
+      // If non-SVG, remove old favicon.svg and update BaseHead link tag
+      if (name !== 'favicon.svg') {
+        const oldSvg = path.join(ROOT, 'public', 'favicon.svg');
+        if (fs.existsSync(oldSvg)) fs.unlinkSync(oldSvg);
+        const ext = path.extname(name).slice(1); // ico, png
+        const mimeType = ext === 'ico' ? 'image/x-icon' : `image/${ext}`;
+        const baseHeadPath = path.join(ROOT, 'src/components/astro/BaseHead.astro');
+        const baseHead = fs.readFileSync(baseHeadPath, 'utf-8');
+        fs.writeFileSync(
+          baseHeadPath,
+          baseHead.replace(
+            /<link rel="icon" type="image\/svg\+xml" href="\/favicon\.svg" \/>/,
+            `<link rel="icon" type="${mimeType}" href="/${name}" />`,
+          ),
+        );
+      }
       break;
     }
   }
@@ -1258,6 +1279,15 @@ async function main() {
     writeFeedsConfig(config, personSlug);
     writeCvConfig(resume, config, fullName);
     writeResearchConfig(config);
+
+    // 15a. Update CMS repo
+    const currentRepo = process.env.GITHUB_REPOSITORY;
+    if (currentRepo) {
+      const cmsPath = path.join(ROOT, 'config', 'cms.yml');
+      const cmsContent = fs.readFileSync(cmsPath, 'utf-8');
+      fs.writeFileSync(cmsPath, cmsContent.replace(/repo:\s*['"].*?['"]/, `repo: '${currentRepo}'`));
+      console.log(`  Updated CMS repo: ${currentRepo}`);
+    }
 
     // 15b. Sync RSS feeds to populate src/data/feeds.json with real data
     console.log('\n  Syncing RSS feeds...');
