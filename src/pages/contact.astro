@@ -11,32 +11,41 @@ const personal = isPersonalMode();
 const web3formsKey = config.web3forms?.accessKey;
 ---
 
-<PageLayout title="Contact" description={personal ? "Get in touch." : "Get in touch with our research lab."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Contact Us</h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8">
+<PageLayout title="Contact" description={personal ? 'Get in touch.' : 'Get in touch with our research lab.'}>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">Contact Us</h1>
+  <p class="mb-8 text-sm text-surface-500 dark:text-dm-muted">
     Have questions about our research or interested in collaboration? Get in touch.
   </p>
 
-  <div class="grid lg:grid-cols-[1fr_280px] gap-8">
+  <div class="grid gap-8 lg:grid-cols-[1fr_280px]">
     <!-- Contact Form -->
     <div>
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
+      <h2
+        class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading"
+      >
         Send a Message
       </h2>
-      {web3formsKey ? (
-        <ContactForm client:visible accessKey={web3formsKey} />
-      ) : (
-        <p class="text-sm text-surface-500 dark:text-dm-muted">
-          Get in touch via email:{' '}
-          <ObfuscatedEmail email={config.socials.email!} class="text-primary-600 dark:text-accent-400 hover:underline" />
-        </p>
-      )}
+      {
+        web3formsKey ? (
+          <ContactForm client:visible accessKey={web3formsKey} />
+        ) : (
+          <p class="text-sm text-surface-500 dark:text-dm-muted">
+            Get in touch via email:{' '}
+            <ObfuscatedEmail
+              email={config.socials.email!}
+              class="text-primary-600 hover:underline dark:text-accent-400"
+            />
+          </p>
+        )
+      }
     </div>
 
     <!-- Contact Info -->
     <div class="space-y-6">
       <div>
-        <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading mb-2">{personal ? "Contact Information" : "Lab Information"}</h3>
+        <h3 class="mb-2 text-sm font-medium text-surface-900 dark:text-dm-heading">
+          {personal ? 'Contact Information' : 'Lab Information'}
+        </h3>
         <div class="space-y-2 text-sm text-surface-500 dark:text-dm-muted">
           <div>
             <span class="text-surface-900 dark:text-dm-heading">{siteName}</span><br />
@@ -45,7 +54,10 @@ const web3formsKey = config.web3forms?.accessKey;
           </div>
           <div>
             <span class="text-surface-700 dark:text-dm-text">Email:</span><br />
-            <ObfuscatedEmail email={config.socials.email!} class="text-primary-600 dark:text-accent-400 hover:underline" />
+            <ObfuscatedEmail
+              email={config.socials.email!}
+              class="text-primary-600 hover:underline dark:text-accent-400"
+            />
           </div>
           <div>
             <span class="text-surface-700 dark:text-dm-text">Address:</span><br />
@@ -56,8 +68,8 @@ const web3formsKey = config.web3forms?.accessKey;
         </div>
       </div>
 
-      <div class="pt-4 border-t border-surface-200 dark:border-dm-border">
-        <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading mb-2">Follow Us</h3>
+      <div class="border-t border-surface-200 pt-4 dark:border-dm-border">
+        <h3 class="mb-2 text-sm font-medium text-surface-900 dark:text-dm-heading">Follow Us</h3>
         <SocialLinks socials={config.socials} />
       </div>
     </div>

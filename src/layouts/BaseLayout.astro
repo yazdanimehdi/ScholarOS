@@ -30,14 +30,14 @@ const colorCSS = generateColorOverrides(config);
     <script is:inline>
       // Apply theme from localStorage or configured default
       function applyTheme() {
-        var saved = localStorage.getItem('theme');
+        const saved = localStorage.getItem('theme');
         if (saved === 'dark') {
           document.documentElement.classList.add('dark');
         } else if (saved === 'light') {
           document.documentElement.classList.remove('dark');
         } else {
           // No saved preference — use configured default
-          var d = document.documentElement.getAttribute('data-default-theme') || 'system';
+          const d = document.documentElement.getAttribute('data-default-theme') || 'system';
           if (d === 'dark' || (d === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
           } else {
@@ -51,7 +51,7 @@ const colorCSS = generateColorOverrides(config);
       document.addEventListener('astro:after-swap', applyTheme);
     </script>
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="flex min-h-screen flex-col">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <slot />
     <Analytics />

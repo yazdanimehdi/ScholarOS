@@ -38,17 +38,17 @@ const DEFAULT_HOMEPAGE_SECTIONS: HomepageSectionEntry[] = [
 export function getHomepageSections(): HomepageSectionId[] {
   const config = getSiteConfig();
   if (config.homepageSections?.length) {
-    return config.homepageSections.filter(s => s.enabled).map(s => s.id);
+    return config.homepageSections.filter((s) => s.enabled).map((s) => s.id);
   }
   // Backward compat: respect about.enabled when homepageSections absent
-  return DEFAULT_HOMEPAGE_SECTIONS
-    .filter(s => s.id === 'about' ? config.about?.enabled !== false : s.enabled)
-    .map(s => s.id);
+  return DEFAULT_HOMEPAGE_SECTIONS.filter((s) => (s.id === 'about' ? config.about?.enabled !== false : s.enabled)).map(
+    (s) => s.id,
+  );
 }
 
 export function getGridColumnCount(): number {
   const sections = getHomepageSections();
-  return ['news', 'publications', 'blog'].filter(id => sections.includes(id as HomepageSectionId)).length;
+  return ['news', 'publications', 'blog'].filter((id) => sections.includes(id as HomepageSectionId)).length;
 }
 
 export function loadYamlConfig<T>(filename: string): T {

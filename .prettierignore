@@ -1,0 +1,6 @@
+dist/
+node_modules/
+.astro/
+pnpm-lock.yaml
+src/data/*.json
+src/components/astro/Analytics.astro

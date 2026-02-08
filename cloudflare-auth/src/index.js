@@ -116,9 +116,7 @@ const handleAuth = async (request, env) => {
     status: 302,
     headers: {
       Location: authURL,
-      'Set-Cookie':
-        `csrf-token=${provider}_${csrfToken}; ` +
-        `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
+      'Set-Cookie': `csrf-token=${provider}_${csrfToken}; ` + `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
     },
   });
 };
@@ -128,8 +126,7 @@ const handleCallback = async (request, env) => {
   const { origin, searchParams } = new URL(url);
   const { code, state } = Object.fromEntries(searchParams);
 
-  const [, provider, csrfToken] =
-    headers.get('Cookie')?.match(/\bcsrf-token=([a-z-]+?)_([0-9a-f]{32})\b/) ?? [];
+  const [, provider, csrfToken] = headers.get('Cookie')?.match(/\bcsrf-token=([a-z-]+?)_([0-9a-f]{32})\b/) ?? [];
 
   if (!provider || !supportedProviders.includes(provider)) {
     return outputHTML({

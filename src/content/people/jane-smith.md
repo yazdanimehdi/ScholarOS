@@ -1,20 +1,20 @@
 ---
-name: "Jane Smith"
-role: "pi"
-title: "Associate Professor"
-photo: "../../assets/images/people/placeholder-avatar.svg"
-email: "jane.smith@example.com"
+name: 'Jane Smith'
+role: 'pi'
+title: 'Associate Professor'
+photo: '../../assets/images/people/placeholder-avatar.svg'
+email: 'jane.smith@example.com'
 socials:
-  github: "https://github.com/janesmith"
-  scholar: "https://scholar.google.com/citations?user=EXAMPLE"
-  twitter: "https://twitter.com/janesmith"
-  linkedin: "https://linkedin.com/in/janesmith"
-  orcid: "https://orcid.org/0000-0001-2345-6789"
-  website: "https://janesmith.com"
+  github: 'https://github.com/janesmith'
+  scholar: 'https://scholar.google.com/citations?user=EXAMPLE'
+  twitter: 'https://twitter.com/janesmith'
+  linkedin: 'https://linkedin.com/in/janesmith'
+  orcid: 'https://orcid.org/0000-0001-2345-6789'
+  website: 'https://janesmith.com'
 researchInterests:
-  - "Machine Learning"
-  - "Natural Language Processing"
-  - "Human-Computer Interaction"
+  - 'Machine Learning'
+  - 'Natural Language Processing'
+  - 'Human-Computer Interaction'
 startDate: 2020-01-01
 sortOrder: 1
 active: true

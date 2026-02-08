@@ -8,25 +8,32 @@ const siteName = getSiteName();
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="border-t border-surface-200 dark:border-dm-border mt-12">
-  <div class="max-w-[930px] mx-auto px-4 sm:px-6 py-6">
-    {config.newsletter?.enabled && config.newsletter?.accessKey && (
-      <div class="border-b border-surface-200 dark:border-dm-border pb-6 mb-6">
-        <h3 class="text-base font-serif font-normal text-surface-900 dark:text-dm-heading mb-1">
-          {config.newsletter.heading || 'Stay Updated'}
-        </h3>
-        {config.newsletter.text && (
-          <p class="text-sm text-surface-500 dark:text-dm-muted mb-3">
-            {config.newsletter.text}
-          </p>
-        )}
-        <NewsletterForm client:visible accessKey={config.newsletter.accessKey} />
-      </div>
-    )}
+<footer class="mt-12 border-t border-surface-200 dark:border-dm-border">
+  <div class="mx-auto max-w-[930px] px-4 py-6 sm:px-6">
+    {
+      config.newsletter?.enabled && config.newsletter?.accessKey && (
+        <div class="mb-6 border-b border-surface-200 pb-6 dark:border-dm-border">
+          <h3 class="mb-1 font-serif text-base font-normal text-surface-900 dark:text-dm-heading">
+            {config.newsletter.heading || 'Stay Updated'}
+          </h3>
+          {config.newsletter.text && (
+            <p class="mb-3 text-sm text-surface-500 dark:text-dm-muted">{config.newsletter.text}</p>
+          )}
+          <NewsletterForm client:visible accessKey={config.newsletter.accessKey} />
+        </div>
+      )
+    }
 
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-surface-500 dark:text-dm-muted">
+    <div
+      class="flex flex-col items-center justify-between gap-3 text-sm text-surface-500 sm:flex-row dark:text-dm-muted"
+    >
       <p>
-        &copy; {currentYear} {siteName}. Powered by <a href="https://astro.build" class="underline text-surface-600 dark:text-dm-text hover:text-primary-600 dark:hover:text-accent-400">Astro</a>.
+        &copy; {currentYear}
+        {siteName}. Powered by <a
+          href="https://astro.build"
+          class="text-surface-600 underline hover:text-primary-600 dark:text-dm-text dark:hover:text-accent-400"
+          >Astro</a
+        >.
       </p>
       <div class="flex items-center gap-4">
         <SocialLinks socials={config.socials} size="sm" />

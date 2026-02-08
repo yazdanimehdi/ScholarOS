@@ -6,15 +6,15 @@
  * and writes src/data/feeds.json.
  */
 
-import fs from "node:fs";
-import path from "node:path";
-import { createHash } from "node:crypto";
-import yaml from "js-yaml";
-import Parser from "rss-parser";
+import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+import yaml from 'js-yaml';
+import Parser from 'rss-parser';
 
-const ROOT = path.resolve(import.meta.dirname, "..");
-const CONFIG_PATH = path.join(ROOT, "config", "feeds.yml");
-const OUTPUT_PATH = path.join(ROOT, "src", "data", "feeds.json");
+const ROOT = path.resolve(import.meta.dirname, '..');
+const CONFIG_PATH = path.join(ROOT, 'config', 'feeds.yml');
+const OUTPUT_PATH = path.join(ROOT, 'src', 'data', 'feeds.json');
 
 interface FeedSource {
   name: string;
@@ -42,29 +42,29 @@ interface FeedItem {
 }
 
 function loadConfig(): FeedsConfig {
-  const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+  const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');
   return yaml.load(raw) as FeedsConfig;
 }
 
 function loadExisting(): FeedItem[] {
   if (!fs.existsSync(OUTPUT_PATH)) return [];
-  const raw = fs.readFileSync(OUTPUT_PATH, "utf-8");
+  const raw = fs.readFileSync(OUTPUT_PATH, 'utf-8');
   return JSON.parse(raw) as FeedItem[];
 }
 
 function slugify(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 function shortHash(str: string): string {
-  return createHash("sha256").update(str).digest("hex").slice(0, 8);
+  return createHash('sha256').update(str).digest('hex').slice(0, 8);
 }
 
 function normalizeLink(link: string): string {
-  return link.replace(/\/+$/, "");
+  return link.replace(/\/+$/, '');
 }
 
 function generateId(source: string, link: string): string {
@@ -72,33 +72,30 @@ function generateId(source: string, link: string): string {
 }
 
 function formatDate(dateStr: string | undefined): string {
-  if (!dateStr) return new Date().toISOString().split("T")[0];
+  if (!dateStr) return new Date().toISOString().split('T')[0];
   const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return new Date().toISOString().split("T")[0];
-  return d.toISOString().split("T")[0];
+  if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+  return d.toISOString().split('T')[0];
 }
 
 function stripHtml(html: string): string {
   return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ")
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
 function truncate(str: string, maxLen: number = 300): string {
   if (str.length <= maxLen) return str;
-  return str.slice(0, maxLen).replace(/\s+\S*$/, "") + "...";
+  return str.slice(0, maxLen).replace(/\s+\S*$/, '') + '...';
 }
 
-async function fetchFeed(
-  source: FeedSource,
-  maxItems: number,
-): Promise<FeedItem[]> {
+async function fetchFeed(source: FeedSource, maxItems: number): Promise<FeedItem[]> {
   const parser = new Parser();
   const feed = await parser.parseURL(source.url);
   const items = (feed.items || []).slice(0, maxItems);
@@ -115,8 +112,7 @@ async function fetchFeed(
         source: source.name,
       };
 
-      const rawExcerpt =
-        item.contentSnippet || item.content || item.summary || "";
+      const rawExcerpt = item.contentSnippet || item.content || item.summary || '';
       const excerpt = truncate(stripHtml(rawExcerpt));
       if (excerpt) result.excerpt = excerpt;
 
@@ -138,13 +134,8 @@ function deduplicateByLink(items: FeedItem[]): FeedItem[] {
   return Array.from(seen.values());
 }
 
-function mergeWithExisting(
-  newItems: FeedItem[],
-  existing: FeedItem[],
-): FeedItem[] {
-  const existingByLink = new Map(
-    existing.map((item) => [normalizeLink(item.link), item]),
-  );
+function mergeWithExisting(newItems: FeedItem[], existing: FeedItem[]): FeedItem[] {
+  const existingByLink = new Map(existing.map((item) => [normalizeLink(item.link), item]));
 
   const merged = new Map<string, FeedItem>();
 
@@ -172,9 +163,7 @@ function mergeWithExisting(
 }
 
 function sortByDateDesc(items: FeedItem[]): FeedItem[] {
-  return items.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
+  return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 async function main() {
@@ -185,15 +174,15 @@ async function main() {
   // Auto-inject Medium feed if mediumUrl is configured
   if (config.mediumUrl) {
     sources.push({
-      name: "Medium",
+      name: 'Medium',
       url: config.mediumUrl,
       author: null,
-      tags: ["medium"],
+      tags: ['medium'],
     });
   }
 
   if (sources.length === 0) {
-    console.log("No feeds configured in config/feeds.yml");
+    console.log('No feeds configured in config/feeds.yml');
     process.exit(1);
   }
 
@@ -218,9 +207,7 @@ async function main() {
 
   // If ALL feeds failed, exit without writing (preserve existing data)
   if (feedSuccess === 0) {
-    console.error(
-      `\nERROR: All ${feedFail} feed(s) failed. Preserving existing data.`,
-    );
+    console.error(`\nERROR: All ${feedFail} feed(s) failed. Preserving existing data.`);
     process.exit(1);
   }
 
@@ -234,13 +221,13 @@ async function main() {
   const sorted = sortByDateDesc(merged);
 
   // Write output
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(sorted, null, 2) + "\n");
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(sorted, null, 2) + '\n');
 
   const added = sorted.length - existing.length;
   console.log(`\nSummary:`);
   console.log(`  Feeds fetched: ${feedSuccess}/${sources.length}`);
   console.log(`  Total items: ${sorted.length}`);
-  console.log(`  Net change: ${added >= 0 ? "+" : ""}${added}`);
+  console.log(`  Net change: ${added >= 0 ? '+' : ''}${added}`);
   if (feedFail > 0) {
     console.log(`  Warnings: ${feedFail} feed(s) failed`);
   }

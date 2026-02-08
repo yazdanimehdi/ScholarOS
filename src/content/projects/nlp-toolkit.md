@@ -1,20 +1,20 @@
 ---
-title: "NLP Toolkit"
-type: "software"
-status: "active"
-url: "https://nlp-toolkit.example.com"
-repoUrl: "https://github.com/example-lab/nlp-toolkit"
-paperUrl: "https://arxiv.org/abs/2024.00000"
+title: 'NLP Toolkit'
+type: 'software'
+status: 'active'
+url: 'https://nlp-toolkit.example.com'
+repoUrl: 'https://github.com/example-lab/nlp-toolkit'
+paperUrl: 'https://arxiv.org/abs/2024.00000'
 team:
-  - "jane-smith"
-  - "alex-chen"
+  - 'jane-smith'
+  - 'alex-chen'
 tags:
-  - "NLP"
-  - "Python"
-  - "Transformers"
-  - "Open Source"
+  - 'NLP'
+  - 'Python'
+  - 'Transformers'
+  - 'Open Source'
 startDate: 2023-01-15
-excerpt: "An open-source Python library for efficient NLP model training and evaluation."
+excerpt: 'An open-source Python library for efficient NLP model training and evaluation.'
 ---
 
 ## Overview

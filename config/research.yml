@@ -1,21 +1,21 @@
-description: ""
+description: ''
 
 areas:
-  - title: "Natural Language Processing"
-    description: "Developing models that understand and generate human language, with a focus on multilingual and low-resource settings."
+  - title: 'Natural Language Processing'
+    description: 'Developing models that understand and generate human language, with a focus on multilingual and low-resource settings.'
     tags:
-      - "Language Models"
-      - "Multilingual NLP"
-      - "Text Generation"
-  - title: "Computer Vision & Multimodal Learning"
-    description: "Building systems that combine visual and textual understanding for tasks like image captioning, visual QA, and cross-modal retrieval."
+      - 'Language Models'
+      - 'Multilingual NLP'
+      - 'Text Generation'
+  - title: 'Computer Vision & Multimodal Learning'
+    description: 'Building systems that combine visual and textual understanding for tasks like image captioning, visual QA, and cross-modal retrieval.'
     tags:
-      - "Vision-Language Models"
-      - "Image Understanding"
-      - "Multimodal Reasoning"
-  - title: "AI Safety & Robustness"
-    description: "Ensuring AI systems are safe, fair, and reliable through formal verification, alignment techniques, and robust evaluation methodologies."
+      - 'Vision-Language Models'
+      - 'Image Understanding'
+      - 'Multimodal Reasoning'
+  - title: 'AI Safety & Robustness'
+    description: 'Ensuring AI systems are safe, fair, and reliable through formal verification, alignment techniques, and robust evaluation methodologies.'
     tags:
-      - "Alignment"
-      - "Fairness"
-      - "Robustness"
+      - 'Alignment'
+      - 'Fairness'
+      - 'Robustness'

@@ -7,9 +7,9 @@ import { isPersonalMode, loadYamlConfig } from '../lib/config';
 
 const personal = isPersonalMode();
 
-const projects = (await getCollection('projects')).filter(p => p.data.status === 'active');
+const projects = (await getCollection('projects')).filter((p) => p.data.status === 'active');
 const publications = (await getCollection('publications'))
-  .filter(p => p.data.featured)
+  .filter((p) => p.data.featured)
   .sort((a, b) => b.data.year - a.data.year)
   .slice(0, 5);
 
@@ -26,77 +26,102 @@ const researchAreas = researchConfig.areas || [];
 const researchDescription = researchConfig.description || '';
 ---
 
-<PageLayout title="Research" description={personal ? "My research areas and current projects." : "Our research areas and current projects."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Research</h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8 max-w-2xl">
-    {researchDescription || (personal
-      ? "My research focuses on artificial intelligence, with an emphasis on building systems that are capable, safe, and beneficial."
-      : "Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial.")}
+<PageLayout
+  title="Research"
+  description={personal ? 'My research areas and current projects.' : 'Our research areas and current projects.'}
+>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">Research</h1>
+  <p class="mb-8 max-w-2xl text-sm text-surface-500 dark:text-dm-muted">
+    {
+      researchDescription ||
+        (personal
+          ? 'My research focuses on artificial intelligence, with an emphasis on building systems that are capable, safe, and beneficial.'
+          : 'Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial.')
+    }
   </p>
 
   <!-- Research Areas -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
+    <h2
+      class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading"
+    >
       Research Areas
     </h2>
     <div class="space-y-6">
-      {researchAreas.map(area => (
-        <div class="pb-5 border-b border-surface-100 dark:border-dm-border last:border-0">
-          <h3 class="text-base font-medium text-surface-900 dark:text-dm-heading mb-1">{area.title}</h3>
-          <p class="text-sm text-surface-600 dark:text-dm-muted mb-2">{area.description}</p>
-          {area.tags && area.tags.length > 0 && (
-            <div class="flex flex-wrap gap-1.5">
-              {area.tags.map(tag => (
-                <span class="text-xs text-surface-400 dark:text-dm-faint">#{tag.toLowerCase().replace(/\s+/g, '-')}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+      {
+        researchAreas.map((area) => (
+          <div class="border-b border-surface-100 pb-5 last:border-0 dark:border-dm-border">
+            <h3 class="mb-1 text-base font-medium text-surface-900 dark:text-dm-heading">{area.title}</h3>
+            <p class="mb-2 text-sm text-surface-600 dark:text-dm-muted">{area.description}</p>
+            {area.tags && area.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1.5">
+                {area.tags.map((tag) => (
+                  <span class="text-xs text-surface-400 dark:text-dm-faint">
+                    #{tag.toLowerCase().replace(/\s+/g, '-')}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      }
     </div>
   </section>
 
   <!-- Current Projects -->
   <section class="mb-10">
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
+    <h2
+      class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading"
+    >
       Current Projects
-      <a href="/projects" class="float-right text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
+      <a href="/projects" class="float-right font-sans text-xs text-primary-600 hover:underline dark:text-accent-400"
+        >View all &rarr;</a
+      >
     </h2>
     <div class="space-y-3">
-      {projects.map(p => (
-        <ProjectCard
-          id={p.id}
-          title={p.data.title}
-          type={p.data.type}
-          status={p.data.status}
-          excerpt={p.data.excerpt}
-          tags={p.data.tags}
-          url={p.data.url}
-          repoUrl={p.data.repoUrl}
-        />
-      ))}
+      {
+        projects.map((p) => (
+          <ProjectCard
+            id={p.id}
+            title={p.data.title}
+            type={p.data.type}
+            status={p.data.status}
+            excerpt={p.data.excerpt}
+            tags={p.data.tags}
+            url={p.data.url}
+            repoUrl={p.data.repoUrl}
+          />
+        ))
+      }
     </div>
   </section>
 
   <!-- Key Publications -->
   <section>
-    <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
+    <h2
+      class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading"
+    >
       Key Publications
-      <a href="/publications" class="float-right text-xs font-sans text-primary-600 dark:text-accent-400 hover:underline">View all &rarr;</a>
+      <a
+        href="/publications"
+        class="float-right font-sans text-xs text-primary-600 hover:underline dark:text-accent-400">View all &rarr;</a
+      >
     </h2>
     <div class="space-y-3">
-      {publications.map(pub => (
-        <PublicationEntry
-          title={pub.data.title}
-          authors={pub.data.authors}
-          venue={pub.data.venue}
-          year={pub.data.year}
-          doi={pub.data.doi}
-          url={pub.data.url}
-          type={pub.data.type}
-          featured={pub.data.featured}
-        />
-      ))}
+      {
+        publications.map((pub) => (
+          <PublicationEntry
+            title={pub.data.title}
+            authors={pub.data.authors}
+            venue={pub.data.venue}
+            year={pub.data.year}
+            doi={pub.data.doi}
+            url={pub.data.url}
+            type={pub.data.type}
+            featured={pub.data.featured}
+          />
+        ))
+      }
     </div>
   </section>
 </PageLayout>

@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="absolute inset-0"></div>
+  <div ref="containerRef" class="absolute inset-0" />
 </template>
 
 <script setup lang="ts">
@@ -37,7 +37,9 @@ function watchTheme(onThemeChange: () => void) {
 
 async function initParticles(gsap: any, container: HTMLElement) {
   container.style.backgroundColor = getBgColor();
-  watchTheme(() => { container.style.backgroundColor = getBgColor(); });
+  watchTheme(() => {
+    container.style.backgroundColor = getBgColor();
+  });
 
   const canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
@@ -114,9 +116,7 @@ async function initGradientMorph(gsap: any, container: HTMLElement) {
 
   function applyGradient() {
     const dark = isDark();
-    const colors = dark
-      ? ['#0d1117', '#161b22', '#1a2332', '#0d1117']
-      : ['#eff3fb', '#dae3f5', '#f9fafb', '#eff3fb'];
+    const colors = dark ? ['#0d1117', '#161b22', '#1a2332', '#0d1117'] : ['#eff3fb', '#dae3f5', '#f9fafb', '#eff3fb'];
     container.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]}, ${colors[3]})`;
     container.style.backgroundSize = '400% 400%';
   }
@@ -147,7 +147,10 @@ async function initGeometric(gsap: any, container: HTMLElement) {
 
   const shapes: SVGElement[] = [];
   for (let i = 0; i < 12; i++) {
-    const shape = document.createElementNS('http://www.w3.org/2000/svg', i % 3 === 0 ? 'circle' : i % 3 === 1 ? 'rect' : 'polygon');
+    const shape = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      i % 3 === 0 ? 'circle' : i % 3 === 1 ? 'rect' : 'polygon',
+    );
     const cx = Math.random() * 800;
     const cy = Math.random() * 400;
 
@@ -174,7 +177,7 @@ async function initGeometric(gsap: any, container: HTMLElement) {
   function applyStroke() {
     const dark = isDark();
     const stroke = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
-    shapes.forEach(s => s.setAttribute('stroke', stroke));
+    shapes.forEach((s) => s.setAttribute('stroke', stroke));
     container.style.backgroundColor = getBgColor();
   }
   applyStroke();

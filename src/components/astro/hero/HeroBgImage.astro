@@ -11,32 +11,36 @@ const { light, dark } = Astro.props;
 
 {/* Light mode image */}
 <div class="absolute inset-0 dark:hidden" style={`background-color: ${light.bgColor};`}>
-  {light.bgImage && (
-    <img
-      src={light.bgImage}
-      alt=""
-      width="1920"
-      height="600"
-      class="w-full h-full object-cover"
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
-    />
-  )}
+  {
+    light.bgImage && (
+      <img
+        src={light.bgImage}
+        alt=""
+        width="1920"
+        height="600"
+        class="h-full w-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    )
+  }
 </div>
 
 {/* Dark mode image */}
 <div class="absolute inset-0 hidden dark:block" style={`background-color: ${dark.bgColor};`}>
-  {dark.bgImage && (
-    <img
-      src={dark.bgImage}
-      alt=""
-      width="1920"
-      height="600"
-      class="w-full h-full object-cover"
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
-    />
-  )}
+  {
+    dark.bgImage && (
+      <img
+        src={dark.bgImage}
+        alt=""
+        width="1920"
+        height="600"
+        class="h-full w-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    )
+  }
 </div>

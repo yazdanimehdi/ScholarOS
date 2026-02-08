@@ -1,14 +1,14 @@
 ---
-title: "Paper Accepted at EMNLP 2024"
+title: 'Paper Accepted at EMNLP 2024'
 date: 2024-09-15
-category: "paper"
-emoji: "📄"
+category: 'paper'
+emoji: '📄'
 pinned: true
 featured: true
-excerpt: "Our paper on adaptive language model fine-tuning has been accepted at EMNLP 2024."
+excerpt: 'Our paper on adaptive language model fine-tuning has been accepted at EMNLP 2024.'
 people:
-  - "jane-smith"
-  - "alex-chen"
+  - 'jane-smith'
+  - 'alex-chen'
 ---
 
 We are thrilled to announce that our paper **"Adaptive Fine-Tuning Strategies for Large Language Models in Low-Resource Domains"** has been accepted at EMNLP 2024!

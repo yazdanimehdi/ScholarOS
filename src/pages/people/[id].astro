@@ -12,7 +12,7 @@ import { getImageShapeClass, isCircularShape } from '../../lib/imageShape';
 
 export async function getStaticPaths() {
   const people = await getCollection('people');
-  return people.map(person => ({
+  return people.map((person) => ({
     params: { id: person.id },
     props: { person },
   }));
@@ -22,11 +22,12 @@ const { person } = Astro.props;
 const { Content } = await render(person);
 
 const publications = (await getCollection('publications'))
-  .filter(p => p.data.authors.some(a => a.toLowerCase().includes(person.data.name.split(' ')[1]?.toLowerCase() || '')))
+  .filter((p) =>
+    p.data.authors.some((a) => a.toLowerCase().includes(person.data.name.split(' ')[1]?.toLowerCase() || '')),
+  )
   .sort((a, b) => b.data.year - a.data.year);
 
-const projects = (await getCollection('projects'))
-  .filter(p => p.data.team?.includes(person.id));
+const projects = (await getCollection('projects')).filter((p) => p.data.team?.includes(person.id));
 
 const shapeClass = getImageShapeClass();
 const circular = isCircularShape();
@@ -45,90 +46,122 @@ if (person.data.photo) {
 }
 ---
 
-<PageLayout title={person.data.name} description={`${person.data.name} - ${getRoleName(person.data.role)}`} ogImage={ogImage}>
+<PageLayout
+  title={person.data.name}
+  description={`${person.data.name} - ${getRoleName(person.data.role)}`}
+  ogImage={ogImage}
+>
   <SEO type="profile" title={person.data.name} />
 
   <!-- Profile header: Photo + Info side by side -->
-  <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 border-b border-surface-200 dark:border-dm-border">
+  <div class="mb-8 flex flex-col gap-6 border-b border-surface-200 pb-6 sm:flex-row sm:gap-8 dark:border-dm-border">
     <!-- Photo -->
     <div class="shrink-0">
-      <div class:list={["overflow-hidden bg-surface-100 dark:bg-dm-alt", shapeClass, circular ? "w-44 h-44 sm:w-48 sm:h-48" : "w-40 h-48 sm:w-44 sm:h-52"]}>
-        {person.data.photo ? (
-          <Image
-            src={person.data.photo}
-            alt={person.data.name}
-            width={176}
-            height={208}
-            class="w-full h-full object-cover"
-          />
-        ) : (
-          <div class="w-full h-full flex items-center justify-center text-4xl font-light text-surface-300 dark:text-dm-border-alt font-serif">
-            {person.data.name.split(' ').map(n => n[0]).join('')}
-          </div>
-        )}
+      <div
+        class:list={[
+          'overflow-hidden bg-surface-100 dark:bg-dm-alt',
+          shapeClass,
+          circular ? 'h-44 w-44 sm:h-48 sm:w-48' : 'h-48 w-40 sm:h-52 sm:w-44',
+        ]}
+      >
+        {
+          person.data.photo ? (
+            <Image
+              src={person.data.photo}
+              alt={person.data.name}
+              width={176}
+              height={208}
+              class="h-full w-full object-cover"
+            />
+          ) : (
+            <div class="flex h-full w-full items-center justify-center font-serif text-4xl font-light text-surface-300 dark:text-dm-border-alt">
+              {person.data.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </div>
+          )
+        }
       </div>
     </div>
 
     <!-- Info -->
     <div class="flex-1">
-      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-1">
+      <h1 class="mb-1 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
         {person.data.name}
       </h1>
-      <p class="text-surface-500 dark:text-dm-muted mb-4">
+      <p class="mb-4 text-surface-500 dark:text-dm-muted">
         {person.data.title || getRoleName(person.data.role)}
       </p>
 
-      {person.data.email && (
-        <div class="flex items-center gap-2 mb-2 text-sm">
-          <svg class="w-4 h-4 text-surface-400 dark:text-dm-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          <ObfuscatedEmail email={person.data.email} class="text-primary-600 dark:text-accent-400 hover:underline" />
-        </div>
-      )}
-
-      {person.data.socials && (
-        <div class="flex items-center gap-2 mb-4 text-sm">
-          {Object.entries(person.data.socials).filter(([_, v]) => v).map(([key, value]) => (
-            <a
-              href={value!}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-primary-600 dark:text-accent-400 hover:underline capitalize"
+      {
+        person.data.email && (
+          <div class="mb-2 flex items-center gap-2 text-sm">
+            <svg
+              class="h-4 w-4 text-surface-400 dark:text-dm-faint"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
             >
-              {key === 'scholar' ? 'Google Scholar' : key.charAt(0).toUpperCase() + key.slice(1)}
-            </a>
-          )).reduce((acc: any[], link: any, i: number) => {
-            if (i > 0) acc.push(<span class="text-surface-300 dark:text-dm-border-alt">|</span>);
-            acc.push(link);
-            return acc;
-          }, [])}
-        </div>
-      )}
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <ObfuscatedEmail email={person.data.email} class="text-primary-600 hover:underline dark:text-accent-400" />
+          </div>
+        )
+      }
 
-      {person.data.researchInterests && person.data.researchInterests.length > 0 && (
-        <div>
-          <h3 class="text-sm font-medium text-surface-700 dark:text-dm-text mb-1">Research Interests</h3>
-          <ul class="list-disc list-inside text-sm text-surface-600 dark:text-dm-muted space-y-0.5">
-            {person.data.researchInterests.map(interest => (
-              <li>{interest}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {
+        person.data.socials && (
+          <div class="mb-4 flex items-center gap-2 text-sm">
+            {Object.entries(person.data.socials)
+              .filter(([_, v]) => v)
+              .map(([key, value]) => (
+                <a
+                  href={value!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary-600 capitalize hover:underline dark:text-accent-400"
+                >
+                  {key === 'scholar' ? 'Google Scholar' : key.charAt(0).toUpperCase() + key.slice(1)}
+                </a>
+              ))
+              .reduce((acc: any[], link: any, i: number) => {
+                if (i > 0) acc.push(<span class="text-surface-300 dark:text-dm-border-alt">|</span>);
+                acc.push(link);
+                return acc;
+              }, [])}
+          </div>
+        )
+      }
 
-      {cvInfo && (
-        <a
-          href={cvInfo.pdfPath}
-          download={`${person.id}-cv.pdf`}
-          class="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-sm rounded border border-surface-200 dark:border-dm-border text-primary-600 dark:text-accent-400 hover:bg-surface-50 dark:hover:bg-[#161b22] transition-colors"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Download CV
-        </a>
-      )}
+      {
+        person.data.researchInterests && person.data.researchInterests.length > 0 && (
+          <div>
+            <h3 class="mb-1 text-sm font-medium text-surface-700 dark:text-dm-text">Research Interests</h3>
+            <ul class="list-inside list-disc space-y-0.5 text-sm text-surface-600 dark:text-dm-muted">
+              {person.data.researchInterests.map((interest) => (
+                <li>{interest}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        cvInfo && (
+          <a
+            href={cvInfo.pdfPath}
+            download={`${person.id}-cv.pdf`}
+            class="mt-3 inline-flex items-center gap-1.5 rounded border border-surface-200 px-3 py-1.5 text-sm text-primary-600 transition-colors hover:bg-surface-50 dark:border-dm-border dark:text-accent-400 dark:hover:bg-[#161b22]"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Download CV
+          </a>
+        )
+      }
     </div>
   </div>
 
@@ -138,50 +171,52 @@ if (person.data.photo) {
   </div>
 
   <!-- Selected Publications -->
-  {publications.length > 0 && (
-    <section class="mb-8">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-3">
-        Selected Publications
-      </h2>
-      <ul class="space-y-2">
-        {publications.map(pub => (
-          <li class="text-sm">
-            <a
-              href={pub.data.url || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="font-medium text-primary-600 dark:text-accent-400 hover:underline"
-            >
-              {pub.data.title}
-            </a>
-            <br />
-            <span class="text-surface-500 dark:text-dm-muted">
-              {pub.data.authors.join(', ')}, {pub.data.venue}, {pub.data.year}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+  {
+    publications.length > 0 && (
+      <section class="mb-8">
+        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Selected Publications
+        </h2>
+        <ul class="space-y-2">
+          {publications.map((pub) => (
+            <li class="text-sm">
+              <a
+                href={pub.data.url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-primary-600 hover:underline dark:text-accent-400"
+              >
+                {pub.data.title}
+              </a>
+              <br />
+              <span class="text-surface-500 dark:text-dm-muted">
+                {pub.data.authors.join(', ')}, {pub.data.venue}, {pub.data.year}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
 
   <!-- Projects -->
-  {projects.length > 0 && (
-    <section>
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-3">
-        Projects
-      </h2>
-      <ul class="space-y-1">
-        {projects.map(p => (
-          <li class="text-sm">
-            <a href={`/projects/${p.id}`} class="text-primary-600 dark:text-accent-400 hover:underline">
-              {p.data.title}
-            </a>
-            {p.data.excerpt && (
-              <span class="text-surface-500 dark:text-dm-muted"> — {p.data.excerpt}</span>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+  {
+    projects.length > 0 && (
+      <section>
+        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Projects
+        </h2>
+        <ul class="space-y-1">
+          {projects.map((p) => (
+            <li class="text-sm">
+              <a href={`/projects/${p.id}`} class="text-primary-600 hover:underline dark:text-accent-400">
+                {p.data.title}
+              </a>
+              {p.data.excerpt && <span class="text-surface-500 dark:text-dm-muted"> — {p.data.excerpt}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
 </PageLayout>

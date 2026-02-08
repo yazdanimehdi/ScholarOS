@@ -12,7 +12,15 @@ interface Props {
 }
 
 const config = getSiteConfig();
-const { type = 'website', title, description = config.description, datePublished, dateModified, author, keywords } = Astro.props;
+const {
+  type = 'website',
+  title,
+  description = config.description,
+  datePublished,
+  dateModified,
+  author,
+  keywords,
+} = Astro.props;
 
 const personal = isPersonalMode();
 
@@ -34,9 +42,7 @@ const resolvedKeywords = keywords || config.seo?.keywords || undefined;
 // Build breadcrumb list from current URL
 const pathname = Astro.url.pathname;
 const segments = pathname.split('/').filter(Boolean);
-const breadcrumbItems = [
-  { '@type': 'ListItem', position: 1, name: 'Home', item: config.siteUrl },
-];
+const breadcrumbItems = [{ '@type': 'ListItem', position: 1, name: 'Home', item: config.siteUrl }];
 let cumPath = '';
 segments.forEach((seg, i) => {
   cumPath += `/${seg}`;
@@ -106,9 +112,7 @@ if (type === 'website') {
     description,
     datePublished: datePublished?.toISOString(),
     dateModified: dateModified?.toISOString() || datePublished?.toISOString(),
-    author: author
-      ? { '@type': 'Person', name: author }
-      : { '@type': 'Person', name: config.author },
+    author: author ? { '@type': 'Person', name: author } : { '@type': 'Person', name: config.author },
     keywords: resolvedKeywords,
     publisher: personal
       ? { '@type': 'Person', name: config.author }

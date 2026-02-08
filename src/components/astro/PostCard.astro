@@ -13,32 +13,36 @@ interface Props {
 const { id, title, date, excerpt, tags, author } = Astro.props;
 ---
 
-<a href={`/blog/${id}`} class="block group py-3 border-b border-surface-100 dark:border-dm-border last:border-b-0">
+<a href={`/blog/${id}`} class="group block border-b border-surface-100 py-3 last:border-b-0 dark:border-dm-border">
   <div class="flex items-start gap-4">
     <!-- Thumbnail placeholder -->
-    <div class="hidden sm:block w-20 h-16 shrink-0 rounded bg-surface-100 dark:bg-dm-alt overflow-hidden">
-      <div class="w-full h-full flex items-center justify-center text-surface-300 dark:text-dm-border-alt">
-        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+    <div class="hidden h-16 w-20 shrink-0 overflow-hidden rounded bg-surface-100 sm:block dark:bg-dm-alt">
+      <div class="flex h-full w-full items-center justify-center text-surface-300 dark:text-dm-border-alt">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path
+            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+          ></path>
         </svg>
       </div>
     </div>
 
-    <div class="flex-1 min-w-0">
-      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors leading-snug">
+    <div class="min-w-0 flex-1">
+      <h3
+        class="text-sm leading-snug font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400"
+      >
         {title}
       </h3>
-      {excerpt && (
-        <p class="text-xs text-surface-500 dark:text-dm-muted mt-1 line-clamp-2">{excerpt}</p>
-      )}
-      <div class="flex items-center gap-2 mt-1 text-xs text-surface-500 dark:text-dm-muted">
+      {excerpt && <p class="mt-1 line-clamp-2 text-xs text-surface-500 dark:text-dm-muted">{excerpt}</p>}
+      <div class="mt-1 flex items-center gap-2 text-xs text-surface-500 dark:text-dm-muted">
         <span>{formatShortDate(date)}</span>
-        {tags && tags.length > 0 && (
-          <>
-            <span>&middot;</span>
-            <span>{tags[0]}</span>
-          </>
-        )}
+        {
+          tags && tags.length > 0 && (
+            <>
+              <span>&middot;</span>
+              <span>{tags[0]}</span>
+            </>
+          )
+        }
       </div>
     </div>
   </div>

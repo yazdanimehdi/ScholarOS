@@ -2,11 +2,11 @@
   <div>
     <!-- Hamburger button -->
     <button
-      @click="open"
-      class="inline-flex items-center justify-center w-8 h-8 rounded text-[var(--color-surface-500)] hover:text-[var(--color-surface-700)] dark:text-dm-muted dark:hover:text-[#c9d1d9] transition-colors"
+      class="inline-flex h-8 w-8 items-center justify-center rounded text-[var(--color-surface-500)] transition-colors hover:text-[var(--color-surface-700)] dark:text-dm-muted dark:hover:text-[#c9d1d9]"
       aria-label="Open menu"
+      @click="open"
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </button>
@@ -14,32 +14,30 @@
     <!-- Backdrop -->
     <Teleport to="body">
       <Transition name="fade">
-        <div
-          v-if="isOpen"
-          class="fixed inset-0 z-50 bg-black/40"
-          @click="close"
-        />
+        <div v-if="isOpen" class="fixed inset-0 z-50 bg-black/40" @click="close" />
       </Transition>
 
       <!-- Slide-out panel -->
       <Transition name="slide">
         <div
           v-if="isOpen"
-          class="fixed top-0 bottom-0 z-50 w-64 bg-white dark:bg-dm-alt border-e border-[var(--color-surface-200)] dark:border-dm-border shadow-lg inset-inline-start-0"
+          class="inset-inline-start-0 fixed top-0 bottom-0 z-50 w-64 border-e border-[var(--color-surface-200)] bg-white shadow-lg dark:border-dm-border dark:bg-dm-alt"
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
           @keydown.escape="close"
         >
-          <div class="flex items-center justify-between p-4 border-b border-[var(--color-surface-200)] dark:border-dm-border">
+          <div
+            class="flex items-center justify-between border-b border-[var(--color-surface-200)] p-4 dark:border-dm-border"
+          >
             <span class="text-sm font-medium text-[var(--color-surface-700)] dark:text-dm-text">Menu</span>
             <button
               ref="closeButtonRef"
-              @click="close"
-              class="inline-flex items-center justify-center w-7 h-7 rounded text-[var(--color-surface-400)] hover:text-[var(--color-surface-600)] dark:text-dm-muted dark:hover:text-[#c9d1d9] transition-colors"
+              class="inline-flex h-7 w-7 items-center justify-center rounded text-[var(--color-surface-400)] transition-colors hover:text-[var(--color-surface-600)] dark:text-dm-muted dark:hover:text-[#c9d1d9]"
               aria-label="Close menu"
+              @click="close"
             >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -50,7 +48,7 @@
               <li v-for="item in navItems" :key="item.href">
                 <a
                   :href="item.href"
-                  class="block px-3 py-2 text-sm rounded text-[var(--color-surface-600)] hover:text-[var(--color-primary-600)] hover:bg-[var(--color-surface-50)] dark:text-dm-muted dark:hover:text-[var(--color-accent-400)] dark:hover:bg-[#21262d] transition-colors"
+                  class="block rounded px-3 py-2 text-sm text-[var(--color-surface-600)] transition-colors hover:bg-[var(--color-surface-50)] hover:text-[var(--color-primary-600)] dark:text-dm-muted dark:hover:bg-[#21262d] dark:hover:text-[var(--color-accent-400)]"
                   @click="close"
                 >
                   {{ item.label }}

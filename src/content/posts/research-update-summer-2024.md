@@ -1,12 +1,12 @@
 ---
-title: "Research Update: Summer 2024"
+title: 'Research Update: Summer 2024'
 date: 2024-07-01
-author: "jane-smith"
+author: 'jane-smith'
 excerpt: "A summary of our lab's research progress and achievements during the first half of 2024."
 tags:
-  - "Lab News"
-  - "Research"
-  - "NLP"
+  - 'Lab News'
+  - 'Research'
+  - 'NLP'
 draft: false
 ---
 

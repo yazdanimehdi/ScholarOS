@@ -8,16 +8,18 @@ interface Props {
 const { title, viewAllHref, viewAllText = 'View all →' } = Astro.props;
 ---
 
-<div class="flex items-baseline justify-between pb-2 border-b border-surface-200 dark:border-dm-border">
-  <h2 class="text-xl font-serif font-normal text-surface-900 dark:text-dm-heading">
+<div class="flex items-baseline justify-between border-b border-surface-200 pb-2 dark:border-dm-border">
+  <h2 class="font-serif text-xl font-normal text-surface-900 dark:text-dm-heading">
     {title}
   </h2>
-  {viewAllHref && (
-    <a
-      href={viewAllHref}
-      class="text-sm text-primary-600 hover:text-primary-700 dark:text-accent-400 dark:hover:text-accent-300 transition-colors"
-    >
-      {viewAllText}
-    </a>
-  )}
+  {
+    viewAllHref && (
+      <a
+        href={viewAllHref}
+        class="text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-accent-400 dark:hover:text-accent-300"
+      >
+        {viewAllText}
+      </a>
+    )
+  }
 </div>

@@ -1,8 +1,8 @@
 authors:
-  - name: "Jane Smith"
-    scholar_id: "XXXXXXXXXX"    # Google Scholar author ID
-  - name: "John Doe"
-    scholar_id: "YYYYYYYYYY"
+  - name: 'Jane Smith'
+    scholar_id: 'XXXXXXXXXX' # Google Scholar author ID
+  - name: 'John Doe'
+    scholar_id: 'YYYYYYYYYY'
 
-syncInterval: "weekly"
+syncInterval: 'weekly'
 maxResults: 100

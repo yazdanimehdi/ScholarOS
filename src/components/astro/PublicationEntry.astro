@@ -16,12 +16,23 @@ interface Props {
   highlightAuthors?: string[];
 }
 
-const { title, authors, venue, year, doi, url, pdf, bibtex, type, featured, image, highlightAuthors = [] } = Astro.props;
+const {
+  title,
+  authors,
+  venue,
+  year,
+  doi,
+  url,
+  pdf,
+  bibtex,
+  type,
+  featured,
+  image,
+  highlightAuthors = [],
+} = Astro.props;
 
 function isHighlighted(author: string): boolean {
-  return highlightAuthors.some(h =>
-    author.toLowerCase().includes(h.toLowerCase())
-  );
+  return highlightAuthors.some((h) => author.toLowerCase().includes(h.toLowerCase()));
 }
 
 // Short venue abbreviation for badge
@@ -35,37 +46,55 @@ function getVenueAbbr(venue: string): string {
 
 <div class="flex gap-3 py-3">
   <!-- Thumbnail (if image exists) -->
-  {image ? (
-    <div class="shrink-0 pt-0.5">
-      <img src={image.src} alt={title} width="64" height="64" class="w-16 h-16 object-cover rounded border border-surface-200 dark:border-dm-border-alt" loading="lazy" />
-    </div>
-  ) : (
-    <div class="shrink-0 pt-0.5">
-      <span class="pub-badge">{getVenueAbbr(venue)}</span>
-    </div>
-  )}
+  {
+    image ? (
+      <div class="shrink-0 pt-0.5">
+        <img
+          src={image.src}
+          alt={title}
+          width="64"
+          height="64"
+          class="h-16 w-16 rounded border border-surface-200 object-cover dark:border-dm-border-alt"
+          loading="lazy"
+        />
+      </div>
+    ) : (
+      <div class="shrink-0 pt-0.5">
+        <span class="pub-badge">{getVenueAbbr(venue)}</span>
+      </div>
+    )
+  }
 
   <!-- Content -->
-  <div class="flex-1 min-w-0">
+  <div class="min-w-0 flex-1">
     <h3 class="text-[0.95rem] leading-snug font-medium text-surface-900 dark:text-dm-heading">
-      {url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
-          {title}
-        </a>
-      ) : title}
+      {
+        url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="transition-colors hover:text-primary-600 dark:hover:text-accent-400"
+          >
+            {title}
+          </a>
+        ) : (
+          title
+        )
+      }
     </h3>
 
     <p class="mt-1 text-sm text-surface-500 dark:text-dm-muted">
-      {authors.map((author, i) => (
-        <>
-          <span class:list={[
-            isHighlighted(author) && 'font-medium text-surface-800 dark:text-dm-text'
-          ]}>
-            {author}
-          </span>
-          {i < authors.length - 1 && ', '}
-        </>
-      ))}
+      {
+        authors.map((author, i) => (
+          <>
+            <span class:list={[isHighlighted(author) && 'font-medium text-surface-800 dark:text-dm-text']}>
+              {author}
+            </span>
+            {i < authors.length - 1 && ', '}
+          </>
+        ))
+      }
     </p>
 
     <p class="mt-0.5 text-sm text-surface-500 dark:text-dm-muted">
@@ -74,24 +103,34 @@ function getVenueAbbr(venue: string): string {
 
     <!-- Action links -->
     <div class="mt-2 flex flex-wrap gap-1.5">
-      {pdf && (
-        <a href={pdf} target="_blank" rel="noopener noreferrer" class="action-btn">PDF</a>
-      )}
-      {url && (
-        <a href={url} target="_blank" rel="noopener noreferrer" class="action-btn">Paper</a>
-      )}
-      {doi && (
-        <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer" class="action-btn">DOI</a>
-      )}
-      {bibtex && (
-        <button
-          class="action-btn bibtex-copy"
-          data-bibtex={bibtex}
-          title="Copy BibTeX"
-        >
-          <span class="bibtex-label">BibTeX</span>
-        </button>
-      )}
+      {
+        pdf && (
+          <a href={pdf} target="_blank" rel="noopener noreferrer" class="action-btn">
+            PDF
+          </a>
+        )
+      }
+      {
+        url && (
+          <a href={url} target="_blank" rel="noopener noreferrer" class="action-btn">
+            Paper
+          </a>
+        )
+      }
+      {
+        doi && (
+          <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer" class="action-btn">
+            DOI
+          </a>
+        )
+      }
+      {
+        bibtex && (
+          <button class="action-btn bibtex-copy" data-bibtex={bibtex} title="Copy BibTeX">
+            <span class="bibtex-label">BibTeX</span>
+          </button>
+        )
+      }
     </div>
   </div>
 </div>

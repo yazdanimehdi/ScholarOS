@@ -294,7 +294,15 @@ export interface CvMetadata {
   pdfSize: number;
 }
 
-export type PersonRole = 'pi' | 'postdoc' | 'phd' | 'masters' | 'undergrad' | 'research-assistant' | 'visiting' | 'alumni';
+export type PersonRole =
+  | 'pi'
+  | 'postdoc'
+  | 'phd'
+  | 'masters'
+  | 'undergrad'
+  | 'research-assistant'
+  | 'visiting'
+  | 'alumni';
 
 export type AnnouncementCategory = 'paper' | 'grant' | 'award' | 'talk' | 'media' | 'general';
 

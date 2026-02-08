@@ -14,7 +14,11 @@
     "sync:scholar": "python3 scripts/sync-scholar.py",
     "render:cv": "python3 scripts/render-cv.py",
     "generate:keywords": "tsx scripts/generate-seo-keywords.ts",
-    "migrate:al-folio": "tsx scripts/migrate-al-folio.ts"
+    "migrate:al-folio": "tsx scripts/migrate-al-folio.ts",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint --fix . && prettier --write .",
+    "format": "prettier --write .",
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",
@@ -28,16 +32,26 @@
     "vue": "^3.5.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.0.0",
     "@types/hast": "^3.0.4",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.2.2",
+    "eslint": "^10.0.0",
+    "eslint-plugin-astro": "^1.5.0",
+    "eslint-plugin-vue": "^10.7.0",
+    "globals": "^17.3.0",
     "js-yaml": "^4.1.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "rss-parser": "^3.13.0",
     "sharp": "^0.33.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.54.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

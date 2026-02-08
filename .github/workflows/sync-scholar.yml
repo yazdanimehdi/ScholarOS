@@ -56,4 +56,3 @@ jobs:
           git commit -m "chore: sync scholar publications"
           git pull --rebase
           git push
-

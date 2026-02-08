@@ -8,43 +8,45 @@ import { getSiteConfig, isPersonalMode } from '../lib/config';
 const config = getSiteConfig();
 const personal = isPersonalMode();
 
-const publications = (await getCollection('publications'))
-  .sort((a, b) => b.data.year - a.data.year);
+const publications = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year);
 
-const pubData = await Promise.all(publications.map(async p => {
-  let imageUrl: string | undefined;
-  if (p.data.image) {
-    const resolved = await getImage({ src: p.data.image, width: 128 });
-    imageUrl = resolved.src;
-  }
-  return {
-    id: p.id,
-    title: p.data.title,
-    authors: p.data.authors,
-    venue: p.data.venue,
-    year: p.data.year,
-    doi: p.data.doi,
-    url: p.data.url,
-    bibtex: p.data.bibtex,
-    type: p.data.type,
-    featured: p.data.featured,
-    abstract: p.data.abstract,
-    image: imageUrl,
-  };
-}));
+const pubData = await Promise.all(
+  publications.map(async (p) => {
+    let imageUrl: string | undefined;
+    if (p.data.image) {
+      const resolved = await getImage({ src: p.data.image, width: 128 });
+      imageUrl = resolved.src;
+    }
+    return {
+      id: p.id,
+      title: p.data.title,
+      authors: p.data.authors,
+      venue: p.data.venue,
+      year: p.data.year,
+      doi: p.data.doi,
+      url: p.data.url,
+      bibtex: p.data.bibtex,
+      type: p.data.type,
+      featured: p.data.featured,
+      abstract: p.data.abstract,
+      image: imageUrl,
+    };
+  }),
+);
 ---
 
-<PageLayout title="Publications" description={personal ? "My published research papers and articles." : "Our published research papers and articles."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Publications</h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
-    {personal
-      ? "Browse my research publications. Use the filters below to search by keyword, year, or type."
-      : "Browse our research publications. Use the filters below to search by keyword, year, or type."}
+<PageLayout
+  title="Publications"
+  description={personal ? 'My published research papers and articles.' : 'Our published research papers and articles.'}
+>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">Publications</h1>
+  <p class="mb-6 text-sm text-surface-500 dark:text-dm-muted">
+    {
+      personal
+        ? 'Browse my research publications. Use the filters below to search by keyword, year, or type.'
+        : 'Browse our research publications. Use the filters below to search by keyword, year, or type.'
+    }
   </p>
 
-  <PublicationFilter
-    publications={pubData}
-    highlightAuthors={[config.author]}
-    client:load
-  />
+  <PublicationFilter publications={pubData} highlightAuthors={[config.author]} client:load />
 </PageLayout>

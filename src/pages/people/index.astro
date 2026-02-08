@@ -19,67 +19,86 @@ for (const person of people) {
 }
 
 const tabOrder = ['Faculty', 'Researchers', 'Students', 'Alumni'];
-const activeGroups = tabOrder.filter(t => groups[t]?.length > 0);
+const activeGroups = tabOrder.filter((t) => groups[t]?.length > 0);
 
 const currentMembers = [...(groups['Faculty'] || []), ...(groups['Researchers'] || []), ...(groups['Students'] || [])];
 const alumni = groups['Alumni'] || [];
 const alumniShapeClass = getImageShapeClass();
 ---
 
-<PageLayout title="People" description={personal ? "Collaborators, students, and research group members." : "Meet our team of researchers, students, and collaborators."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-6">{personal ? "Collaborators & Students" : "Our Team"}</h1>
+<PageLayout
+  title="People"
+  description={personal
+    ? 'Collaborators, students, and research group members.'
+    : 'Meet our team of researchers, students, and collaborators.'}
+>
+  <h1 class="mb-6 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
+    {personal ? 'Collaborators & Students' : 'Our Team'}
+  </h1>
 
   <!-- Current Members -->
-  {currentMembers.length > 0 && (
-    <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        Current Members
-      </h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {currentMembers.map(person => (
-          <PersonCard
-            id={person.id}
-            name={person.data.name}
-            role={person.data.role}
-            title={person.data.title}
-            photo={person.data.photo}
-            email={person.data.email}
-            socials={person.data.socials}
-            startDate={person.data.startDate}
-            showDate={true}
-          />
-        ))}
-      </div>
-    </section>
-  )}
+  {
+    currentMembers.length > 0 && (
+      <section class="mb-10">
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Current Members
+        </h2>
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+          {currentMembers.map((person) => (
+            <PersonCard
+              id={person.id}
+              name={person.data.name}
+              role={person.data.role}
+              title={person.data.title}
+              photo={person.data.photo}
+              email={person.data.email}
+              socials={person.data.socials}
+              startDate={person.data.startDate}
+              showDate={true}
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <!-- Alumni -->
-  {alumni.length > 0 && (
-    <section>
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        Alumni
-      </h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {alumni.map(person => (
-          <div class="text-center">
-            <a href={`/people/${person.id}`} class="block group">
-              <div class:list={["w-16 h-16 mx-auto mb-2 overflow-hidden bg-surface-100 dark:bg-dm-alt", alumniShapeClass]}>
-                <div class="w-full h-full flex items-center justify-center text-sm font-light text-surface-400 dark:text-dm-faint font-serif">
-                  {person.data.name.split(' ').map(n => n[0]).join('')}
+  {
+    alumni.length > 0 && (
+      <section>
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Alumni
+        </h2>
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+          {alumni.map((person) => (
+            <div class="text-center">
+              <a href={`/people/${person.id}`} class="group block">
+                <div
+                  class:list={[
+                    'mx-auto mb-2 h-16 w-16 overflow-hidden bg-surface-100 dark:bg-dm-alt',
+                    alumniShapeClass,
+                  ]}
+                >
+                  <div class="flex h-full w-full items-center justify-center font-serif text-sm font-light text-surface-400 dark:text-dm-faint">
+                    {person.data.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </div>
                 </div>
-              </div>
-              <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
-                {person.data.name}
-              </h3>
-            </a>
-            {person.data.socials && (
-              <div class="mt-1 flex justify-center">
-                <SocialLinks socials={person.data.socials} size="sm" />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  )}
+                <h3 class="text-sm font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400">
+                  {person.data.name}
+                </h3>
+              </a>
+              {person.data.socials && (
+                <div class="mt-1 flex justify-center">
+                  <SocialLinks socials={person.data.socials} size="sm" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
 </PageLayout>

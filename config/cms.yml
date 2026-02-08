@@ -3,878 +3,1179 @@
 
 backend:
   name: github
-  repo: "your-username/your-repo"   # <-- CHANGE THIS (auto-configured on template init)
+  repo: 'your-username/your-repo' # <-- CHANGE THIS (auto-configured on template init)
   branch: main
   # base_url: ""                    # <-- Cloudflare Worker URL for OAuth login
-                                    #     Deploy cloudflare-auth/ then set this to your Worker URL
-                                    #     (e.g. https://sveltia-cms-auth.your-name.workers.dev)
-                                    #     Without this, users sign in with a Personal Access Token
+  #     Deploy cloudflare-auth/ then set this to your Worker URL
+  #     (e.g. https://sveltia-cms-auth.your-name.workers.dev)
+  #     Without this, users sign in with a Personal Access Token
 
-media_folder: "src/assets/images"
-public_folder: "/src/assets/images"
+media_folder: 'src/assets/images'
+public_folder: '/src/assets/images'
 
 slug:
-  encoding: "ascii"
+  encoding: 'ascii'
   clean_accents: true
-  sanitize_replacement: "-"
+  sanitize_replacement: '-'
 
 collections:
   # ──────────────────────────────────────────────
   # Folder Collections (markdown content)
   # ──────────────────────────────────────────────
 
-  - name: "people"
-    label: "People"
-    folder: "src/content/people"
+  - name: 'people'
+    label: 'People'
+    folder: 'src/content/people'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Name", name: "name", widget: "string" }
-      - label: "Role"
-        name: "role"
-        widget: "select"
+      - { label: 'Name', name: 'name', widget: 'string' }
+      - label: 'Role'
+        name: 'role'
+        widget: 'select'
         options:
-          - { label: "Principal Investigator", value: "pi" }
-          - { label: "Postdoc", value: "postdoc" }
-          - { label: "PhD Student", value: "phd" }
-          - { label: "Master's Student", value: "masters" }
-          - { label: "Undergraduate", value: "undergrad" }
-          - { label: "Research Assistant", value: "research-assistant" }
-          - { label: "Visiting Researcher", value: "visiting" }
-          - { label: "Alumni", value: "alumni" }
-      - { label: "Title", name: "title", widget: "string", required: false }
-      - { label: "Photo", name: "photo", widget: "image", required: false }
-      - { label: "Email", name: "email", widget: "string", required: false }
-      - label: "Socials"
-        name: "socials"
-        widget: "object"
+          - { label: 'Principal Investigator', value: 'pi' }
+          - { label: 'Postdoc', value: 'postdoc' }
+          - { label: 'PhD Student', value: 'phd' }
+          - { label: "Master's Student", value: 'masters' }
+          - { label: 'Undergraduate', value: 'undergrad' }
+          - { label: 'Research Assistant', value: 'research-assistant' }
+          - { label: 'Visiting Researcher', value: 'visiting' }
+          - { label: 'Alumni', value: 'alumni' }
+      - { label: 'Title', name: 'title', widget: 'string', required: false }
+      - { label: 'Photo', name: 'photo', widget: 'image', required: false }
+      - { label: 'Email', name: 'email', widget: 'string', required: false }
+      - label: 'Socials'
+        name: 'socials'
+        widget: 'object'
         required: false
         collapsed: true
         fields:
-          - { label: "GitHub", name: "github", widget: "string", required: false }
-          - { label: "Google Scholar", name: "scholar", widget: "string", required: false }
-          - { label: "Twitter / X", name: "twitter", widget: "string", required: false }
-          - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
-          - { label: "ORCID", name: "orcid", widget: "string", required: false }
-          - { label: "Mastodon", name: "mastodon", widget: "string", required: false }
-          - { label: "Bluesky", name: "bluesky", widget: "string", required: false }
-          - { label: "Website", name: "website", widget: "string", required: false }
-      - label: "Research Interests"
-        name: "researchInterests"
-        widget: "list"
+          - { label: 'GitHub', name: 'github', widget: 'string', required: false }
+          - { label: 'Google Scholar', name: 'scholar', widget: 'string', required: false }
+          - { label: 'Twitter / X', name: 'twitter', widget: 'string', required: false }
+          - { label: 'LinkedIn', name: 'linkedin', widget: 'string', required: false }
+          - { label: 'ORCID', name: 'orcid', widget: 'string', required: false }
+          - { label: 'Mastodon', name: 'mastodon', widget: 'string', required: false }
+          - { label: 'Bluesky', name: 'bluesky', widget: 'string', required: false }
+          - { label: 'Website', name: 'website', widget: 'string', required: false }
+      - label: 'Research Interests'
+        name: 'researchInterests'
+        widget: 'list'
         required: false
-        field: { label: "Interest", name: "interest", widget: "string" }
-      - { label: "Start Date", name: "startDate", widget: "datetime", required: false }
-      - { label: "End Date", name: "endDate", widget: "datetime", required: false }
-      - { label: "Sort Order", name: "sortOrder", widget: "number", default: 99, value_type: "int" }
-      - { label: "Active", name: "active", widget: "boolean", default: true }
-      - { label: "Body", name: "body", widget: "markdown" }
+        field: { label: 'Interest', name: 'interest', widget: 'string' }
+      - { label: 'Start Date', name: 'startDate', widget: 'datetime', required: false }
+      - { label: 'End Date', name: 'endDate', widget: 'datetime', required: false }
+      - { label: 'Sort Order', name: 'sortOrder', widget: 'number', default: 99, value_type: 'int' }
+      - { label: 'Active', name: 'active', widget: 'boolean', default: true }
+      - { label: 'Body', name: 'body', widget: 'markdown' }
 
-  - name: "announcements"
-    label: "Announcements"
-    folder: "src/content/announcements"
+  - name: 'announcements'
+    label: 'Announcements'
+    folder: 'src/content/announcements'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - { label: 'Date', name: 'date', widget: 'datetime' }
+      - label: 'Category'
+        name: 'category'
+        widget: 'select'
         options:
-          - { label: "Paper", value: "paper" }
-          - { label: "Grant", value: "grant" }
-          - { label: "Award", value: "award" }
-          - { label: "Talk", value: "talk" }
-          - { label: "Media", value: "media" }
-          - { label: "General", value: "general" }
-      - { label: "Pinned", name: "pinned", widget: "boolean", default: false }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      - { label: "Image", name: "image", widget: "image", required: false }
-      - { label: "Emoji Icon", name: "emoji", widget: "string", required: false, hint: "Optional emoji shown as icon (e.g. 🏆 📄 🎉). Used when no image is set." }
-      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
-      - label: "People"
-        name: "people"
-        widget: "list"
+          - { label: 'Paper', value: 'paper' }
+          - { label: 'Grant', value: 'grant' }
+          - { label: 'Award', value: 'award' }
+          - { label: 'Talk', value: 'talk' }
+          - { label: 'Media', value: 'media' }
+          - { label: 'General', value: 'general' }
+      - { label: 'Pinned', name: 'pinned', widget: 'boolean', default: false }
+      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
+      - { label: 'Image', name: 'image', widget: 'image', required: false }
+      - {
+          label: 'Emoji Icon',
+          name: 'emoji',
+          widget: 'string',
+          required: false,
+          hint: 'Optional emoji shown as icon (e.g. 🏆 📄 🎉). Used when no image is set.',
+        }
+      - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
+      - label: 'People'
+        name: 'people'
+        widget: 'list'
         required: false
-        field: { label: "Person ID", name: "person", widget: "string" }
-      - { label: "Body", name: "body", widget: "markdown" }
+        field: { label: 'Person ID', name: 'person', widget: 'string' }
+      - { label: 'Body', name: 'body', widget: 'markdown' }
 
-  - name: "projects"
-    label: "Projects"
-    folder: "src/content/projects"
+  - name: 'projects'
+    label: 'Projects'
+    folder: 'src/content/projects'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - label: "Type"
-        name: "type"
-        widget: "select"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - label: 'Type'
+        name: 'type'
+        widget: 'select'
         options:
-          - { label: "Software", value: "software" }
-          - { label: "Dataset", value: "dataset" }
-          - { label: "Benchmark", value: "benchmark" }
-          - { label: "Hardware", value: "hardware" }
-          - { label: "Other", value: "other" }
-      - label: "Status"
-        name: "status"
-        widget: "select"
+          - { label: 'Software', value: 'software' }
+          - { label: 'Dataset', value: 'dataset' }
+          - { label: 'Benchmark', value: 'benchmark' }
+          - { label: 'Hardware', value: 'hardware' }
+          - { label: 'Other', value: 'other' }
+      - label: 'Status'
+        name: 'status'
+        widget: 'select'
         options:
-          - { label: "Active", value: "active" }
-          - { label: "Completed", value: "completed" }
-          - { label: "Upcoming", value: "upcoming" }
-      - { label: "Image", name: "image", widget: "image", required: false }
-      - { label: "URL", name: "url", widget: "string", required: false }
-      - { label: "Repository URL", name: "repoUrl", widget: "string", required: false }
-      - { label: "Paper URL", name: "paperUrl", widget: "string", required: false }
-      - label: "Team"
-        name: "team"
-        widget: "list"
+          - { label: 'Active', value: 'active' }
+          - { label: 'Completed', value: 'completed' }
+          - { label: 'Upcoming', value: 'upcoming' }
+      - { label: 'Image', name: 'image', widget: 'image', required: false }
+      - { label: 'URL', name: 'url', widget: 'string', required: false }
+      - { label: 'Repository URL', name: 'repoUrl', widget: 'string', required: false }
+      - { label: 'Paper URL', name: 'paperUrl', widget: 'string', required: false }
+      - label: 'Team'
+        name: 'team'
+        widget: 'list'
         required: false
-        field: { label: "Person ID", name: "person", widget: "string" }
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
+        field: { label: 'Person ID', name: 'person', widget: 'string' }
+      - label: 'Tags'
+        name: 'tags'
+        widget: 'list'
         required: false
-        field: { label: "Tag", name: "tag", widget: "string" }
-      - { label: "Start Date", name: "startDate", widget: "datetime", required: false }
-      - { label: "End Date", name: "endDate", widget: "datetime", required: false }
-      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+        field: { label: 'Tag', name: 'tag', widget: 'string' }
+      - { label: 'Start Date', name: 'startDate', widget: 'datetime', required: false }
+      - { label: 'End Date', name: 'endDate', widget: 'datetime', required: false }
+      - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
+      - { label: 'Body', name: 'body', widget: 'markdown' }
 
-  - name: "posts"
-    label: "Blog Posts"
-    folder: "src/content/posts"
+  - name: 'posts'
+    label: 'Blog Posts'
+    folder: 'src/content/posts'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Author", name: "author", widget: "string", required: false }
-      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
-      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - { label: 'Date', name: 'date', widget: 'datetime' }
+      - { label: 'Author', name: 'author', widget: 'string', required: false }
+      - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
+      - { label: 'Cover Image', name: 'coverImage', widget: 'image', required: false }
+      - label: 'Tags'
+        name: 'tags'
+        widget: 'list'
         required: false
-        field: { label: "Tag", name: "tag", widget: "string" }
-      - { label: "Keywords", name: "keywords", widget: "string", required: false }
-      - { label: "Draft", name: "draft", widget: "boolean", default: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+        field: { label: 'Tag', name: 'tag', widget: 'string' }
+      - { label: 'Keywords', name: 'keywords', widget: 'string', required: false }
+      - { label: 'Draft', name: 'draft', widget: 'boolean', default: false }
+      - { label: 'Body', name: 'body', widget: 'markdown' }
 
-  - name: "publications"
-    label: "Publications"
-    folder: "src/content/publications"
+  - name: 'publications'
+    label: 'Publications'
+    folder: 'src/content/publications'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - label: "Authors"
-        name: "authors"
-        widget: "list"
-        field: { label: "Author", name: "author", widget: "string" }
-      - { label: "Venue", name: "venue", widget: "string" }
-      - { label: "Year", name: "year", widget: "number", value_type: "int" }
-      - { label: "DOI", name: "doi", widget: "string", required: false }
-      - { label: "URL", name: "url", widget: "string", required: false }
-      - { label: "PDF", name: "pdf", widget: "string", required: false }
-      - label: "Type"
-        name: "type"
-        widget: "select"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - label: 'Authors'
+        name: 'authors'
+        widget: 'list'
+        field: { label: 'Author', name: 'author', widget: 'string' }
+      - { label: 'Venue', name: 'venue', widget: 'string' }
+      - { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
+      - { label: 'DOI', name: 'doi', widget: 'string', required: false }
+      - { label: 'URL', name: 'url', widget: 'string', required: false }
+      - { label: 'PDF', name: 'pdf', widget: 'string', required: false }
+      - label: 'Type'
+        name: 'type'
+        widget: 'select'
         options:
-          - { label: "Journal", value: "journal" }
-          - { label: "Conference", value: "conference" }
-          - { label: "Preprint", value: "preprint" }
-          - { label: "Workshop", value: "workshop" }
-          - { label: "Thesis", value: "thesis" }
-          - { label: "Book Chapter", value: "book-chapter" }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      - { label: "Abstract", name: "abstract", widget: "text", required: false }
-      - { label: "Image", name: "image", widget: "image", required: false, hint: "Thumbnail image or GIF (e.g. a figure from the paper)" }
-      - { label: "BibTeX", name: "bibtex", widget: "code", required: false, default_language: "bibtex", allow_language_selection: false, output_code_only: true }
-      - { label: "Body", name: "body", widget: "markdown", required: false }
+          - { label: 'Journal', value: 'journal' }
+          - { label: 'Conference', value: 'conference' }
+          - { label: 'Preprint', value: 'preprint' }
+          - { label: 'Workshop', value: 'workshop' }
+          - { label: 'Thesis', value: 'thesis' }
+          - { label: 'Book Chapter', value: 'book-chapter' }
+      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
+      - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
+      - {
+          label: 'Image',
+          name: 'image',
+          widget: 'image',
+          required: false,
+          hint: 'Thumbnail image or GIF (e.g. a figure from the paper)',
+        }
+      - {
+          label: 'BibTeX',
+          name: 'bibtex',
+          widget: 'code',
+          required: false,
+          default_language: 'bibtex',
+          allow_language_selection: false,
+          output_code_only: true,
+        }
+      - { label: 'Body', name: 'body', widget: 'markdown', required: false }
 
-  - name: "positions"
-    label: "Positions"
-    folder: "src/content/positions"
+  - name: 'positions'
+    label: 'Positions'
+    folder: 'src/content/positions'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - label: "Type"
-        name: "type"
-        widget: "select"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - label: 'Type'
+        name: 'type'
+        widget: 'select'
         options:
-          - { label: "PhD", value: "phd" }
-          - { label: "Postdoc", value: "postdoc" }
-          - { label: "Master's", value: "masters" }
-          - { label: "Undergraduate", value: "undergrad" }
-          - { label: "Research Assistant", value: "research-assistant" }
-          - { label: "Visiting Researcher", value: "visiting" }
-          - { label: "Other", value: "other" }
-      - label: "Status"
-        name: "status"
-        widget: "select"
+          - { label: 'PhD', value: 'phd' }
+          - { label: 'Postdoc', value: 'postdoc' }
+          - { label: "Master's", value: 'masters' }
+          - { label: 'Undergraduate', value: 'undergrad' }
+          - { label: 'Research Assistant', value: 'research-assistant' }
+          - { label: 'Visiting Researcher', value: 'visiting' }
+          - { label: 'Other', value: 'other' }
+      - label: 'Status'
+        name: 'status'
+        widget: 'select'
         options:
-          - { label: "Open", value: "open" }
-          - { label: "Closed", value: "closed" }
-      - { label: "Deadline", name: "deadline", widget: "datetime", required: false }
-      - { label: "Excerpt", name: "excerpt", widget: "string", required: false }
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
+          - { label: 'Open', value: 'open' }
+          - { label: 'Closed', value: 'closed' }
+      - { label: 'Deadline', name: 'deadline', widget: 'datetime', required: false }
+      - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
+      - label: 'Tags'
+        name: 'tags'
+        widget: 'list'
         required: false
-        field: { label: "Tag", name: "tag", widget: "string" }
-      - { label: "Contact", name: "contact", widget: "string", required: false }
-      - { label: "Sort Order", name: "sortOrder", widget: "number", default: 99, value_type: "int" }
-      - { label: "Body", name: "body", widget: "markdown" }
+        field: { label: 'Tag', name: 'tag', widget: 'string' }
+      - { label: 'Contact', name: 'contact', widget: 'string', required: false }
+      - { label: 'Sort Order', name: 'sortOrder', widget: 'number', default: 99, value_type: 'int' }
+      - { label: 'Body', name: 'body', widget: 'markdown' }
 
-  - name: "talks"
-    label: "Talks"
-    folder: "src/content/talks"
+  - name: 'talks'
+    label: 'Talks'
+    folder: 'src/content/talks'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Event", name: "event", widget: "string" }
-      - { label: "Date", name: "date", widget: "string", hint: "Display date (e.g. November 2024)" }
-      - { label: "Location", name: "location", widget: "string", required: false }
-      - label: "Type"
-        name: "type"
-        widget: "select"
+      - { label: 'Title', name: 'title', widget: 'string' }
+      - { label: 'Event', name: 'event', widget: 'string' }
+      - { label: 'Date', name: 'date', widget: 'string', hint: 'Display date (e.g. November 2024)' }
+      - { label: 'Location', name: 'location', widget: 'string', required: false }
+      - label: 'Type'
+        name: 'type'
+        widget: 'select'
         options:
-          - { label: "Conference Talk", value: "Conference Talk" }
-          - { label: "Invited Talk", value: "Invited Talk" }
-          - { label: "Seminar", value: "Seminar" }
-          - { label: "Tutorial", value: "Tutorial" }
-          - { label: "Workshop", value: "Workshop" }
-          - { label: "Keynote", value: "Keynote" }
-          - { label: "Panel", value: "Panel" }
-      - { label: "Slides URL", name: "slidesUrl", widget: "string", required: false }
-      - { label: "Video URL", name: "videoUrl", widget: "string", required: false }
-      - { label: "Sort Date", name: "sortDate", widget: "datetime", required: false, hint: "Used for ordering. If empty, talks appear in file order." }
-      - { label: "Body", name: "body", widget: "markdown", required: false }
+          - { label: 'Conference Talk', value: 'Conference Talk' }
+          - { label: 'Invited Talk', value: 'Invited Talk' }
+          - { label: 'Seminar', value: 'Seminar' }
+          - { label: 'Tutorial', value: 'Tutorial' }
+          - { label: 'Workshop', value: 'Workshop' }
+          - { label: 'Keynote', value: 'Keynote' }
+          - { label: 'Panel', value: 'Panel' }
+      - { label: 'Slides URL', name: 'slidesUrl', widget: 'string', required: false }
+      - { label: 'Video URL', name: 'videoUrl', widget: 'string', required: false }
+      - {
+          label: 'Sort Date',
+          name: 'sortDate',
+          widget: 'datetime',
+          required: false,
+          hint: 'Used for ordering. If empty, talks appear in file order.',
+        }
+      - { label: 'Body', name: 'body', widget: 'markdown', required: false }
 
-  - name: "person-cvs"
-    label: "Person CVs"
-    folder: "cv"
+  - name: 'person-cvs'
+    label: 'Person CVs'
+    folder: 'cv'
     create: true
-    extension: "yml"
-    format: "yaml"
-    slug: "{{slug}}"
+    extension: 'yml'
+    format: 'yaml'
+    slug: '{{slug}}'
     fields:
-      - label: "CV"
-        name: "cv"
-        widget: "object"
+      - label: 'CV'
+        name: 'cv'
+        widget: 'object'
         fields:
-          - { label: "Name", name: "name", widget: "string" }
-          - { label: "Location", name: "location", widget: "string", required: false }
-          - { label: "Email", name: "email", widget: "string", required: false }
-          - { label: "Phone", name: "phone", widget: "string", required: false }
-          - { label: "Website", name: "website", widget: "string", required: false }
-          - label: "Sections"
-            name: "sections"
-            widget: "object"
+          - { label: 'Name', name: 'name', widget: 'string' }
+          - { label: 'Location', name: 'location', widget: 'string', required: false }
+          - { label: 'Email', name: 'email', widget: 'string', required: false }
+          - { label: 'Phone', name: 'phone', widget: 'string', required: false }
+          - { label: 'Website', name: 'website', widget: 'string', required: false }
+          - label: 'Sections'
+            name: 'sections'
+            widget: 'object'
             fields:
-              - label: "Education"
-                name: "education"
-                widget: "list"
+              - label: 'Education'
+                name: 'education'
+                widget: 'list'
                 required: false
                 fields:
-                  - { label: "Institution", name: "institution", widget: "string" }
-                  - { label: "Area", name: "area", widget: "string" }
-                  - { label: "Degree", name: "degree", widget: "string" }
-                  - { label: "Location", name: "location", widget: "string", required: false }
-                  - { label: "Start Date", name: "startDate", widget: "string", hint: "YYYY-MM" }
-                  - { label: "End Date", name: "endDate", widget: "string", hint: "YYYY-MM or 'present'" }
-                  - { label: "Highlights", name: "highlights", widget: "list", required: false, field: { label: "Highlight", name: "highlight", widget: "string" } }
-              - label: "Experience"
-                name: "experience"
-                widget: "list"
+                  - { label: 'Institution', name: 'institution', widget: 'string' }
+                  - { label: 'Area', name: 'area', widget: 'string' }
+                  - { label: 'Degree', name: 'degree', widget: 'string' }
+                  - { label: 'Location', name: 'location', widget: 'string', required: false }
+                  - { label: 'Start Date', name: 'startDate', widget: 'string', hint: 'YYYY-MM' }
+                  - { label: 'End Date', name: 'endDate', widget: 'string', hint: "YYYY-MM or 'present'" }
+                  - {
+                      label: 'Highlights',
+                      name: 'highlights',
+                      widget: 'list',
+                      required: false,
+                      field: { label: 'Highlight', name: 'highlight', widget: 'string' },
+                    }
+              - label: 'Experience'
+                name: 'experience'
+                widget: 'list'
                 required: false
                 fields:
-                  - { label: "Company", name: "company", widget: "string" }
-                  - { label: "Position", name: "position", widget: "string" }
-                  - { label: "Location", name: "location", widget: "string", required: false }
-                  - { label: "Start Date", name: "startDate", widget: "string", hint: "YYYY-MM" }
-                  - { label: "End Date", name: "endDate", widget: "string", hint: "YYYY-MM or 'present'" }
-                  - { label: "Highlights", name: "highlights", widget: "list", required: false, field: { label: "Highlight", name: "highlight", widget: "string" } }
-              - label: "Publications"
-                name: "publications"
-                widget: "list"
+                  - { label: 'Company', name: 'company', widget: 'string' }
+                  - { label: 'Position', name: 'position', widget: 'string' }
+                  - { label: 'Location', name: 'location', widget: 'string', required: false }
+                  - { label: 'Start Date', name: 'startDate', widget: 'string', hint: 'YYYY-MM' }
+                  - { label: 'End Date', name: 'endDate', widget: 'string', hint: "YYYY-MM or 'present'" }
+                  - {
+                      label: 'Highlights',
+                      name: 'highlights',
+                      widget: 'list',
+                      required: false,
+                      field: { label: 'Highlight', name: 'highlight', widget: 'string' },
+                    }
+              - label: 'Publications'
+                name: 'publications'
+                widget: 'list'
                 required: false
                 fields:
-                  - { label: "Title", name: "title", widget: "string" }
-                  - { label: "Authors", name: "authors", widget: "list", field: { label: "Author", name: "author", widget: "string" } }
-                  - { label: "Journal", name: "journal", widget: "string", required: false }
-                  - { label: "Date", name: "date", widget: "string" }
-                  - { label: "DOI", name: "doi", widget: "string", required: false }
-                  - { label: "URL", name: "url", widget: "string", required: false }
-              - label: "Awards"
-                name: "awards"
-                widget: "list"
+                  - { label: 'Title', name: 'title', widget: 'string' }
+                  - {
+                      label: 'Authors',
+                      name: 'authors',
+                      widget: 'list',
+                      field: { label: 'Author', name: 'author', widget: 'string' },
+                    }
+                  - { label: 'Journal', name: 'journal', widget: 'string', required: false }
+                  - { label: 'Date', name: 'date', widget: 'string' }
+                  - { label: 'DOI', name: 'doi', widget: 'string', required: false }
+                  - { label: 'URL', name: 'url', widget: 'string', required: false }
+              - label: 'Awards'
+                name: 'awards'
+                widget: 'list'
                 required: false
                 fields:
-                  - { label: "Award", name: "label", widget: "string" }
-                  - { label: "Details", name: "details", widget: "string" }
-              - label: "Skills"
-                name: "skills"
-                widget: "list"
+                  - { label: 'Award', name: 'label', widget: 'string' }
+                  - { label: 'Details', name: 'details', widget: 'string' }
+              - label: 'Skills'
+                name: 'skills'
+                widget: 'list'
                 required: false
                 fields:
-                  - { label: "Category", name: "label", widget: "string" }
-                  - { label: "Details", name: "details", widget: "string" }
-      - label: "Design"
-        name: "design"
-        widget: "object"
+                  - { label: 'Category', name: 'label', widget: 'string' }
+                  - { label: 'Details', name: 'details', widget: 'string' }
+      - label: 'Design'
+        name: 'design'
+        widget: 'object'
         required: false
         collapsed: true
         fields:
-          - { label: "Theme", name: "theme", widget: "select", options: ["classic", "sb2nov", "moderncv", "engineeringresumes"], default: "classic" }
+          - {
+              label: 'Theme',
+              name: 'theme',
+              widget: 'select',
+              options: ['classic', 'sb2nov', 'moderncv', 'engineeringresumes'],
+              default: 'classic',
+            }
 
   # ──────────────────────────────────────────────
   # File Collections (config files)
   # ──────────────────────────────────────────────
 
-  - name: "settings"
-    label: "Settings"
+  - name: 'settings'
+    label: 'Settings'
     files:
-      - name: "site"
-        label: "Site Settings"
-        file: "config/site.yml"
+      - name: 'site'
+        label: 'Site Settings'
+        file: 'config/site.yml'
         fields:
-          - label: "Site Mode"
-            name: "siteMode"
-            widget: "select"
+          - label: 'Site Mode'
+            name: 'siteMode'
+            widget: 'select'
             options:
-              - { label: "Lab / Research Group", value: "lab" }
-              - { label: "Personal Academic Site", value: "personal" }
-          - { label: "Language", name: "lang", widget: "string", default: "en", hint: "BCP 47 language tag (e.g. en, fa, ar, zh)" }
-          - label: "Text Direction"
-            name: "direction"
-            widget: "select"
+              - { label: 'Lab / Research Group', value: 'lab' }
+              - { label: 'Personal Academic Site', value: 'personal' }
+          - {
+              label: 'Language',
+              name: 'lang',
+              widget: 'string',
+              default: 'en',
+              hint: 'BCP 47 language tag (e.g. en, fa, ar, zh)',
+            }
+          - label: 'Text Direction'
+            name: 'direction'
+            widget: 'select'
             options:
-              - { label: "Left to Right", value: "ltr" }
-              - { label: "Right to Left", value: "rtl" }
-          - label: "Default Theme"
-            name: "defaultTheme"
-            widget: "select"
+              - { label: 'Left to Right', value: 'ltr' }
+              - { label: 'Right to Left', value: 'rtl' }
+          - label: 'Default Theme'
+            name: 'defaultTheme'
+            widget: 'select'
             options:
-              - { label: "Light", value: "light" }
-              - { label: "Dark", value: "dark" }
-              - { label: "System", value: "system" }
-          - { label: "Site Title", name: "title", widget: "string" }
-          - { label: "Description", name: "description", widget: "text" }
-          - { label: "Author", name: "author", widget: "string" }
-          - { label: "Lab Name", name: "labName", widget: "string", required: false }
-          - { label: "University", name: "university", widget: "string", required: false }
-          - { label: "Department", name: "department", widget: "string", required: false }
-          - { label: "Site URL", name: "siteUrl", widget: "string" }
-          - label: "Image Shape"
-            name: "imageShape"
-            widget: "select"
+              - { label: 'Light', value: 'light' }
+              - { label: 'Dark', value: 'dark' }
+              - { label: 'System', value: 'system' }
+          - { label: 'Site Title', name: 'title', widget: 'string' }
+          - { label: 'Description', name: 'description', widget: 'text' }
+          - { label: 'Author', name: 'author', widget: 'string' }
+          - { label: 'Lab Name', name: 'labName', widget: 'string', required: false }
+          - { label: 'University', name: 'university', widget: 'string', required: false }
+          - { label: 'Department', name: 'department', widget: 'string', required: false }
+          - { label: 'Site URL', name: 'siteUrl', widget: 'string' }
+          - label: 'Image Shape'
+            name: 'imageShape'
+            widget: 'select'
             options:
-              - { label: "Rectangular", value: "rectangular" }
-              - { label: "Circular", value: "circular" }
-              - { label: "Oval", value: "oval" }
-          - label: "Top Bar"
-            name: "topBar"
-            widget: "object"
+              - { label: 'Rectangular', value: 'rectangular' }
+              - { label: 'Circular', value: 'circular' }
+              - { label: 'Oval', value: 'oval' }
+          - label: 'Top Bar'
+            name: 'topBar'
+            widget: 'object'
             collapsed: true
             fields:
-              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
-              - { label: "Text", name: "text", widget: "string" }
-              - label: "Links"
-                name: "links"
-                widget: "list"
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+              - { label: 'Text', name: 'text', widget: 'string' }
+              - label: 'Links'
+                name: 'links'
+                widget: 'list'
                 fields:
-                  - { label: "Label", name: "label", widget: "string" }
-                  - { label: "URL", name: "href", widget: "string" }
-                  - { label: "External", name: "external", widget: "boolean", required: false, default: false }
-          - label: "Hero Background"
-            name: "hero"
-            widget: "object"
+                  - { label: 'Label', name: 'label', widget: 'string' }
+                  - { label: 'URL', name: 'href', widget: 'string' }
+                  - { label: 'External', name: 'external', widget: 'boolean', required: false, default: false }
+          - label: 'Hero Background'
+            name: 'hero'
+            widget: 'object'
             collapsed: true
             fields:
-              - label: "Background Type"
-                name: "type"
-                widget: "select"
+              - label: 'Background Type'
+                name: 'type'
+                widget: 'select'
                 options:
-                  - { label: "Animation", value: "animation" }
-                  - { label: "Image", value: "image" }
-                  - { label: "Video", value: "video" }
-                  - { label: "Pattern", value: "pattern" }
-                  - { label: "None", value: "none" }
-              - label: "Light Mode"
-                name: "light"
-                widget: "object"
+                  - { label: 'Animation', value: 'animation' }
+                  - { label: 'Image', value: 'image' }
+                  - { label: 'Video', value: 'video' }
+                  - { label: 'Pattern', value: 'pattern' }
+                  - { label: 'None', value: 'none' }
+              - label: 'Light Mode'
+                name: 'light'
+                widget: 'object'
                 fields:
-                  - { label: "Background Color", name: "bgColor", widget: "string", default: "#ffffff", hint: "Hex color (e.g. #ffffff)" }
-                  - { label: "Background Image", name: "bgImage", widget: "image", required: false, hint: "Optional background image for light mode" }
-              - label: "Dark Mode"
-                name: "dark"
-                widget: "object"
+                  - {
+                      label: 'Background Color',
+                      name: 'bgColor',
+                      widget: 'string',
+                      default: '#ffffff',
+                      hint: 'Hex color (e.g. #ffffff)',
+                    }
+                  - {
+                      label: 'Background Image',
+                      name: 'bgImage',
+                      widget: 'image',
+                      required: false,
+                      hint: 'Optional background image for light mode',
+                    }
+              - label: 'Dark Mode'
+                name: 'dark'
+                widget: 'object'
                 fields:
-                  - { label: "Background Color", name: "bgColor", widget: "string", default: "#0d1117", hint: "Hex color (e.g. #0d1117)" }
-                  - { label: "Background Image", name: "bgImage", widget: "image", required: false, hint: "Optional background image for dark mode" }
-              - label: "Video Settings"
-                name: "video"
-                widget: "object"
+                  - {
+                      label: 'Background Color',
+                      name: 'bgColor',
+                      widget: 'string',
+                      default: '#0d1117',
+                      hint: 'Hex color (e.g. #0d1117)',
+                    }
+                  - {
+                      label: 'Background Image',
+                      name: 'bgImage',
+                      widget: 'image',
+                      required: false,
+                      hint: 'Optional background image for dark mode',
+                    }
+              - label: 'Video Settings'
+                name: 'video'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Video Source", name: "src", widget: "string", required: false, hint: "Path to video file (e.g. /videos/hero-bg.mp4)" }
-                  - { label: "Poster Image", name: "poster", widget: "string", required: false, hint: "Fallback image while video loads" }
-              - label: "Pattern Settings"
-                name: "pattern"
-                widget: "object"
+                  - {
+                      label: 'Video Source',
+                      name: 'src',
+                      widget: 'string',
+                      required: false,
+                      hint: 'Path to video file (e.g. /videos/hero-bg.mp4)',
+                    }
+                  - {
+                      label: 'Poster Image',
+                      name: 'poster',
+                      widget: 'string',
+                      required: false,
+                      hint: 'Fallback image while video loads',
+                    }
+              - label: 'Pattern Settings'
+                name: 'pattern'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - label: "Pattern Name"
-                    name: "name"
-                    widget: "select"
+                  - label: 'Pattern Name'
+                    name: 'name'
+                    widget: 'select'
                     options:
-                      - { label: "Dots", value: "dots" }
-                      - { label: "Grid", value: "grid" }
-                      - { label: "Waves", value: "waves" }
-                      - { label: "Diagonal", value: "diagonal" }
-                      - { label: "Hexagons", value: "hexagons" }
-                    default: "dots"
-              - label: "Animation Settings"
-                name: "animation"
-                widget: "object"
+                      - { label: 'Dots', value: 'dots' }
+                      - { label: 'Grid', value: 'grid' }
+                      - { label: 'Waves', value: 'waves' }
+                      - { label: 'Diagonal', value: 'diagonal' }
+                      - { label: 'Hexagons', value: 'hexagons' }
+                    default: 'dots'
+              - label: 'Animation Settings'
+                name: 'animation'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - label: "Animation Preset"
-                    name: "preset"
-                    widget: "select"
+                  - label: 'Animation Preset'
+                    name: 'preset'
+                    widget: 'select'
                     options:
-                      - { label: "Particles", value: "particles" }
-                      - { label: "Gradient Morph", value: "gradient-morph" }
-                      - { label: "Geometric", value: "geometric" }
-                      - { label: "Wave Lines", value: "wave-lines" }
-                      - { label: "Custom", value: "custom" }
-                    default: "particles"
-                  - { label: "Custom Script", name: "customScript", widget: "string", required: false, hint: "Path to custom JS file in /public (only when preset is 'custom')" }
-          - label: "About Section"
-            name: "about"
-            widget: "object"
+                      - { label: 'Particles', value: 'particles' }
+                      - { label: 'Gradient Morph', value: 'gradient-morph' }
+                      - { label: 'Geometric', value: 'geometric' }
+                      - { label: 'Wave Lines', value: 'wave-lines' }
+                      - { label: 'Custom', value: 'custom' }
+                    default: 'particles'
+                  - {
+                      label: 'Custom Script',
+                      name: 'customScript',
+                      widget: 'string',
+                      required: false,
+                      hint: "Path to custom JS file in /public (only when preset is 'custom')",
+                    }
+          - label: 'About Section'
+            name: 'about'
+            widget: 'object'
             collapsed: true
             fields:
-              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
-              - { label: "Title", name: "title", widget: "string" }
-              - { label: "Text", name: "text", widget: "text" }
-              - { label: "Image", name: "image", widget: "image", required: false }
-          - label: "Homepage Sections"
-            name: "homepageSections"
-            widget: "list"
-            hint: "Drag to reorder homepage sections. Toggle enabled to show/hide."
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+              - { label: 'Title', name: 'title', widget: 'string' }
+              - { label: 'Text', name: 'text', widget: 'text' }
+              - { label: 'Image', name: 'image', widget: 'image', required: false }
+          - label: 'Homepage Sections'
+            name: 'homepageSections'
+            widget: 'list'
+            hint: 'Drag to reorder homepage sections. Toggle enabled to show/hide.'
             collapsed: false
             fields:
-              - label: "Section"
-                name: "id"
-                widget: "select"
+              - label: 'Section'
+                name: 'id'
+                widget: 'select'
                 options:
-                  - { label: "Hero", value: "hero" }
-                  - { label: "About", value: "about" }
-                  - { label: "News / Announcements", value: "news" }
-                  - { label: "Publications", value: "publications" }
-                  - { label: "Blog", value: "blog" }
-              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
-          - label: "Typography"
-            name: "fonts"
-            widget: "object"
+                  - { label: 'Hero', value: 'hero' }
+                  - { label: 'About', value: 'about' }
+                  - { label: 'News / Announcements', value: 'news' }
+                  - { label: 'Publications', value: 'publications' }
+                  - { label: 'Blog', value: 'blog' }
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+          - label: 'Typography'
+            name: 'fonts'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - label: "Font Families"
-                name: "families"
-                widget: "object"
+              - label: 'Font Families'
+                name: 'families'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Sans-serif (body text)", name: "sans", widget: "string", required: false, default: "Roboto", hint: "Google Fonts name for body text and UI" }
-                  - { label: "Serif (headings)", name: "serif", widget: "string", required: false, default: "Roboto Slab", hint: "Google Fonts name for headings" }
-                  - { label: "Monospace (code)", name: "mono", widget: "string", required: false, default: "Roboto Mono", hint: "Google Fonts name for code blocks" }
-              - label: "Font Sizes"
-                name: "sizes"
-                widget: "object"
+                  - {
+                      label: 'Sans-serif (body text)',
+                      name: 'sans',
+                      widget: 'string',
+                      required: false,
+                      default: 'Roboto',
+                      hint: 'Google Fonts name for body text and UI',
+                    }
+                  - {
+                      label: 'Serif (headings)',
+                      name: 'serif',
+                      widget: 'string',
+                      required: false,
+                      default: 'Roboto Slab',
+                      hint: 'Google Fonts name for headings',
+                    }
+                  - {
+                      label: 'Monospace (code)',
+                      name: 'mono',
+                      widget: 'string',
+                      required: false,
+                      default: 'Roboto Mono',
+                      hint: 'Google Fonts name for code blocks',
+                    }
+              - label: 'Font Sizes'
+                name: 'sizes'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Base", name: "base", widget: "string", required: false, default: "1rem", hint: "Body text (default: 1rem / 16px)" }
-                  - { label: "Small", name: "sm", widget: "string", required: false, default: "0.875rem", hint: "Meta text, dates, tags (default: 0.875rem / 14px)" }
-                  - { label: "Large", name: "lg", widget: "string", required: false, default: "1.125rem", hint: "Lead paragraphs (default: 1.125rem / 18px)" }
-                  - { label: "Heading 1", name: "h1", widget: "string", required: false, default: "2rem", hint: "Page titles (default: 2rem / 32px)" }
-                  - { label: "Heading 2", name: "h2", widget: "string", required: false, default: "1.5rem", hint: "Section headings (default: 1.5rem / 24px)" }
-                  - { label: "Heading 3", name: "h3", widget: "string", required: false, default: "1.25rem", hint: "Subsection headings (default: 1.25rem / 20px)" }
-          - label: "Colors"
-            name: "colors"
-            widget: "object"
+                  - {
+                      label: 'Base',
+                      name: 'base',
+                      widget: 'string',
+                      required: false,
+                      default: '1rem',
+                      hint: 'Body text (default: 1rem / 16px)',
+                    }
+                  - {
+                      label: 'Small',
+                      name: 'sm',
+                      widget: 'string',
+                      required: false,
+                      default: '0.875rem',
+                      hint: 'Meta text, dates, tags (default: 0.875rem / 14px)',
+                    }
+                  - {
+                      label: 'Large',
+                      name: 'lg',
+                      widget: 'string',
+                      required: false,
+                      default: '1.125rem',
+                      hint: 'Lead paragraphs (default: 1.125rem / 18px)',
+                    }
+                  - {
+                      label: 'Heading 1',
+                      name: 'h1',
+                      widget: 'string',
+                      required: false,
+                      default: '2rem',
+                      hint: 'Page titles (default: 2rem / 32px)',
+                    }
+                  - {
+                      label: 'Heading 2',
+                      name: 'h2',
+                      widget: 'string',
+                      required: false,
+                      default: '1.5rem',
+                      hint: 'Section headings (default: 1.5rem / 24px)',
+                    }
+                  - {
+                      label: 'Heading 3',
+                      name: 'h3',
+                      widget: 'string',
+                      required: false,
+                      default: '1.25rem',
+                      hint: 'Subsection headings (default: 1.25rem / 20px)',
+                    }
+          - label: 'Colors'
+            name: 'colors'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - label: "Light Mode"
-                name: "light"
-                widget: "object"
+              - label: 'Light Mode'
+                name: 'light'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Primary Color", name: "primary", widget: "string", required: false, default: "#2c5282", hint: "Hex color for primary accent in light mode (e.g. #2c5282)" }
-                  - { label: "Secondary Color", name: "secondary", widget: "string", required: false, default: "#06b6d4", hint: "Hex color for secondary accent in light mode (e.g. #06b6d4)" }
-              - label: "Dark Mode"
-                name: "dark"
-                widget: "object"
+                  - {
+                      label: 'Primary Color',
+                      name: 'primary',
+                      widget: 'string',
+                      required: false,
+                      default: '#2c5282',
+                      hint: 'Hex color for primary accent in light mode (e.g. #2c5282)',
+                    }
+                  - {
+                      label: 'Secondary Color',
+                      name: 'secondary',
+                      widget: 'string',
+                      required: false,
+                      default: '#06b6d4',
+                      hint: 'Hex color for secondary accent in light mode (e.g. #06b6d4)',
+                    }
+              - label: 'Dark Mode'
+                name: 'dark'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Primary Color", name: "primary", widget: "string", required: false, default: "#22d3ee", hint: "Hex color for primary accent in dark mode (e.g. #22d3ee)" }
-                  - { label: "Secondary Color", name: "secondary", widget: "string", required: false, default: "#2c5282", hint: "Hex color for secondary accent in dark mode (e.g. #2c5282)" }
-          - label: "Background"
-            name: "background"
-            widget: "object"
+                  - {
+                      label: 'Primary Color',
+                      name: 'primary',
+                      widget: 'string',
+                      required: false,
+                      default: '#22d3ee',
+                      hint: 'Hex color for primary accent in dark mode (e.g. #22d3ee)',
+                    }
+                  - {
+                      label: 'Secondary Color',
+                      name: 'secondary',
+                      widget: 'string',
+                      required: false,
+                      default: '#2c5282',
+                      hint: 'Hex color for secondary accent in dark mode (e.g. #2c5282)',
+                    }
+          - label: 'Background'
+            name: 'background'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - label: "Light Mode"
-                name: "light"
-                widget: "object"
+              - label: 'Light Mode'
+                name: 'light'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Background Color", name: "color", widget: "string", required: false, default: "#ffffff", hint: "Hex color for page background in light mode" }
-                  - { label: "Background Image", name: "image", widget: "image", required: false, hint: "Optional background image for light mode" }
-              - label: "Dark Mode"
-                name: "dark"
-                widget: "object"
+                  - {
+                      label: 'Background Color',
+                      name: 'color',
+                      widget: 'string',
+                      required: false,
+                      default: '#ffffff',
+                      hint: 'Hex color for page background in light mode',
+                    }
+                  - {
+                      label: 'Background Image',
+                      name: 'image',
+                      widget: 'image',
+                      required: false,
+                      hint: 'Optional background image for light mode',
+                    }
+              - label: 'Dark Mode'
+                name: 'dark'
+                widget: 'object'
                 collapsed: true
                 required: false
                 fields:
-                  - { label: "Background Color", name: "color", widget: "string", required: false, default: "#0d1117", hint: "Hex color for page background in dark mode" }
-                  - { label: "Background Image", name: "image", widget: "image", required: false, hint: "Optional background image for dark mode" }
-          - label: "Navigation"
-            name: "nav"
-            widget: "list"
+                  - {
+                      label: 'Background Color',
+                      name: 'color',
+                      widget: 'string',
+                      required: false,
+                      default: '#0d1117',
+                      hint: 'Hex color for page background in dark mode',
+                    }
+                  - {
+                      label: 'Background Image',
+                      name: 'image',
+                      widget: 'image',
+                      required: false,
+                      hint: 'Optional background image for dark mode',
+                    }
+          - label: 'Navigation'
+            name: 'nav'
+            widget: 'list'
             fields:
-              - { label: "Label", name: "label", widget: "string" }
-              - { label: "URL", name: "href", widget: "string" }
-          - label: "Social Links"
-            name: "socials"
-            widget: "object"
+              - { label: 'Label', name: 'label', widget: 'string' }
+              - { label: 'URL', name: 'href', widget: 'string' }
+          - label: 'Social Links'
+            name: 'socials'
+            widget: 'object'
             collapsed: true
             fields:
-              - { label: "Email", name: "email", widget: "string", required: false }
-              - { label: "GitHub", name: "github", widget: "string", required: false }
-              - { label: "Google Scholar", name: "scholar", widget: "string", required: false }
-              - { label: "Twitter / X", name: "twitter", widget: "string", required: false }
-              - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
-              - { label: "ORCID", name: "orcid", widget: "string", required: false }
-              - { label: "Mastodon", name: "mastodon", widget: "string", required: false }
-              - { label: "Bluesky", name: "bluesky", widget: "string", required: false }
-              - { label: "Website", name: "website", widget: "string", required: false }
-          - label: "GitHub Repositories"
-            name: "github"
-            widget: "object"
+              - { label: 'Email', name: 'email', widget: 'string', required: false }
+              - { label: 'GitHub', name: 'github', widget: 'string', required: false }
+              - { label: 'Google Scholar', name: 'scholar', widget: 'string', required: false }
+              - { label: 'Twitter / X', name: 'twitter', widget: 'string', required: false }
+              - { label: 'LinkedIn', name: 'linkedin', widget: 'string', required: false }
+              - { label: 'ORCID', name: 'orcid', widget: 'string', required: false }
+              - { label: 'Mastodon', name: 'mastodon', widget: 'string', required: false }
+              - { label: 'Bluesky', name: 'bluesky', widget: 'string', required: false }
+              - { label: 'Website', name: 'website', widget: 'string', required: false }
+          - label: 'GitHub Repositories'
+            name: 'github'
+            widget: 'object'
             collapsed: true
             fields:
-              - { label: "Username", name: "username", widget: "string" }
-              - { label: "Show Stats", name: "stats", widget: "boolean", default: true }
-              - { label: "Show Trophies", name: "trophies", widget: "boolean", default: true }
-              - label: "Pinned Repos"
-                name: "pinnedRepos"
-                widget: "list"
+              - { label: 'Username', name: 'username', widget: 'string' }
+              - { label: 'Show Stats', name: 'stats', widget: 'boolean', default: true }
+              - { label: 'Show Trophies', name: 'trophies', widget: 'boolean', default: true }
+              - label: 'Pinned Repos'
+                name: 'pinnedRepos'
+                widget: 'list'
                 required: false
-                field: { label: "Repo Name", name: "repo", widget: "string" }
-              - { label: "Stats Base URL", name: "statsBaseUrl", widget: "string", required: false, hint: "Self-hosted github-readme-stats URL (leave empty for default)" }
-              - { label: "Trophy Base URL", name: "trophyBaseUrl", widget: "string", required: false, hint: "Self-hosted github-profile-trophy URL (leave empty for default)" }
-          - label: "Analytics"
-            name: "analytics"
-            widget: "object"
+                field: { label: 'Repo Name', name: 'repo', widget: 'string' }
+              - {
+                  label: 'Stats Base URL',
+                  name: 'statsBaseUrl',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Self-hosted github-readme-stats URL (leave empty for default)',
+                }
+              - {
+                  label: 'Trophy Base URL',
+                  name: 'trophyBaseUrl',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Self-hosted github-profile-trophy URL (leave empty for default)',
+                }
+          - label: 'Analytics'
+            name: 'analytics'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - { label: "Google Analytics", name: "googleAnalytics", widget: "string", required: false, hint: "Measurement ID (e.g. G-XXXXXXXXXX)" }
-              - { label: "Google Tag Manager", name: "googleTagManager", widget: "string", required: false, hint: "Container ID (e.g. GTM-XXXXXXX)" }
-              - { label: "Cronitor", name: "cronitor", widget: "string", required: false, hint: "Site ID" }
-              - { label: "OpenPanel", name: "openpanel", widget: "string", required: false, hint: "Client UUID" }
-              - { label: "Pirsch", name: "pirsch", widget: "string", required: false, hint: "Site ID" }
-              - { label: "Microsoft Clarity", name: "microsoftClarity", widget: "string", required: false, hint: "Project ID" }
-          - label: "Web3Forms"
-            name: "web3forms"
-            widget: "object"
+              - {
+                  label: 'Google Analytics',
+                  name: 'googleAnalytics',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Measurement ID (e.g. G-XXXXXXXXXX)',
+                }
+              - {
+                  label: 'Google Tag Manager',
+                  name: 'googleTagManager',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Container ID (e.g. GTM-XXXXXXX)',
+                }
+              - { label: 'Cronitor', name: 'cronitor', widget: 'string', required: false, hint: 'Site ID' }
+              - { label: 'OpenPanel', name: 'openpanel', widget: 'string', required: false, hint: 'Client UUID' }
+              - { label: 'Pirsch', name: 'pirsch', widget: 'string', required: false, hint: 'Site ID' }
+              - {
+                  label: 'Microsoft Clarity',
+                  name: 'microsoftClarity',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Project ID',
+                }
+          - label: 'Web3Forms'
+            name: 'web3forms'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - { label: "Access Key", name: "accessKey", widget: "string", required: false, hint: "Get your free access key at https://web3forms.com — leave empty to disable contact and application forms" }
-          - label: "Newsletter"
-            name: "newsletter"
-            widget: "object"
+              - {
+                  label: 'Access Key',
+                  name: 'accessKey',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Get your free access key at https://web3forms.com — leave empty to disable contact and application forms',
+                }
+          - label: 'Newsletter'
+            name: 'newsletter'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - { label: "Enabled", name: "enabled", widget: "boolean", default: false }
-              - { label: "Access Key", name: "accessKey", widget: "string", required: false, hint: "Web3Forms access key for newsletter signups" }
-              - { label: "Heading", name: "heading", widget: "string", required: false, default: "Stay Updated" }
-              - { label: "Description", name: "text", widget: "string", required: false }
-          - label: "SEO"
-            name: "seo"
-            widget: "object"
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: false }
+              - {
+                  label: 'Access Key',
+                  name: 'accessKey',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Web3Forms access key for newsletter signups',
+                }
+              - { label: 'Heading', name: 'heading', widget: 'string', required: false, default: 'Stay Updated' }
+              - { label: 'Description', name: 'text', widget: 'string', required: false }
+          - label: 'SEO'
+            name: 'seo'
+            widget: 'object'
             collapsed: true
             required: false
             fields:
-              - { label: "Keywords", name: "keywords", widget: "string", required: false, hint: "Comma-separated keywords for meta tags" }
-              - { label: "Google Site Verification", name: "googleSiteVerification", widget: "string", required: false, hint: "Google Search Console verification code" }
-              - { label: "Bing Site Verification", name: "bingSiteVerification", widget: "string", required: false, hint: "Bing Webmaster verification code" }
-          - label: "Footer"
-            name: "footer"
-            widget: "object"
+              - {
+                  label: 'Keywords',
+                  name: 'keywords',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Comma-separated keywords for meta tags',
+                }
+              - {
+                  label: 'Google Site Verification',
+                  name: 'googleSiteVerification',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Google Search Console verification code',
+                }
+              - {
+                  label: 'Bing Site Verification',
+                  name: 'bingSiteVerification',
+                  widget: 'string',
+                  required: false,
+                  hint: 'Bing Webmaster verification code',
+                }
+          - label: 'Footer'
+            name: 'footer'
+            widget: 'object'
             collapsed: true
             fields:
-              - { label: "Text", name: "text", widget: "string" }
-              - label: "Links"
-                name: "links"
-                widget: "list"
+              - { label: 'Text', name: 'text', widget: 'string' }
+              - label: 'Links'
+                name: 'links'
+                widget: 'list'
                 fields:
-                  - { label: "Label", name: "label", widget: "string" }
-                  - { label: "URL", name: "href", widget: "string" }
-          - { label: "CMS Admin Path", name: "adminPath", widget: "string", default: "admin" }
-          - label: "Admin Users"
-            name: "adminUsers"
-            widget: "list"
+                  - { label: 'Label', name: 'label', widget: 'string' }
+                  - { label: 'URL', name: 'href', widget: 'string' }
+          - { label: 'CMS Admin Path', name: 'adminPath', widget: 'string', default: 'admin' }
+          - label: 'Admin Users'
+            name: 'adminUsers'
+            widget: 'list'
             required: false
-            hint: "GitHub usernames who can edit any profile in the CMS"
-            field: { label: "GitHub Username", name: "username", widget: "string" }
-          - { label: "Cookie Consent", name: "cookieConsent", widget: "boolean", default: false }
+            hint: 'GitHub usernames who can edit any profile in the CMS'
+            field: { label: 'GitHub Username', name: 'username', widget: 'string' }
+          - { label: 'Cookie Consent', name: 'cookieConsent', widget: 'boolean', default: false }
 
-      - name: "cv-upload"
-        label: "CV (Raw YAML Upload)"
-        file: "config/cv-upload.yml"
+      - name: 'cv-upload'
+        label: 'CV (Raw YAML Upload)'
+        file: 'config/cv-upload.yml'
         fields:
-          - label: "Use uploaded YAML"
-            name: "enabled"
-            widget: "boolean"
+          - label: 'Use uploaded YAML'
+            name: 'enabled'
+            widget: 'boolean'
             default: false
-            hint: "When enabled, the raw YAML below is used instead of the structured CV form fields."
-          - label: "RenderCV YAML"
-            name: "content"
-            widget: "code"
-            default_language: "yaml"
+            hint: 'When enabled, the raw YAML below is used instead of the structured CV form fields.'
+          - label: 'RenderCV YAML'
+            name: 'content'
+            widget: 'code'
+            default_language: 'yaml'
             allow_language_selection: false
             output_code_only: true
             required: false
-            hint: "Paste your complete RenderCV YAML here. See https://docs.rendercv.com for the format."
+            hint: 'Paste your complete RenderCV YAML here. See https://docs.rendercv.com for the format.'
 
-      - name: "cv"
-        label: "CV (Structured)"
-        file: "config/cv.yml"
+      - name: 'cv'
+        label: 'CV (Structured)'
+        file: 'config/cv.yml'
         fields:
-          - label: "CV"
-            name: "cv"
-            widget: "object"
+          - label: 'CV'
+            name: 'cv'
+            widget: 'object'
             fields:
-              - { label: "Name", name: "name", widget: "string" }
-              - { label: "Location", name: "location", widget: "string" }
-              - { label: "Email", name: "email", widget: "string" }
-              - { label: "Phone", name: "phone", widget: "string", required: false }
-              - { label: "Website", name: "website", widget: "string", required: false }
-              - label: "Social Networks"
-                name: "socialNetworks"
-                widget: "list"
+              - { label: 'Name', name: 'name', widget: 'string' }
+              - { label: 'Location', name: 'location', widget: 'string' }
+              - { label: 'Email', name: 'email', widget: 'string' }
+              - { label: 'Phone', name: 'phone', widget: 'string', required: false }
+              - { label: 'Website', name: 'website', widget: 'string', required: false }
+              - label: 'Social Networks'
+                name: 'socialNetworks'
+                widget: 'list'
                 required: false
                 collapsed: true
                 fields:
-                  - { label: "Network", name: "network", widget: "select", options: ["LinkedIn", "GitHub", "Google Scholar", "ORCID", "Twitter"] }
-                  - { label: "Username", name: "username", widget: "string" }
-              - label: "Sections"
-                name: "sections"
-                widget: "object"
+                  - {
+                      label: 'Network',
+                      name: 'network',
+                      widget: 'select',
+                      options: ['LinkedIn', 'GitHub', 'Google Scholar', 'ORCID', 'Twitter'],
+                    }
+                  - { label: 'Username', name: 'username', widget: 'string' }
+              - label: 'Sections'
+                name: 'sections'
+                widget: 'object'
                 fields:
-                  - label: "Education"
-                    name: "education"
-                    widget: "list"
+                  - label: 'Education'
+                    name: 'education'
+                    widget: 'list'
                     fields:
-                      - { label: "Institution", name: "institution", widget: "string" }
-                      - { label: "Area", name: "area", widget: "string" }
-                      - { label: "Degree", name: "degree", widget: "string" }
-                      - { label: "Location", name: "location", widget: "string", required: false }
-                      - { label: "Start Date", name: "startDate", widget: "string", hint: "Format: YYYY-MM (e.g. 2020-09)" }
-                      - { label: "End Date", name: "endDate", widget: "string", hint: "Format: YYYY-MM or 'present'" }
-                      - label: "Highlights"
-                        name: "highlights"
-                        widget: "list"
+                      - { label: 'Institution', name: 'institution', widget: 'string' }
+                      - { label: 'Area', name: 'area', widget: 'string' }
+                      - { label: 'Degree', name: 'degree', widget: 'string' }
+                      - { label: 'Location', name: 'location', widget: 'string', required: false }
+                      - {
+                          label: 'Start Date',
+                          name: 'startDate',
+                          widget: 'string',
+                          hint: 'Format: YYYY-MM (e.g. 2020-09)',
+                        }
+                      - { label: 'End Date', name: 'endDate', widget: 'string', hint: "Format: YYYY-MM or 'present'" }
+                      - label: 'Highlights'
+                        name: 'highlights'
+                        widget: 'list'
                         required: false
-                        field: { label: "Highlight", name: "highlight", widget: "string" }
-                  - label: "Experience"
-                    name: "experience"
-                    widget: "list"
+                        field: { label: 'Highlight', name: 'highlight', widget: 'string' }
+                  - label: 'Experience'
+                    name: 'experience'
+                    widget: 'list'
                     fields:
-                      - { label: "Company / Institution", name: "company", widget: "string" }
-                      - { label: "Position", name: "position", widget: "string" }
-                      - { label: "Location", name: "location", widget: "string", required: false }
-                      - { label: "Start Date", name: "startDate", widget: "string", hint: "Format: YYYY-MM (e.g. 2020-09)" }
-                      - { label: "End Date", name: "endDate", widget: "string", hint: "Format: YYYY-MM or 'present'" }
-                      - label: "Highlights"
-                        name: "highlights"
-                        widget: "list"
+                      - { label: 'Company / Institution', name: 'company', widget: 'string' }
+                      - { label: 'Position', name: 'position', widget: 'string' }
+                      - { label: 'Location', name: 'location', widget: 'string', required: false }
+                      - {
+                          label: 'Start Date',
+                          name: 'startDate',
+                          widget: 'string',
+                          hint: 'Format: YYYY-MM (e.g. 2020-09)',
+                        }
+                      - { label: 'End Date', name: 'endDate', widget: 'string', hint: "Format: YYYY-MM or 'present'" }
+                      - label: 'Highlights'
+                        name: 'highlights'
+                        widget: 'list'
                         required: false
-                        field: { label: "Highlight", name: "highlight", widget: "string" }
-                  - label: "Publications"
-                    name: "publications"
-                    widget: "list"
+                        field: { label: 'Highlight', name: 'highlight', widget: 'string' }
+                  - label: 'Publications'
+                    name: 'publications'
+                    widget: 'list'
                     required: false
                     fields:
-                      - { label: "Title", name: "title", widget: "string" }
-                      - label: "Authors"
-                        name: "authors"
-                        widget: "list"
-                        field: { label: "Author", name: "author", widget: "string" }
-                        hint: "Wrap a name in ** for bold (e.g. **Jane Smith**)"
-                      - { label: "Journal / Venue", name: "journal", widget: "string", required: false }
-                      - { label: "Date / Year", name: "date", widget: "string", hint: "e.g. 2025 or 2025-01" }
-                      - { label: "DOI", name: "doi", widget: "string", required: false }
-                      - { label: "URL", name: "url", widget: "string", required: false }
-                  - label: "Awards"
-                    name: "awards"
-                    widget: "list"
+                      - { label: 'Title', name: 'title', widget: 'string' }
+                      - label: 'Authors'
+                        name: 'authors'
+                        widget: 'list'
+                        field: { label: 'Author', name: 'author', widget: 'string' }
+                        hint: 'Wrap a name in ** for bold (e.g. **Jane Smith**)'
+                      - { label: 'Journal / Venue', name: 'journal', widget: 'string', required: false }
+                      - { label: 'Date / Year', name: 'date', widget: 'string', hint: 'e.g. 2025 or 2025-01' }
+                      - { label: 'DOI', name: 'doi', widget: 'string', required: false }
+                      - { label: 'URL', name: 'url', widget: 'string', required: false }
+                  - label: 'Awards'
+                    name: 'awards'
+                    widget: 'list'
                     required: false
                     fields:
-                      - { label: "Award", name: "label", widget: "string" }
-                      - { label: "Year / Details", name: "details", widget: "string" }
-                  - label: "Skills"
-                    name: "skills"
-                    widget: "list"
+                      - { label: 'Award', name: 'label', widget: 'string' }
+                      - { label: 'Year / Details', name: 'details', widget: 'string' }
+                  - label: 'Skills'
+                    name: 'skills'
+                    widget: 'list'
                     required: false
                     fields:
-                      - { label: "Category", name: "label", widget: "string" }
-                      - { label: "Details", name: "details", widget: "string" }
-          - label: "Design"
-            name: "design"
-            widget: "object"
+                      - { label: 'Category', name: 'label', widget: 'string' }
+                      - { label: 'Details', name: 'details', widget: 'string' }
+          - label: 'Design'
+            name: 'design'
+            widget: 'object'
             required: false
             collapsed: true
             fields:
-              - label: "Theme"
-                name: "theme"
-                widget: "select"
-                options: ["classic", "sb2nov", "moderncv", "engineeringresumes"]
-                default: "classic"
+              - label: 'Theme'
+                name: 'theme'
+                widget: 'select'
+                options: ['classic', 'sb2nov', 'moderncv', 'engineeringresumes']
+                default: 'classic'
 
-      - name: "feeds"
-        label: "Feed Sources"
-        file: "config/feeds.yml"
+      - name: 'feeds'
+        label: 'Feed Sources'
+        file: 'config/feeds.yml'
         fields:
-          - label: "Feeds"
-            name: "feeds"
-            widget: "list"
+          - label: 'Feeds'
+            name: 'feeds'
+            widget: 'list'
             fields:
-              - { label: "Name", name: "name", widget: "string" }
-              - { label: "URL", name: "url", widget: "string" }
-              - { label: "Author", name: "author", widget: "string", required: false }
-          - label: "Sync Interval"
-            name: "syncInterval"
-            widget: "select"
+              - { label: 'Name', name: 'name', widget: 'string' }
+              - { label: 'URL', name: 'url', widget: 'string' }
+              - { label: 'Author', name: 'author', widget: 'string', required: false }
+          - label: 'Sync Interval'
+            name: 'syncInterval'
+            widget: 'select'
             options:
-              - { label: "Hourly", value: "hourly" }
-              - { label: "Daily", value: "daily" }
-              - { label: "Weekly", value: "weekly" }
-          - { label: "Max Items per Feed", name: "maxItemsPerFeed", widget: "number", default: 20, value_type: "int" }
+              - { label: 'Hourly', value: 'hourly' }
+              - { label: 'Daily', value: 'daily' }
+              - { label: 'Weekly', value: 'weekly' }
+          - { label: 'Max Items per Feed', name: 'maxItemsPerFeed', widget: 'number', default: 20, value_type: 'int' }
 
-      - name: "scholar"
-        label: "Google Scholar Sync"
-        file: "config/scholar.yml"
+      - name: 'scholar'
+        label: 'Google Scholar Sync'
+        file: 'config/scholar.yml'
         fields:
-          - label: "Authors"
-            name: "authors"
-            widget: "list"
-            hint: "Google Scholar authors to sync publications from"
+          - label: 'Authors'
+            name: 'authors'
+            widget: 'list'
+            hint: 'Google Scholar authors to sync publications from'
             fields:
-              - { label: "Name", name: "name", widget: "string" }
-              - { label: "Scholar ID", name: "scholar_id", widget: "string", hint: "Google Scholar author ID (from the URL)" }
-          - label: "Sync Interval"
-            name: "syncInterval"
-            widget: "select"
+              - { label: 'Name', name: 'name', widget: 'string' }
+              - {
+                  label: 'Scholar ID',
+                  name: 'scholar_id',
+                  widget: 'string',
+                  hint: 'Google Scholar author ID (from the URL)',
+                }
+          - label: 'Sync Interval'
+            name: 'syncInterval'
+            widget: 'select'
             options:
-              - { label: "Daily", value: "daily" }
-              - { label: "Weekly", value: "weekly" }
-              - { label: "Monthly", value: "monthly" }
-            default: "weekly"
-          - { label: "Max Results", name: "maxResults", widget: "number", default: 100, value_type: "int", hint: "Maximum publications to fetch per author" }
+              - { label: 'Daily', value: 'daily' }
+              - { label: 'Weekly', value: 'weekly' }
+              - { label: 'Monthly', value: 'monthly' }
+            default: 'weekly'
+          - {
+              label: 'Max Results',
+              name: 'maxResults',
+              widget: 'number',
+              default: 100,
+              value_type: 'int',
+              hint: 'Maximum publications to fetch per author',
+            }
 
-      - name: "publications-override"
-        label: "Publication Overrides"
-        file: "config/publications.override.yml"
+      - name: 'publications-override'
+        label: 'Publication Overrides'
+        file: 'config/publications.override.yml'
         fields:
-          - label: "Manual Additions"
-            name: "additions"
-            widget: "list"
+          - label: 'Manual Additions'
+            name: 'additions'
+            widget: 'list'
             required: false
-            hint: "Publications not on Google Scholar that you want to add manually"
+            hint: 'Publications not on Google Scholar that you want to add manually'
             fields:
-              - { label: "Title", name: "title", widget: "string" }
-              - label: "Authors"
-                name: "authors"
-                widget: "list"
-                field: { label: "Author", name: "author", widget: "string" }
-              - { label: "Venue", name: "venue", widget: "string" }
-              - { label: "Year", name: "year", widget: "number", value_type: "int" }
-              - { label: "DOI", name: "doi", widget: "string", required: false }
-              - { label: "URL", name: "url", widget: "string", required: false }
-              - { label: "PDF", name: "pdf", widget: "string", required: false }
-              - label: "Type"
-                name: "type"
-                widget: "select"
+              - { label: 'Title', name: 'title', widget: 'string' }
+              - label: 'Authors'
+                name: 'authors'
+                widget: 'list'
+                field: { label: 'Author', name: 'author', widget: 'string' }
+              - { label: 'Venue', name: 'venue', widget: 'string' }
+              - { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
+              - { label: 'DOI', name: 'doi', widget: 'string', required: false }
+              - { label: 'URL', name: 'url', widget: 'string', required: false }
+              - { label: 'PDF', name: 'pdf', widget: 'string', required: false }
+              - label: 'Type'
+                name: 'type'
+                widget: 'select'
                 options:
-                  - { label: "Journal", value: "journal" }
-                  - { label: "Conference", value: "conference" }
-                  - { label: "Preprint", value: "preprint" }
-                  - { label: "Workshop", value: "workshop" }
-                  - { label: "Thesis", value: "thesis" }
-                  - { label: "Book Chapter", value: "book-chapter" }
-              - { label: "Featured", name: "featured", widget: "boolean", default: false }
-              - { label: "Abstract", name: "abstract", widget: "text", required: false }
-          - label: "Excluded DOIs"
-            name: "exclude"
-            widget: "list"
+                  - { label: 'Journal', value: 'journal' }
+                  - { label: 'Conference', value: 'conference' }
+                  - { label: 'Preprint', value: 'preprint' }
+                  - { label: 'Workshop', value: 'workshop' }
+                  - { label: 'Thesis', value: 'thesis' }
+                  - { label: 'Book Chapter', value: 'book-chapter' }
+              - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
+              - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
+          - label: 'Excluded DOIs'
+            name: 'exclude'
+            widget: 'list'
             required: false
-            hint: "DOIs of synced publications to hide from the site"
-            field: { label: "DOI", name: "doi", widget: "string" }
-          - label: "Field Overrides"
-            name: "overrides"
-            widget: "list"
+            hint: 'DOIs of synced publications to hide from the site'
+            field: { label: 'DOI', name: 'doi', widget: 'string' }
+          - label: 'Field Overrides'
+            name: 'overrides'
+            widget: 'list'
             required: false
-            hint: "Override specific fields on synced publications (matched by DOI)"
+            hint: 'Override specific fields on synced publications (matched by DOI)'
             fields:
-              - { label: "DOI", name: "doi", widget: "string" }
-              - label: "Fields to Set"
-                name: "set"
-                widget: "object"
+              - { label: 'DOI', name: 'doi', widget: 'string' }
+              - label: 'Fields to Set'
+                name: 'set'
+                widget: 'object'
                 fields:
-                  - { label: "Featured", name: "featured", widget: "boolean", required: false }
-                  - { label: "PDF URL", name: "pdf", widget: "string", required: false }
-                  - { label: "URL", name: "url", widget: "string", required: false }
-                  - { label: "Type", name: "type", widget: "string", required: false }
-                  - { label: "Abstract", name: "abstract", widget: "text", required: false }
+                  - { label: 'Featured', name: 'featured', widget: 'boolean', required: false }
+                  - { label: 'PDF URL', name: 'pdf', widget: 'string', required: false }
+                  - { label: 'URL', name: 'url', widget: 'string', required: false }
+                  - { label: 'Type', name: 'type', widget: 'string', required: false }
+                  - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
 
-      - name: "research"
-        label: "Research Areas"
-        file: "config/research.yml"
+      - name: 'research'
+        label: 'Research Areas'
+        file: 'config/research.yml'
         fields:
-          - label: "Research Page Description"
-            name: "description"
-            widget: "text"
+          - label: 'Research Page Description'
+            name: 'description'
+            widget: 'text'
             required: false
-            hint: "Introductory text shown at the top of the Research page"
-          - label: "Research Areas"
-            name: "areas"
-            widget: "list"
-            hint: "Define your research focus areas shown on the Research page"
+            hint: 'Introductory text shown at the top of the Research page'
+          - label: 'Research Areas'
+            name: 'areas'
+            widget: 'list'
+            hint: 'Define your research focus areas shown on the Research page'
             fields:
-              - { label: "Title", name: "title", widget: "string" }
-              - { label: "Description", name: "description", widget: "text" }
-              - label: "Tags"
-                name: "tags"
-                widget: "list"
+              - { label: 'Title', name: 'title', widget: 'string' }
+              - { label: 'Description', name: 'description', widget: 'text' }
+              - label: 'Tags'
+                name: 'tags'
+                widget: 'list'
                 required: false
-                field: { label: "Tag", name: "tag", widget: "string" }
+                field: { label: 'Tag', name: 'tag', widget: 'string' }

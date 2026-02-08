@@ -1,17 +1,17 @@
 ---
-name: "Alex Chen"
-role: "postdoc"
-title: "Postdoctoral Researcher"
-photo: "../../assets/images/people/placeholder-avatar.svg"
-email: "alex.chen@example.com"
+name: 'Alex Chen'
+role: 'postdoc'
+title: 'Postdoctoral Researcher'
+photo: '../../assets/images/people/placeholder-avatar.svg'
+email: 'alex.chen@example.com'
 socials:
-  github: "https://github.com/alexchen"
-  scholar: "https://scholar.google.com/citations?user=EXAMPLE2"
-  linkedin: "https://linkedin.com/in/alexchen"
+  github: 'https://github.com/alexchen'
+  scholar: 'https://scholar.google.com/citations?user=EXAMPLE2'
+  linkedin: 'https://linkedin.com/in/alexchen'
 researchInterests:
-  - "Computer Vision"
-  - "Multimodal Learning"
-  - "Generative Models"
+  - 'Computer Vision'
+  - 'Multimodal Learning'
+  - 'Generative Models'
 startDate: 2023-09-01
 sortOrder: 10
 active: true

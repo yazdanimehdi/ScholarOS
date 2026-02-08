@@ -1,13 +1,13 @@
 ---
-title: "Best Demo Award at NAACL 2024"
+title: 'Best Demo Award at NAACL 2024'
 date: 2024-06-20
-category: "award"
-emoji: "🏆"
+category: 'award'
+emoji: '🏆'
 pinned: false
 featured: false
-excerpt: "Maria Garcia received the Best Demo Award at NAACL 2024 for her interactive robot learning system."
+excerpt: 'Maria Garcia received the Best Demo Award at NAACL 2024 for her interactive robot learning system.'
 people:
-  - "maria-garcia"
+  - 'maria-garcia'
 ---
 
 Congratulations to Maria Garcia for receiving the **Best Demo Award** at NAACL 2024 for her interactive demonstration of a natural language-guided robot learning system!

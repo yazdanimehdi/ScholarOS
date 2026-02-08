@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
 
 jobs:
   init:
@@ -59,6 +60,24 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: initialize template for ${OWNER}"
           git pull --rebase
           git push
+
+      - name: Enable GitHub Pages (Actions source)
+        if: steps.check.outputs.needs_init == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Enable Pages with Actions build source (prevents default Jekyll build)
+          if ! gh api "repos/${REPO}/pages" \
+            --method POST \
+            --field build_type=workflow \
+            --silent 2>/dev/null; then
+            # Already exists -- update to Actions source
+            gh api "repos/${REPO}/pages" \
+              --method PUT \
+              --field build_type=workflow \
+              --silent 2>/dev/null || true
+          fi
 
       - name: Determine site URL
         if: steps.check.outputs.needs_init == 'true'

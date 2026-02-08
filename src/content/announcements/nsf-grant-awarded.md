@@ -1,13 +1,13 @@
 ---
-title: "NSF Grant Awarded for AI Safety Research"
+title: 'NSF Grant Awarded for AI Safety Research'
 date: 2024-08-01
-category: "grant"
-emoji: "💰"
+category: 'grant'
+emoji: '💰'
 pinned: false
 featured: true
-excerpt: "The lab has received a $1.2M NSF grant to study safety and alignment in AI systems."
+excerpt: 'The lab has received a $1.2M NSF grant to study safety and alignment in AI systems.'
 people:
-  - "jane-smith"
+  - 'jane-smith'
 ---
 
 We are excited to announce that our lab has been awarded a $1.2M grant from the National Science Foundation (NSF) to support our research on safety and alignment in artificial intelligence systems.

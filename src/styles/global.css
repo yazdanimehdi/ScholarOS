@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -54,9 +54,9 @@
   --color-dm-border-alt: #30363d;
 
   /* Font families */
-  --font-sans: "Roboto", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: "Roboto Slab", ui-serif, Georgia, serif;
-  --font-mono: "Roboto Mono", ui-monospace, monospace;
+  --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: 'Roboto Slab', ui-serif, Georgia, serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
 }
 
 /* ===== Base styles ===== */
@@ -179,7 +179,9 @@
     color: var(--color-primary-600);
     text-decoration: none;
     border-bottom: 1px dashed var(--color-primary-300);
-    transition: border-color 0.15s ease, color 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
   }
 
   .prose a:hover {
@@ -422,7 +424,6 @@
   }
 
   @media (max-width: 768px) {
-
     .post-grid.cols-2,
     .post-grid.cols-3,
     .post-grid.cols-4 {
@@ -532,7 +533,6 @@
 /* end @layer components for prose */
 
 @layer components {
-
   /* ===== Skip link ===== */
   .skip-link {
     position: absolute;
@@ -609,7 +609,7 @@
   }
 
   .hero-cosmic::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     background-image:
@@ -659,7 +659,7 @@
 
   /* ===== News item bullet ===== */
   .news-bullet::before {
-    content: "";
+    content: '';
     display: inline-block;
     width: 6px;
     height: 6px;
@@ -704,12 +704,13 @@
 
   /* Waves */
   .hero-pattern--waves {
-    background-image:
-      repeating-linear-gradient(0deg,
-        transparent,
-        transparent 30px,
-        var(--color-surface-200) 30px,
-        var(--color-surface-200) 31px);
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      var(--color-surface-200) 30px,
+      var(--color-surface-200) 31px
+    );
     background-size: 100% 60px;
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'%3E%3Cpath d='M0,30 Q50,0 100,30 Q150,60 200,30 L200,60 L0,60Z' fill='white'/%3E%3C/svg%3E");
     mask-size: 200px 60px;
@@ -717,53 +718,148 @@
   }
 
   html.dark .hero-pattern--waves {
-    background-image:
-      repeating-linear-gradient(0deg,
-        transparent,
-        transparent 30px,
-        rgba(255, 255, 255, 0.06) 30px,
-        rgba(255, 255, 255, 0.06) 31px);
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      rgba(255, 255, 255, 0.06) 30px,
+      rgba(255, 255, 255, 0.06) 31px
+    );
   }
 
   /* Diagonal */
   .hero-pattern--diagonal {
-    background-image: repeating-linear-gradient(45deg,
-        transparent,
-        transparent 10px,
-        var(--color-surface-200) 10px,
-        var(--color-surface-200) 11px);
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      var(--color-surface-200) 10px,
+      var(--color-surface-200) 11px
+    );
   }
 
   html.dark .hero-pattern--diagonal {
-    background-image: repeating-linear-gradient(45deg,
-        transparent,
-        transparent 10px,
-        rgba(255, 255, 255, 0.06) 10px,
-        rgba(255, 255, 255, 0.06) 11px);
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.06) 10px,
+      rgba(255, 255, 255, 0.06) 11px
+    );
   }
 
   /* Hexagons */
   .hero-pattern--hexagons {
     background-color: transparent;
     background-image:
-      linear-gradient(30deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
-      linear-gradient(150deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
-      linear-gradient(30deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
-      linear-gradient(150deg, var(--color-surface-200) 12%, transparent 12.5%, transparent 87%, var(--color-surface-200) 87.5%, var(--color-surface-200)),
-      linear-gradient(60deg, var(--color-surface-100) 25%, transparent 25.5%, transparent 75%, var(--color-surface-100) 75%, var(--color-surface-100)),
-      linear-gradient(60deg, var(--color-surface-100) 25%, transparent 25.5%, transparent 75%, var(--color-surface-100) 75%, var(--color-surface-100));
+      linear-gradient(
+        30deg,
+        var(--color-surface-200) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        var(--color-surface-200) 87.5%,
+        var(--color-surface-200)
+      ),
+      linear-gradient(
+        150deg,
+        var(--color-surface-200) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        var(--color-surface-200) 87.5%,
+        var(--color-surface-200)
+      ),
+      linear-gradient(
+        30deg,
+        var(--color-surface-200) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        var(--color-surface-200) 87.5%,
+        var(--color-surface-200)
+      ),
+      linear-gradient(
+        150deg,
+        var(--color-surface-200) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        var(--color-surface-200) 87.5%,
+        var(--color-surface-200)
+      ),
+      linear-gradient(
+        60deg,
+        var(--color-surface-100) 25%,
+        transparent 25.5%,
+        transparent 75%,
+        var(--color-surface-100) 75%,
+        var(--color-surface-100)
+      ),
+      linear-gradient(
+        60deg,
+        var(--color-surface-100) 25%,
+        transparent 25.5%,
+        transparent 75%,
+        var(--color-surface-100) 75%,
+        var(--color-surface-100)
+      );
     background-size: 40px 70px;
-    background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+    background-position:
+      0 0,
+      0 0,
+      20px 35px,
+      20px 35px,
+      0 0,
+      20px 35px;
   }
 
   html.dark .hero-pattern--hexagons {
     background-image:
-      linear-gradient(30deg, rgba(255, 255, 255, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.06) 87.5%, rgba(255, 255, 255, 0.06)),
-      linear-gradient(150deg, rgba(255, 255, 255, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.06) 87.5%, rgba(255, 255, 255, 0.06)),
-      linear-gradient(30deg, rgba(255, 255, 255, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.06) 87.5%, rgba(255, 255, 255, 0.06)),
-      linear-gradient(150deg, rgba(255, 255, 255, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.06) 87.5%, rgba(255, 255, 255, 0.06)),
-      linear-gradient(60deg, rgba(255, 255, 255, 0.03) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.03) 75%, rgba(255, 255, 255, 0.03)),
-      linear-gradient(60deg, rgba(255, 255, 255, 0.03) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.03) 75%, rgba(255, 255, 255, 0.03));
+      linear-gradient(
+        30deg,
+        rgba(255, 255, 255, 0.06) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgba(255, 255, 255, 0.06) 87.5%,
+        rgba(255, 255, 255, 0.06)
+      ),
+      linear-gradient(
+        150deg,
+        rgba(255, 255, 255, 0.06) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgba(255, 255, 255, 0.06) 87.5%,
+        rgba(255, 255, 255, 0.06)
+      ),
+      linear-gradient(
+        30deg,
+        rgba(255, 255, 255, 0.06) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgba(255, 255, 255, 0.06) 87.5%,
+        rgba(255, 255, 255, 0.06)
+      ),
+      linear-gradient(
+        150deg,
+        rgba(255, 255, 255, 0.06) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgba(255, 255, 255, 0.06) 87.5%,
+        rgba(255, 255, 255, 0.06)
+      ),
+      linear-gradient(
+        60deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        transparent 25.5%,
+        transparent 75%,
+        rgba(255, 255, 255, 0.03) 75%,
+        rgba(255, 255, 255, 0.03)
+      ),
+      linear-gradient(
+        60deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        transparent 25.5%,
+        transparent 75%,
+        rgba(255, 255, 255, 0.03) 75%,
+        rgba(255, 255, 255, 0.03)
+      );
   }
 }
 

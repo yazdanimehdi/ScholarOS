@@ -24,29 +24,33 @@ const showToc = headings.length > 2;
   <Breadcrumb />
 
   <article class="mt-4">
-    <header class="mb-6 pb-4 border-b border-surface-200 dark:border-dm-border">
-      <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
+    <header class="mb-6 border-b border-surface-200 pb-4 dark:border-dm-border">
+      <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
         {title}
       </h1>
-      {description && (
-        <p class="text-surface-500 dark:text-dm-muted mb-3">{description}</p>
-      )}
+      {description && <p class="mb-3 text-surface-500 dark:text-dm-muted">{description}</p>}
       <div class="flex flex-wrap items-center gap-3 text-sm text-surface-400 dark:text-dm-faint">
         {date && <FormattedDate date={date} />}
-        {author && (
-          <>
-            <span>&middot;</span>
-            <a href={`/people/${author}`} class="text-primary-600 dark:text-accent-400 hover:underline">{author}</a>
-          </>
-        )}
+        {
+          author && (
+            <>
+              <span>&middot;</span>
+              <a href={`/people/${author}`} class="text-primary-600 hover:underline dark:text-accent-400">
+                {author}
+              </a>
+            </>
+          )
+        }
       </div>
-      {tags && tags.length > 0 && (
-        <div class="flex flex-wrap gap-2 mt-3">
-          {tags.map(tag => (
-            <span class="text-xs text-surface-400 dark:text-dm-faint">#{tag}</span>
-          ))}
-        </div>
-      )}
+      {
+        tags && tags.length > 0 && (
+          <div class="mt-3 flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span class="text-xs text-surface-400 dark:text-dm-faint">#{tag}</span>
+            ))}
+          </div>
+        )
+      }
     </header>
 
     <div class={showToc ? 'lg:grid lg:grid-cols-[1fr_200px] lg:gap-8' : ''}>
@@ -55,11 +59,13 @@ const showToc = headings.length > 2;
       </div>
       <ProseEnhancements />
 
-      {showToc && (
-        <aside class="hidden lg:block">
-          <TableOfContents headings={headings} />
-        </aside>
-      )}
+      {
+        showToc && (
+          <aside class="hidden lg:block">
+            <TableOfContents headings={headings} />
+          </aside>
+        )
+      }
     </div>
   </article>
 </PageLayout>

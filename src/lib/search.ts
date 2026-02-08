@@ -8,16 +8,15 @@ export interface SearchItem {
 }
 
 export async function getSearchItems(): Promise<SearchItem[]> {
-  const [posts, publications, people, projects, announcements, positions, talks] =
-    await Promise.all([
-      getCollection('posts'),
-      getCollection('publications'),
-      getCollection('people'),
-      getCollection('projects'),
-      getCollection('announcements'),
-      getCollection('positions'),
-      getCollection('talks'),
-    ]);
+  const [posts, publications, people, projects, announcements, positions, talks] = await Promise.all([
+    getCollection('posts'),
+    getCollection('publications'),
+    getCollection('people'),
+    getCollection('projects'),
+    getCollection('announcements'),
+    getCollection('positions'),
+    getCollection('talks'),
+  ]);
 
   const items: SearchItem[] = [];
 

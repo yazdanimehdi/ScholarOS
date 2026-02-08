@@ -33,9 +33,7 @@
   /* ── MathJax ───────────────────────────────────────────────── */
 
   async function renderMath() {
-    const hasMath =
-      document.querySelector('.math-inline') ||
-      document.querySelector('.math-display');
+    const hasMath = document.querySelector('.math-inline') || document.querySelector('.math-display');
     if (!hasMath) return;
 
     if ((window as any).MathJax?.typesetPromise) {
@@ -50,10 +48,7 @@
       startup: { typeset: true },
     };
 
-    await loadScript(
-      'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
-      'mathjax-cdn',
-    );
+    await loadScript('https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js', 'mathjax-cdn');
   }
 
   /* ── Chart.js ──────────────────────────────────────────────── */
@@ -61,14 +56,12 @@
   const chartInstances: Map<HTMLCanvasElement, any> = new Map();
 
   async function renderCharts() {
-    const blocks = document.querySelectorAll<HTMLPreElement>(
-      'pre[data-language="chartjs"]',
-    );
+    const blocks = document.querySelectorAll<HTMLPreElement>('pre[data-language="chartjs"]');
     if (blocks.length === 0) return;
 
-    const { Chart, registerables } = await import(
+    const { Chart, registerables } = (await import(
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.js/+esm'
-    ) as any;
+    )) as any;
     Chart.register(...registerables);
 
     blocks.forEach((pre) => {
@@ -114,14 +107,12 @@
   }
 
   async function renderMermaid() {
-    const blocks = document.querySelectorAll<HTMLPreElement>(
-      'pre[data-language="mermaid"]',
-    );
+    const blocks = document.querySelectorAll<HTMLPreElement>('pre[data-language="mermaid"]');
     if (blocks.length === 0) return;
 
-    const { default: mermaid } = await import(
+    const { default: mermaid } = (await import(
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
-    ) as any;
+    )) as any;
 
     mermaid.initialize({
       startOnLoad: false,
@@ -149,9 +140,9 @@
     const containers = document.querySelectorAll<HTMLDivElement>('.mermaid-container');
     if (containers.length === 0) return;
 
-    const { default: mermaid } = await import(
+    const { default: mermaid } = (await import(
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
-    ) as any;
+    )) as any;
 
     mermaid.initialize({
       startOnLoad: false,
@@ -171,15 +162,10 @@
   /* ── TikZ ──────────────────────────────────────────────────── */
 
   async function renderTikz() {
-    const blocks = document.querySelectorAll<HTMLPreElement>(
-      'pre[data-language="tikz"]',
-    );
+    const blocks = document.querySelectorAll<HTMLPreElement>('pre[data-language="tikz"]');
     if (blocks.length === 0) return;
 
-    await loadScript(
-      'https://cdn.jsdelivr.net/npm/tikzjax@1/dist/tikzjax.js',
-      'tikzjax-cdn',
-    );
+    await loadScript('https://cdn.jsdelivr.net/npm/tikzjax@1/dist/tikzjax.js', 'tikzjax-cdn');
 
     // Ensure tikzjax CSS is loaded
     if (!document.getElementById('tikzjax-css')) {
@@ -271,12 +257,7 @@
 
   async function initProseEnhancements() {
     renderVideoEmbeds();
-    await Promise.allSettled([
-      renderMath(),
-      renderCharts(),
-      renderMermaid(),
-      renderTikz(),
-    ]);
+    await Promise.allSettled([renderMath(), renderCharts(), renderMermaid(), renderTikz()]);
   }
 
   // Run on initial load and on every ViewTransition navigation
@@ -287,7 +268,9 @@
   // Clean up Chart.js instances before ViewTransition swap
   document.addEventListener('astro:before-swap', () => {
     chartInstances.forEach((instance) => {
-      try { instance.destroy(); } catch {}
+      try {
+        instance.destroy();
+      } catch {}
     });
     chartInstances.clear();
   });

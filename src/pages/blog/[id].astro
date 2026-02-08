@@ -7,8 +7,8 @@ import { getImage } from 'astro:assets';
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
   return posts
-    .filter(p => !p.data.draft)
-    .map(post => ({
+    .filter((p) => !p.data.draft)
+    .map((post) => ({
       params: { id: post.id },
       props: { post },
     }));

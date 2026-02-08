@@ -6,14 +6,14 @@ import { slugify } from '../../../lib/utils';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
+  const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
 
-  return allTags.map(tag => ({
+  return allTags.map((tag) => ({
     params: { tag: slugify(tag) },
     props: {
       tag,
       posts: posts
-        .filter(p => !p.data.draft && p.data.tags?.includes(tag))
+        .filter((p) => !p.data.draft && p.data.tags?.includes(tag))
         .sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
     },
   }));
@@ -23,26 +23,31 @@ const { tag, posts } = Astro.props;
 ---
 
 <PageLayout title={`Posts tagged "${tag}"`} description={`Blog posts tagged with "${tag}".`}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
     #{tag.toLowerCase().replace(/\s+/g, '-')}
   </h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-2">
+  <p class="mb-2 text-sm text-surface-500 dark:text-dm-muted">
     {posts.length} post{posts.length !== 1 ? 's' : ''} tagged with "{tag}".
   </p>
-  <a href="/blog" class="inline-flex items-center gap-1 text-sm text-primary-600 dark:text-accent-400 hover:underline mb-6">
+  <a
+    href="/blog"
+    class="mb-6 inline-flex items-center gap-1 text-sm text-primary-600 hover:underline dark:text-accent-400"
+  >
     &larr; Back to all posts
   </a>
 
   <div class="divide-y divide-surface-100 dark:divide-dm-border">
-    {posts.map(post => (
-      <PostCard
-        id={post.id}
-        title={post.data.title}
-        date={post.data.date}
-        excerpt={post.data.excerpt}
-        tags={post.data.tags}
-        author={post.data.author}
-      />
-    ))}
+    {
+      posts.map((post) => (
+        <PostCard
+          id={post.id}
+          title={post.data.title}
+          date={post.data.date}
+          excerpt={post.data.excerpt}
+          tags={post.data.tags}
+          author={post.data.author}
+        />
+      ))
+    }
   </div>
 </PageLayout>

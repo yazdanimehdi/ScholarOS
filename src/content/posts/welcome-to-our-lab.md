@@ -1,11 +1,11 @@
 ---
-title: "Welcome to the Smith Research Lab"
+title: 'Welcome to the Smith Research Lab'
 date: 2024-01-15
-author: "jane-smith"
+author: 'jane-smith'
 excerpt: "An introduction to our research lab, our mission, and what we're working on."
 tags:
-  - "Lab News"
-  - "Introduction"
+  - 'Lab News'
+  - 'Introduction'
 draft: false
 ---
 

@@ -3,25 +3,23 @@ import PageLayout from '../layouts/PageLayout.astro';
 ---
 
 <PageLayout title="Page Not Found">
-  <div class="text-center py-12 sm:py-20">
-    <div class="text-6xl font-serif font-normal text-surface-300 dark:text-dm-border-alt mb-3">
-      404
-    </div>
-    <h1 class="text-xl sm:text-2xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
+  <div class="py-12 text-center sm:py-20">
+    <div class="mb-3 font-serif text-6xl font-normal text-surface-300 dark:text-dm-border-alt">404</div>
+    <h1 class="mb-2 font-serif text-xl font-normal text-surface-900 sm:text-2xl dark:text-dm-heading">
       Page Not Found
     </h1>
-    <p class="text-sm text-surface-500 dark:text-dm-muted mb-6 max-w-md mx-auto">
+    <p class="mx-auto mb-6 max-w-md text-sm text-surface-500 dark:text-dm-muted">
       The page you're looking for doesn't exist or has been moved.
     </p>
 
     <div class="flex flex-wrap justify-center gap-3 text-sm">
-      <a href="/" class="text-primary-600 dark:text-accent-400 hover:underline">Home</a>
+      <a href="/" class="text-primary-600 hover:underline dark:text-accent-400">Home</a>
       <span class="text-surface-300 dark:text-dm-border-alt">|</span>
-      <a href="/research" class="text-primary-600 dark:text-accent-400 hover:underline">Research</a>
+      <a href="/research" class="text-primary-600 hover:underline dark:text-accent-400">Research</a>
       <span class="text-surface-300 dark:text-dm-border-alt">|</span>
-      <a href="/people" class="text-primary-600 dark:text-accent-400 hover:underline">People</a>
+      <a href="/people" class="text-primary-600 hover:underline dark:text-accent-400">People</a>
       <span class="text-surface-300 dark:text-dm-border-alt">|</span>
-      <a href="/contact" class="text-primary-600 dark:text-accent-400 hover:underline">Contact</a>
+      <a href="/contact" class="text-primary-600 hover:underline dark:text-accent-400">Contact</a>
     </div>
   </div>
 </PageLayout>

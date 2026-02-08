@@ -1,14 +1,14 @@
-mediumUrl: ""  # e.g. https://medium.com/feed/@username
+mediumUrl: '' # e.g. https://medium.com/feed/@username
 
 feeds:
   - name: "Jane Smith's Blog"
-    url: "https://example.com/feed.xml"
-    author: "jane-smith"
-    tags: ["blog"]
-  - name: "Lab Medium Publication"
-    url: "https://medium.com/feed/@example-lab"
+    url: 'https://example.com/feed.xml'
+    author: 'jane-smith'
+    tags: ['blog']
+  - name: 'Lab Medium Publication'
+    url: 'https://medium.com/feed/@example-lab'
     author: null
-    tags: ["medium"]
+    tags: ['medium']
 
-syncInterval: "daily"
+syncInterval: 'daily'
 maxItemsPerFeed: 20

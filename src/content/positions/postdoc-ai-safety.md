@@ -1,9 +1,9 @@
 ---
-title: "Postdoctoral Researcher in AI Safety"
+title: 'Postdoctoral Researcher in AI Safety'
 type: postdoc
 status: open
 deadline: 2025-09-01
-excerpt: "Two-year postdoctoral position investigating alignment, robustness, and safety of large-scale AI systems."
+excerpt: 'Two-year postdoctoral position investigating alignment, robustness, and safety of large-scale AI systems.'
 tags:
   - AI-safety
   - alignment

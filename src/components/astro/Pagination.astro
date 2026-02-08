@@ -30,29 +30,51 @@ function getPageNumbers(): (number | '...')[] {
 ---
 
 <nav aria-label="Pagination" class="flex items-center justify-center gap-1 text-sm">
-  {currentPage > 1 ? (
-    <a href={getPageUrl(currentPage - 1)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors">
-      ← Previous
-    </a>
-  ) : (
-    <span class="px-3 py-1.5 text-surface-300 dark:text-dm-border-alt">← Previous</span>
-  )}
-
-  {getPageNumbers().map(page =>
-    page === '...' ? (
-      <span class="px-2 py-1.5 text-surface-400">...</span>
-    ) : page === currentPage ? (
-      <span class="px-3 py-1.5 font-medium text-primary-600 dark:text-accent-400 border-b-2 border-primary-600 dark:border-accent-400" aria-current="page">{page}</span>
+  {
+    currentPage > 1 ? (
+      <a
+        href={getPageUrl(currentPage - 1)}
+        class="px-3 py-1.5 text-surface-600 transition-colors hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400"
+      >
+        ← Previous
+      </a>
     ) : (
-      <a href={getPageUrl(page)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors">{page}</a>
+      <span class="px-3 py-1.5 text-surface-300 dark:text-dm-border-alt">← Previous</span>
     )
-  )}
+  }
 
-  {currentPage < totalPages ? (
-    <a href={getPageUrl(currentPage + 1)} class="px-3 py-1.5 text-surface-600 hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400 transition-colors">
-      Next →
-    </a>
-  ) : (
-    <span class="px-3 py-1.5 text-surface-300 dark:text-dm-border-alt">Next →</span>
-  )}
+  {
+    getPageNumbers().map((page) =>
+      page === '...' ? (
+        <span class="px-2 py-1.5 text-surface-400">...</span>
+      ) : page === currentPage ? (
+        <span
+          class="border-b-2 border-primary-600 px-3 py-1.5 font-medium text-primary-600 dark:border-accent-400 dark:text-accent-400"
+          aria-current="page"
+        >
+          {page}
+        </span>
+      ) : (
+        <a
+          href={getPageUrl(page)}
+          class="px-3 py-1.5 text-surface-600 transition-colors hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400"
+        >
+          {page}
+        </a>
+      ),
+    )
+  }
+
+  {
+    currentPage < totalPages ? (
+      <a
+        href={getPageUrl(currentPage + 1)}
+        class="px-3 py-1.5 text-surface-600 transition-colors hover:text-primary-600 dark:text-dm-muted dark:hover:text-accent-400"
+      >
+        Next →
+      </a>
+    ) : (
+      <span class="px-3 py-1.5 text-surface-300 dark:text-dm-border-alt">Next →</span>
+    )
+  }
 </nav>

@@ -37,14 +37,16 @@ const sizes = {
 
 // Build Google Fonts URL
 const uniqueFamilies = [...new Set([families.sans, families.serif, families.mono])];
-const fontParams = uniqueFamilies.map((family) => {
-  const encoded = family.replace(/ /g, '+');
-  // Mono fonts get fewer weights
-  if (family === families.mono && family !== families.sans && family !== families.serif) {
-    return `family=${encoded}:wght@400;500`;
-  }
-  return `family=${encoded}:wght@300;400;500;700`;
-}).join('&');
+const fontParams = uniqueFamilies
+  .map((family) => {
+    const encoded = family.replace(/ /g, '+');
+    // Mono fonts get fewer weights
+    if (family === families.mono && family !== families.sans && family !== families.serif) {
+      return `family=${encoded}:wght@400;500`;
+    }
+    return `family=${encoded}:wght@300;400;500;700`;
+  })
+  .join('&');
 const googleFontsUrl = `https://fonts.googleapis.com/css2?${fontParams}&display=swap`;
 
 // Font family stacks

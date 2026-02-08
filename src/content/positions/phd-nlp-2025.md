@@ -1,9 +1,9 @@
 ---
-title: "PhD Position in Natural Language Processing"
+title: 'PhD Position in Natural Language Processing'
 type: phd
 status: open
 deadline: 2025-12-15
-excerpt: "Fully funded PhD position focusing on large language models, multilingual NLP, and text generation."
+excerpt: 'Fully funded PhD position focusing on large language models, multilingual NLP, and text generation.'
 tags:
   - NLP
   - LLMs

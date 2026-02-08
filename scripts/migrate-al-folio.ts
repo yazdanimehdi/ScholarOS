@@ -10,41 +10,41 @@
  * example/placeholder content.
  */
 
-import fs from "node:fs";
-import path from "node:path";
-import { execFileSync } from "node:child_process";
-import { tmpdir } from "node:os";
-import yaml from "js-yaml";
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import yaml from 'js-yaml';
 
-const ROOT = path.resolve(import.meta.dirname, "..");
+const ROOT = path.resolve(import.meta.dirname, '..');
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
 function slugify(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 function stripHtml(html: string): string {
   return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/\{%.*?%\}/g, "")
-    .replace(/\{\{.*?\}\}/g, "")
-    .replace(/\s+/g, " ")
+    .replace(/\{%.*?%\}/g, '')
+    .replace(/\{\{.*?\}\}/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
 function parseFrontmatter(content: string): { data: Record<string, unknown>; body: string } {
-  if (!content.startsWith("---")) return { data: {}, body: content };
-  const end = content.indexOf("---", 3);
+  if (!content.startsWith('---')) return { data: {}, body: content };
+  const end = content.indexOf('---', 3);
   if (end === -1) return { data: {}, body: content };
   const fm = content.slice(3, end).trim();
   const body = content.slice(end + 3).trim();
@@ -57,7 +57,7 @@ function parseFrontmatter(content: string): { data: Record<string, unknown>; bod
 
 function readFileOpt(filePath: string): string | null {
   if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, "utf-8");
+  return fs.readFileSync(filePath, 'utf-8');
 }
 
 function ensureDir(dirPath: string): void {
@@ -66,7 +66,7 @@ function ensureDir(dirPath: string): void {
 
 function rmMdFiles(dir: string): number {
   if (!fs.existsSync(dir)) return 0;
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md') || f.endsWith('.mdx'));
   for (const f of files) fs.unlinkSync(path.join(dir, f));
   return files.length;
 }
@@ -76,7 +76,7 @@ function yamlDump(obj: unknown): string {
 }
 
 function escapeYamlString(s: string): string {
-  if (/[\n\r:#{}\[\],&*?|>!'"%@`]/.test(s) || s.startsWith(" ") || s.endsWith(" ")) {
+  if (/[\n\r:#{}[\],&*?|>!'"%@`]/.test(s) || s.startsWith(' ') || s.endsWith(' ')) {
     return JSON.stringify(s);
   }
   return s;
@@ -99,14 +99,14 @@ function parseBibTeX(content: string): BibEntry[] {
 
   while ((match = entryRegex.exec(content)) !== null) {
     const type = match[1].toLowerCase();
-    if (type === "string" || type === "preamble" || type === "comment") continue;
+    if (type === 'string' || type === 'preamble' || type === 'comment') continue;
 
     const startBrace = match.index + match[0].length - 1;
     let depth = 1;
     let i = startBrace + 1;
     while (i < content.length && depth > 0) {
-      if (content[i] === "{") depth++;
-      else if (content[i] === "}") depth--;
+      if (content[i] === '{') depth++;
+      else if (content[i] === '}') depth--;
       i++;
     }
 
@@ -114,7 +114,7 @@ function parseBibTeX(content: string): BibEntry[] {
     const raw = content.slice(match.index, i);
 
     // Extract key (everything before first comma)
-    const commaIdx = inner.indexOf(",");
+    const commaIdx = inner.indexOf(',');
     if (commaIdx === -1) continue;
     const key = inner.slice(0, commaIdx).trim();
     const fieldsStr = inner.slice(commaIdx + 1);
@@ -131,14 +131,14 @@ function parseBibTeX(content: string): BibEntry[] {
       // Skip whitespace
       while (valueStart < fieldsStr.length && /\s/.test(fieldsStr[valueStart])) valueStart++;
 
-      let value = "";
-      if (fieldsStr[valueStart] === "{") {
+      let value = '';
+      if (fieldsStr[valueStart] === '{') {
         // Brace-delimited value
         let d = 1;
         let j = valueStart + 1;
         while (j < fieldsStr.length && d > 0) {
-          if (fieldsStr[j] === "{") d++;
-          else if (fieldsStr[j] === "}") d--;
+          if (fieldsStr[j] === '{') d++;
+          else if (fieldsStr[j] === '}') d--;
           j++;
         }
         value = fieldsStr.slice(valueStart + 1, j - 1);
@@ -146,18 +146,18 @@ function parseBibTeX(content: string): BibEntry[] {
         // Quote-delimited value
         let j = valueStart + 1;
         while (j < fieldsStr.length && fieldsStr[j] !== '"') {
-          if (fieldsStr[j] === "\\") j++; // skip escaped char
+          if (fieldsStr[j] === '\\') j++; // skip escaped char
           j++;
         }
         value = fieldsStr.slice(valueStart + 1, j);
       } else {
         // Bare value (number or macro)
         let j = valueStart;
-        while (j < fieldsStr.length && fieldsStr[j] !== "," && fieldsStr[j] !== "}") j++;
+        while (j < fieldsStr.length && fieldsStr[j] !== ',' && fieldsStr[j] !== '}') j++;
         value = fieldsStr.slice(valueStart, j).trim();
       }
 
-      fields[fieldName] = value.replace(/\s+/g, " ").trim();
+      fields[fieldName] = value.replace(/\s+/g, ' ').trim();
       // Advance the regex past the value
       fieldRegex.lastIndex = valueStart + value.length + 2;
     }
@@ -171,10 +171,10 @@ function parseBibTeX(content: string): BibEntry[] {
 function parseBibAuthors(authorStr: string): string[] {
   if (!authorStr) return [];
   return authorStr.split(/\s+and\s+/i).map((a) => {
-    a = a.replace(/[{}]/g, "").trim();
-    if (a.includes(",")) {
-      const [last, ...first] = a.split(",").map((s) => s.trim());
-      return [...first, last].join(" ");
+    a = a.replace(/[{}]/g, '').trim();
+    if (a.includes(',')) {
+      const [last, ...first] = a.split(',').map((s) => s.trim());
+      return [...first, last].join(' ');
     }
     return a;
   });
@@ -182,35 +182,52 @@ function parseBibAuthors(authorStr: string): string[] {
 
 function mapPubType(bibType: string): string {
   switch (bibType) {
-    case "article":
-      return "journal";
-    case "inproceedings":
-    case "conference":
-      return "conference";
-    case "misc":
-    case "unpublished":
-      return "preprint";
-    case "phdthesis":
-    case "mastersthesis":
-      return "thesis";
-    case "incollection":
-    case "inbook":
-      return "book-chapter";
+    case 'article':
+      return 'journal';
+    case 'inproceedings':
+    case 'conference':
+      return 'conference';
+    case 'misc':
+    case 'unpublished':
+      return 'preprint';
+    case 'phdthesis':
+    case 'mastersthesis':
+      return 'thesis';
+    case 'incollection':
+    case 'inbook':
+      return 'book-chapter';
     default:
-      return "conference";
+      return 'conference';
   }
 }
 
 function cleanBibtexForStorage(raw: string): string {
   // Remove al-folio custom fields from the stored bibtex
-  const customFields = ["preview", "selected", "bibtex_show", "abbr", "altmetric", "dimensions", "google_scholar_id", "html", "pdf", "supp", "blog", "code", "poster", "slides", "website", "award"];
+  const customFields = [
+    'preview',
+    'selected',
+    'bibtex_show',
+    'abbr',
+    'altmetric',
+    'dimensions',
+    'google_scholar_id',
+    'html',
+    'pdf',
+    'supp',
+    'blog',
+    'code',
+    'poster',
+    'slides',
+    'website',
+    'award',
+  ];
   let cleaned = raw;
   for (const field of customFields) {
     // Remove field = {value}, or field = "value", including trailing comma
-    cleaned = cleaned.replace(new RegExp(`\\s*${field}\\s*=\\s*(?:\\{[^}]*\\}|"[^"]*"|[^,}]+),?`, "gi"), "");
+    cleaned = cleaned.replace(new RegExp(`\\s*${field}\\s*=\\s*(?:\\{[^}]*\\}|"[^"]*"|[^,}]+),?`, 'gi'), '');
   }
   // Clean up any double commas or trailing commas before closing brace
-  cleaned = cleaned.replace(/,\s*,/g, ",").replace(/,\s*\}/g, "\n}");
+  cleaned = cleaned.replace(/,\s*,/g, ',').replace(/,\s*\}/g, '\n}');
   return cleaned.trim();
 }
 
@@ -218,21 +235,21 @@ function cleanBibtexForStorage(raw: string): string {
 
 function inferCategory(text: string): string {
   const lower = text.toLowerCase();
-  if (/\b(paper|accepted|publication|published|journal|conference)\b/.test(lower)) return "paper";
-  if (/\b(award|prize|won|winner|honored)\b/.test(lower)) return "award";
-  if (/\b(grant|fund|nsf|nih|darpa)\b/.test(lower)) return "grant";
-  if (/\b(talk|present|invited|keynote|seminar)\b/.test(lower)) return "talk";
-  if (/\b(intern|join|hired|welcome|new member|position)\b/.test(lower)) return "media";
-  return "general";
+  if (/\b(paper|accepted|publication|published|journal|conference)\b/.test(lower)) return 'paper';
+  if (/\b(award|prize|won|winner|honored)\b/.test(lower)) return 'award';
+  if (/\b(grant|fund|nsf|nih|darpa)\b/.test(lower)) return 'grant';
+  if (/\b(talk|present|invited|keynote|seminar)\b/.test(lower)) return 'talk';
+  if (/\b(intern|join|hired|welcome|new member|position)\b/.test(lower)) return 'media';
+  return 'general';
 }
 
 function extractTitle(text: string): string {
-  const clean = stripHtml(text).replace(/\n/g, " ").trim();
+  const clean = stripHtml(text).replace(/\n/g, ' ').trim();
   // Take first sentence or first 80 chars
   const sentenceEnd = clean.search(/[.!?]\s/);
   if (sentenceEnd > 0 && sentenceEnd <= 80) return clean.slice(0, sentenceEnd + 1);
   if (clean.length <= 80) return clean;
-  return clean.slice(0, 80).replace(/\s+\S*$/, "") + "...";
+  return clean.slice(0, 80).replace(/\s+\S*$/, '') + '...';
 }
 
 // ─── Parse functions ──────────────────────────────────────────────────
@@ -264,9 +281,9 @@ interface NavItem {
 }
 
 function parseAlFolioConfig(cloneDir: string): AlFolioConfig {
-  const raw = readFileOpt(path.join(cloneDir, "_config.yml"));
+  const raw = readFileOpt(path.join(cloneDir, '_config.yml'));
   if (!raw) {
-    console.warn("  Warning: _config.yml not found");
+    console.warn('  Warning: _config.yml not found');
     return {};
   }
   return (yaml.load(raw) as AlFolioConfig) || {};
@@ -274,32 +291,32 @@ function parseAlFolioConfig(cloneDir: string): AlFolioConfig {
 
 function parseAboutPage(cloneDir: string): { data: Record<string, unknown>; body: string } {
   // Try _pages/about.md first, then about.md
-  for (const p of ["_pages/about.md", "about.md", "_pages/about.html"]) {
+  for (const p of ['_pages/about.md', 'about.md', '_pages/about.html']) {
     const raw = readFileOpt(path.join(cloneDir, p));
     if (raw) return parseFrontmatter(raw);
   }
-  return { data: {}, body: "" };
+  return { data: {}, body: '' };
 }
 
 function parseRepositories(cloneDir: string): { github_users: string[]; github_repos: string[] } {
-  const raw = readFileOpt(path.join(cloneDir, "_data/repositories.yml"));
+  const raw = readFileOpt(path.join(cloneDir, '_data/repositories.yml'));
   if (!raw) return { github_users: [], github_repos: [] };
   const data = yaml.load(raw) as Record<string, unknown>;
   const users = (data?.github_users as string[]) || [];
   const repos = ((data?.github_repos as string[]) || []).map((r) => {
     // repos may be "user/repo" format — extract just repo name
-    return r.includes("/") ? r.split("/")[1] : r;
+    return r.includes('/') ? r.split('/')[1] : r;
   });
   return { github_users: users, github_repos: repos };
 }
 
 function parseResume(cloneDir: string): Record<string, unknown> | null {
-  const raw = readFileOpt(path.join(cloneDir, "assets/json/resume.json"));
+  const raw = readFileOpt(path.join(cloneDir, 'assets/json/resume.json'));
   if (!raw) return null;
   try {
     return JSON.parse(raw);
   } catch {
-    console.warn("  Warning: Could not parse resume.json");
+    console.warn('  Warning: Could not parse resume.json');
     return null;
   }
 }
@@ -314,40 +331,37 @@ interface NewsItem {
 }
 
 function parseNews(cloneDir: string): NewsItem[] {
-  const dir = path.join(cloneDir, "_news");
+  const dir = path.join(cloneDir, '_news');
   if (!fs.existsSync(dir)) return [];
 
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md") || f.endsWith(".html"));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md') || f.endsWith('.html'));
   const items: NewsItem[] = [];
 
   for (const file of files) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf-8");
+    const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
     const { data, body } = parseFrontmatter(raw);
 
-    const dateStr = data.date
-      ? new Date(data.date as string).toISOString().split("T")[0]
-      : "2024-01-01";
+    const dateStr = data.date ? new Date(data.date as string).toISOString().split('T')[0] : '2024-01-01';
 
     const cleanBody = stripHtml(body).trim();
-    const title = extractTitle(cleanBody || file.replace(/\.md$|\.html$/, ""));
+    const title = extractTitle(cleanBody || file.replace(/\.md$|\.html$/, ''));
     const category = inferCategory(cleanBody);
     const excerpt = cleanBody.split(/[.!?]\s/)[0]?.trim() || cleanBody.slice(0, 150);
 
     // Convert HTML body to markdown-ish text
-    let mdBody = body
-      .replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/g, "[$2]($1)")
-      .replace(/<b>(.*?)<\/b>/g, "**$1**")
-      .replace(/<i>(.*?)<\/i>/g, "*$1*")
-      .replace(/<em>(.*?)<\/em>/g, "*$1*")
-      .replace(/<strong>(.*?)<\/strong>/g, "**$1**")
-      .replace(/<br\s*\/?>/g, "\n")
-      .replace(/<[^>]*>/g, "")
-      .replace(/\{%.*?%\}/g, "")
-      .replace(/\{\{.*?\}\}/g, "")
+    const mdBody = body
+      .replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/g, '[$2]($1)')
+      .replace(/<b>(.*?)<\/b>/g, '**$1**')
+      .replace(/<i>(.*?)<\/i>/g, '*$1*')
+      .replace(/<em>(.*?)<\/em>/g, '*$1*')
+      .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+      .replace(/<br\s*\/?>/g, '\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\{%.*?%\}/g, '')
+      .replace(/\{\{.*?\}\}/g, '')
       .trim();
 
-    const slug = slugify(file.replace(/\.md$|\.html$/, "").replace(/^\d{4}-\d{2}-\d{2}-?/, ""))
-      || slugify(title);
+    const slug = slugify(file.replace(/\.md$|\.html$/, '').replace(/^\d{4}-\d{2}-\d{2}-?/, '')) || slugify(title);
 
     items.push({ slug, date: dateStr, title, body: mdBody, category, excerpt });
   }
@@ -362,16 +376,16 @@ interface ProjectItem {
 }
 
 function parseProjects(cloneDir: string): ProjectItem[] {
-  const dir = path.join(cloneDir, "_projects");
+  const dir = path.join(cloneDir, '_projects');
   if (!fs.existsSync(dir)) return [];
 
   return fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith(".md"))
+    .filter((f) => f.endsWith('.md'))
     .map((file) => {
-      const raw = fs.readFileSync(path.join(dir, file), "utf-8");
+      const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
       const { data, body } = parseFrontmatter(raw);
-      const slug = slugify(file.replace(/\.md$/, "").replace(/^\d+_?/, ""));
+      const slug = slugify(file.replace(/\.md$/, '').replace(/^\d+_?/, ''));
       return { slug, data, body };
     });
 }
@@ -383,51 +397,49 @@ interface PostItem {
 }
 
 function parsePosts(cloneDir: string): PostItem[] {
-  const dir = path.join(cloneDir, "_posts");
+  const dir = path.join(cloneDir, '_posts');
   if (!fs.existsSync(dir)) return [];
 
   return fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith(".md") || f.endsWith(".html"))
+    .filter((f) => f.endsWith('.md') || f.endsWith('.html'))
     .map((file) => {
-      const raw = fs.readFileSync(path.join(dir, file), "utf-8");
+      const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
       const { data, body } = parseFrontmatter(raw);
-      const slug = slugify(
-        file.replace(/\.md$|\.html$/, "").replace(/^\d{4}-\d{2}-\d{2}-?/, ""),
-      );
+      const slug = slugify(file.replace(/\.md$|\.html$/, '').replace(/^\d{4}-\d{2}-\d{2}-?/, ''));
       return { slug, data, body };
     });
 }
 
 function parseNavPages(cloneDir: string): NavItem[] {
-  const dir = path.join(cloneDir, "_pages");
+  const dir = path.join(cloneDir, '_pages');
   if (!fs.existsSync(dir)) return [];
 
   const pages: { label: string; href: string; order: number }[] = [];
 
-  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".md") || f.endsWith(".html"))) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf-8");
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.md') || f.endsWith('.html'))) {
+    const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
     const { data } = parseFrontmatter(raw);
     if (!data.nav) continue;
 
-    const title = (data.title as string) || file.replace(/\.\w+$/, "");
+    const title = (data.title as string) || file.replace(/\.\w+$/, '');
     const permalink = data.permalink as string | undefined;
     const order = (data.nav_order as number) || 99;
 
     // Map al-folio permalinks to ScholarOS routes
     let href = permalink || `/${slugify(title)}`;
     const routeMap: Record<string, string> = {
-      "/": "/",
-      "/publications/": "/publications",
-      "/projects/": "/projects",
-      "/blog/": "/blog",
-      "/news/": "/news",
-      "/cv/": "/cv",
-      "/repositories/": "/repositories",
-      "/teaching/": "/blog",
-      "/al-folio/": "/",
+      '/': '/',
+      '/publications/': '/publications',
+      '/projects/': '/projects',
+      '/blog/': '/blog',
+      '/news/': '/news',
+      '/cv/': '/cv',
+      '/repositories/': '/repositories',
+      '/teaching/': '/blog',
+      '/al-folio/': '/',
     };
-    href = routeMap[href] || href.replace(/\/$/, "");
+    href = routeMap[href] || href.replace(/\/$/, '');
 
     pages.push({ label: title, href, order });
   }
@@ -449,15 +461,15 @@ function copyImages(
   // Copy profile photo
   if (profileImage) {
     const srcPaths = [
-      path.join(cloneDir, "assets/img", profileImage),
-      path.join(cloneDir, "assets/img/prof_pic.jpg"),
-      path.join(cloneDir, "assets/img/prof_pic.png"),
+      path.join(cloneDir, 'assets/img', profileImage),
+      path.join(cloneDir, 'assets/img/prof_pic.jpg'),
+      path.join(cloneDir, 'assets/img/prof_pic.png'),
     ];
 
     for (const src of srcPaths) {
       if (fs.existsSync(src)) {
         const ext = path.extname(src);
-        const destDir = path.join(ROOT, "src/assets/images/people");
+        const destDir = path.join(ROOT, 'src/assets/images/people');
         ensureDir(destDir);
         const dest = path.join(destDir, `profile${ext}`);
         fs.copyFileSync(src, dest);
@@ -470,12 +482,12 @@ function copyImages(
 
   // If no profile found from about page, try common names
   if (!profileDest) {
-    const commonNames = ["prof_pic.jpg", "prof_pic.png", "prof_pic.jpeg", "avatar.jpg", "avatar.png"];
+    const commonNames = ['prof_pic.jpg', 'prof_pic.png', 'prof_pic.jpeg', 'avatar.jpg', 'avatar.png'];
     for (const name of commonNames) {
-      const src = path.join(cloneDir, "assets/img", name);
+      const src = path.join(cloneDir, 'assets/img', name);
       if (fs.existsSync(src)) {
         const ext = path.extname(src);
-        const destDir = path.join(ROOT, "src/assets/images/people");
+        const destDir = path.join(ROOT, 'src/assets/images/people');
         ensureDir(destDir);
         const dest = path.join(destDir, `profile${ext}`);
         fs.copyFileSync(src, dest);
@@ -487,13 +499,13 @@ function copyImages(
   }
 
   // Copy publication preview images
-  const pubImgDir = path.join(ROOT, "src/assets/images/publications");
+  const pubImgDir = path.join(ROOT, 'src/assets/images/publications');
   ensureDir(pubImgDir);
 
   for (const [, filename] of pubPreviews) {
     const srcPaths = [
-      path.join(cloneDir, "assets/img/publication_preview", filename),
-      path.join(cloneDir, "assets/img", filename),
+      path.join(cloneDir, 'assets/img/publication_preview', filename),
+      path.join(cloneDir, 'assets/img', filename),
     ];
     for (const src of srcPaths) {
       if (fs.existsSync(src)) {
@@ -511,22 +523,22 @@ function copyImages(
 
 function cleanExistingContent(): number {
   let total = 0;
-  const dirs = ["people", "publications", "announcements", "projects", "posts", "positions", "talks"];
+  const dirs = ['people', 'publications', 'announcements', 'projects', 'posts', 'positions', 'talks'];
   for (const dir of dirs) {
-    const fullDir = path.join(ROOT, "src/content", dir);
+    const fullDir = path.join(ROOT, 'src/content', dir);
     total += rmMdFiles(fullDir);
   }
   // Clear feeds.json so stale example data doesn't appear
-  const feedsJson = path.join(ROOT, "src/data/feeds.json");
+  const feedsJson = path.join(ROOT, 'src/data/feeds.json');
   if (fs.existsSync(feedsJson)) {
-    fs.writeFileSync(feedsJson, "[]\n");
-    console.log("  Cleared src/data/feeds.json");
+    fs.writeFileSync(feedsJson, '[]\n');
+    console.log('  Cleared src/data/feeds.json');
   }
   // Clear feeds.yml of example entries
-  const feedsYmlPath = path.join(ROOT, "config", "feeds.yml");
+  const feedsYmlPath = path.join(ROOT, 'config', 'feeds.yml');
   if (fs.existsSync(feedsYmlPath)) {
-    fs.writeFileSync(feedsYmlPath, yamlDump({ mediumUrl: "", feeds: [], syncInterval: "daily", maxItemsPerFeed: 20 }));
-    console.log("  Cleared config/feeds.yml");
+    fs.writeFileSync(feedsYmlPath, yamlDump({ mediumUrl: '', feeds: [], syncInterval: 'daily', maxItemsPerFeed: 20 }));
+    console.log('  Cleared config/feeds.yml');
   }
   return total;
 }
@@ -541,17 +553,18 @@ function writeSiteConfig(
   profileImagePath: string | null,
   personSlug: string,
 ): void {
-  const fullName = [config.first_name, config.last_name].filter(Boolean).join(" ") || "Academic";
+  const fullName = [config.first_name, config.last_name].filter(Boolean).join(' ') || 'Academic';
 
   // Build nav — filter out People (personal site doesn't need it)
-  const nav = navItems.length > 0
-    ? navItems.filter((n) => n.href !== "/people").map(({ label, href }) => ({ label, href }))
-    : [
-        { label: "Publications", href: "/publications" },
-        { label: "Blog", href: "/blog" },
-        { label: "CV", href: "/cv" },
-        { label: "Contact", href: "/contact" },
-      ];
+  const nav =
+    navItems.length > 0
+      ? navItems.filter((n) => n.href !== '/people').map(({ label, href }) => ({ label, href }))
+      : [
+          { label: 'Publications', href: '/publications' },
+          { label: 'Blog', href: '/blog' },
+          { label: 'CV', href: '/cv' },
+          { label: 'Contact', href: '/contact' },
+        ];
 
   // Build socials
   const socials: Record<string, string> = {};
@@ -563,10 +576,10 @@ function writeSiteConfig(
   if (config.mastodon_username) {
     // mastodon_username might be @user@instance or just username
     const masto = config.mastodon_username;
-    if (masto.startsWith("http")) {
+    if (masto.startsWith('http')) {
       socials.mastodon = masto;
-    } else if (masto.includes("@")) {
-      const parts = masto.replace(/^@/, "").split("@");
+    } else if (masto.includes('@')) {
+      const parts = masto.replace(/^@/, '').split('@');
       if (parts.length === 2) socials.mastodon = `https://${parts[1]}/@${parts[0]}`;
     }
   }
@@ -574,51 +587,49 @@ function writeSiteConfig(
 
   // Extract about text from body (first paragraph)
   const aboutBody = about.body
-    .replace(/\{%.*?%\}/gs, "")
-    .replace(/\{\{.*?\}\}/gs, "")
-    .replace(/<[^>]*>/g, "")
+    .replace(/\{%.*?%\}/gs, '')
+    .replace(/\{\{.*?\}\}/gs, '')
+    .replace(/<[^>]*>/g, '')
     .trim();
-  const aboutText = aboutBody.split(/\n\n/)[0]?.trim() || config.description || "";
+  const aboutText = aboutBody.split(/\n\n/)[0]?.trim() || config.description || '';
 
-  const aboutImage = profileImagePath
-    ? `/images/people/profile${path.extname(profileImagePath)}`
-    : "/images/about.jpg";
+  const aboutImage = profileImagePath ? `/images/people/profile${path.extname(profileImagePath)}` : '/images/about.jpg';
 
   // Build github config
   const githubConfig: Record<string, unknown> = {
-    username: repos.github_users[0] || config.github_username || "",
+    username: repos.github_users[0] || config.github_username || '',
     stats: true,
     trophies: true,
     pinnedRepos: repos.github_repos,
   };
 
   const siteYml: Record<string, unknown> = {
-    siteMode: "personal",
-    lang: config.lang || "en",
-    direction: "ltr",
-    defaultTheme: config.enable_darkmode ? "system" : "light",
-    topBar: { enabled: false, text: "", links: [] },
+    siteMode: 'personal',
+    lang: config.lang || 'en',
+    direction: 'ltr',
+    defaultTheme: config.enable_darkmode ? 'system' : 'light',
+    topBar: { enabled: false, text: '', links: [] },
     hero: {
-      type: "pattern",
-      light: { bgColor: "#ffffff", bgImage: "" },
-      dark: { bgColor: "#0d1117", bgImage: "" },
-      video: { src: "", poster: "" },
-      pattern: { name: "hexagons" },
-      animation: { preset: "wave-lines", customScript: "" },
+      type: 'pattern',
+      light: { bgColor: '#ffffff', bgImage: '' },
+      dark: { bgColor: '#0d1117', bgImage: '' },
+      video: { src: '', poster: '' },
+      pattern: { name: 'hexagons' },
+      animation: { preset: 'wave-lines', customScript: '' },
     },
     fonts: {
-      families: { sans: "Roboto", serif: "Roboto Slab", mono: "Roboto Mono" },
-      sizes: { base: "1.2rem", sm: "0.95rem", lg: "1.3rem", h1: "2.3rem", h2: "1.7rem", h3: "1.5rem" },
+      families: { sans: 'Roboto', serif: 'Roboto Slab', mono: 'Roboto Mono' },
+      sizes: { base: '1.2rem', sm: '0.95rem', lg: '1.3rem', h1: '2.3rem', h2: '1.7rem', h3: '1.5rem' },
     },
     colors: {
-      light: { primary: "#2c5282", secondary: "#06b6d4" },
-      dark: { primary: "#22d3ee", secondary: "#2c5282" },
+      light: { primary: '#2c5282', secondary: '#06b6d4' },
+      dark: { primary: '#22d3ee', secondary: '#2c5282' },
     },
     background: {
-      light: { color: "#ffffff", image: "" },
-      dark: { color: "#0d1117", image: "" },
+      light: { color: '#ffffff', image: '' },
+      dark: { color: '#0d1117', image: '' },
     },
-    imageShape: "rectangular",
+    imageShape: 'rectangular',
     about: {
       enabled: true,
       title: `About ${fullName}`,
@@ -626,53 +637,58 @@ function writeSiteConfig(
       image: aboutImage,
     },
     homepageSections: [
-      { id: "hero", enabled: true },
-      { id: "about", enabled: true },
-      { id: "news", enabled: true },
-      { id: "publications", enabled: true },
-      { id: "blog", enabled: true },
+      { id: 'hero', enabled: true },
+      { id: 'about', enabled: true },
+      { id: 'news', enabled: true },
+      { id: 'publications', enabled: true },
+      { id: 'blog', enabled: true },
     ],
     title: fullName,
     description: config.description || `${fullName}'s academic website`,
     author: fullName,
-    labName: "",
-    university: "",
-    department: "",
-    siteUrl: config.url || "https://example.com",
+    labName: '',
+    university: '',
+    department: '',
+    siteUrl: config.url || 'https://example.com',
     nav,
     github: githubConfig,
     socials,
     analytics: {
-      googleAnalytics: config.google_analytics || "",
-      googleTagManager: "",
-      cronitor: "",
-      openpanel: "",
-      pirsch: "",
-      microsoftClarity: "",
+      googleAnalytics: config.google_analytics || '',
+      googleTagManager: '',
+      cronitor: '',
+      openpanel: '',
+      pirsch: '',
+      microsoftClarity: '',
     },
-    web3forms: { accessKey: "" },
-    newsletter: { enabled: false, accessKey: "", heading: "Stay Updated", text: "Subscribe to get notified about new publications and news." },
+    web3forms: { accessKey: '' },
+    newsletter: {
+      enabled: false,
+      accessKey: '',
+      heading: 'Stay Updated',
+      text: 'Subscribe to get notified about new publications and news.',
+    },
     seo: {
-      keywords: (config.keywords as string) || "",
-      googleSiteVerification: "",
-      bingSiteVerification: "",
+      keywords: (config.keywords as string) || '',
+      googleSiteVerification: '',
+      bingSiteVerification: '',
     },
-    adminPath: "admin",
+    adminPath: 'admin',
     adminUsers: [personSlug],
     cookieConsent: false,
     footer: {
       text: 'Built with <a href="https://scholaros.com">ScholarOS</a>',
       links: [
-        { label: "Privacy", href: "/privacy" },
-        { label: "Sitemap", href: "/sitemap-index.xml" },
+        { label: 'Privacy', href: '/privacy' },
+        { label: 'Sitemap', href: '/sitemap-index.xml' },
       ],
     },
-    alfolioRepo: "",
+    alfolioRepo: '',
   };
 
-  const outPath = path.join(ROOT, "config", "site.yml");
+  const outPath = path.join(ROOT, 'config', 'site.yml');
   fs.writeFileSync(outPath, `# Site Configuration\n# Migrated from al-folio\n\n${yamlDump(siteYml)}`);
-  console.log("  Wrote config/site.yml");
+  console.log('  Wrote config/site.yml');
 }
 
 function writeScholarConfig(config: AlFolioConfig, fullName: string): void {
@@ -680,16 +696,16 @@ function writeScholarConfig(config: AlFolioConfig, fullName: string): void {
     authors: [
       {
         name: fullName,
-        scholar_id: config.scholar_userid || "XXXXXXXXXX",
+        scholar_id: config.scholar_userid || 'XXXXXXXXXX',
       },
     ],
-    syncInterval: "weekly",
+    syncInterval: 'weekly',
     maxResults: 100,
   };
 
-  const outPath = path.join(ROOT, "config", "scholar.yml");
+  const outPath = path.join(ROOT, 'config', 'scholar.yml');
   fs.writeFileSync(outPath, yamlDump(scholarYml));
-  console.log("  Wrote config/scholar.yml");
+  console.log('  Wrote config/scholar.yml');
 }
 
 function writeFeedsConfig(config: AlFolioConfig, personSlug: string): void {
@@ -699,44 +715,44 @@ function writeFeedsConfig(config: AlFolioConfig, personSlug: string): void {
   const extSources = config.external_sources || [];
   for (const src of extSources) {
     if (!src.rss_url) continue;
-    const isMedium = src.rss_url.includes("medium.com");
+    const isMedium = src.rss_url.includes('medium.com');
     feeds.push({
-      name: src.name || (isMedium ? "Medium" : "External Blog"),
+      name: src.name || (isMedium ? 'Medium' : 'External Blog'),
       url: src.rss_url,
       author: personSlug,
-      tags: isMedium ? ["medium"] : ["blog"],
+      tags: isMedium ? ['medium'] : ['blog'],
     });
   }
 
   // Determine mediumUrl
-  let mediumUrl = "";
+  let mediumUrl = '';
   if (config.medium_username) {
     mediumUrl = `https://medium.com/feed/@${config.medium_username}`;
     // Add Medium feed if not already present from external_sources
-    if (!feeds.some((f) => f.url.includes("medium.com"))) {
+    if (!feeds.some((f) => f.url.includes('medium.com'))) {
       feeds.push({
-        name: "Medium",
+        name: 'Medium',
         url: mediumUrl,
         author: personSlug,
-        tags: ["medium"],
+        tags: ['medium'],
       });
     }
   } else {
     // Check if any external source is medium
-    const mediumFeed = feeds.find((f) => f.url.includes("medium.com"));
+    const mediumFeed = feeds.find((f) => f.url.includes('medium.com'));
     if (mediumFeed) mediumUrl = mediumFeed.url;
   }
 
   const feedsYml: Record<string, unknown> = {
     mediumUrl,
     feeds,
-    syncInterval: "daily",
+    syncInterval: 'daily',
     maxItemsPerFeed: 20,
   };
 
-  const outPath = path.join(ROOT, "config", "feeds.yml");
+  const outPath = path.join(ROOT, 'config', 'feeds.yml');
   fs.writeFileSync(outPath, yamlDump(feedsYml));
-  console.log("  Wrote config/feeds.yml");
+  console.log('  Wrote config/feeds.yml');
 }
 
 function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioConfig, fullName: string): void {
@@ -754,19 +770,19 @@ function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioCo
   // Education
   const education = (resume?.education as Record<string, unknown>[]) || [];
   for (const edu of education) {
-    const startDate = (edu.startDate as string) || "";
-    const endDate = (edu.endDate as string) || "present";
+    const startDate = (edu.startDate as string) || '';
+    const endDate = (edu.endDate as string) || 'present';
     const highlights: string[] = [];
     if (edu.courses) {
       for (const c of edu.courses as string[]) highlights.push(c);
     }
     cvSections.education.push({
-      institution: (edu.institution as string) || "",
-      area: (edu.area as string) || (edu.studyType as string) || "",
-      degree: (edu.studyType as string) || "",
-      location: "",
+      institution: (edu.institution as string) || '',
+      area: (edu.area as string) || (edu.studyType as string) || '',
+      degree: (edu.studyType as string) || '',
+      location: '',
       startDate: startDate.slice(0, 7) || startDate,
-      endDate: endDate === "" ? "present" : endDate.slice(0, 7) || endDate,
+      endDate: endDate === '' ? 'present' : endDate.slice(0, 7) || endDate,
       highlights,
     });
   }
@@ -774,17 +790,15 @@ function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioCo
   // Work experience
   const work = (resume?.work as Record<string, unknown>[]) || [];
   for (const w of work) {
-    const startDate = (w.startDate as string) || "";
-    const endDate = (w.endDate as string) || "present";
-    const highlights = (w.summary as string)
-      ? [(w.summary as string)]
-      : ((w.highlights as string[]) || []);
+    const startDate = (w.startDate as string) || '';
+    const endDate = (w.endDate as string) || 'present';
+    const highlights = (w.summary as string) ? [w.summary as string] : (w.highlights as string[]) || [];
     cvSections.experience.push({
-      company: (w.name as string) || (w.company as string) || "",
-      position: (w.position as string) || "",
-      location: (w.location as string) || "",
+      company: (w.name as string) || (w.company as string) || '',
+      position: (w.position as string) || '',
+      location: (w.location as string) || '',
       startDate: startDate.slice(0, 7) || startDate,
-      endDate: endDate === "" ? "present" : endDate.slice(0, 7) || endDate,
+      endDate: endDate === '' ? 'present' : endDate.slice(0, 7) || endDate,
       highlights,
     });
   }
@@ -793,20 +807,20 @@ function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioCo
   const pubs = (resume?.publications as Record<string, unknown>[]) || [];
   for (const pub of pubs) {
     cvSections.publications.push({
-      title: (pub.name as string) || (pub.title as string) || "",
+      title: (pub.name as string) || (pub.title as string) || '',
       authors: [(pub.author as string) || fullName],
-      journal: (pub.publisher as string) || "",
-      date: (pub.releaseDate as string) || "",
-      url: (pub.url as string) || (pub.website as string) || "",
+      journal: (pub.publisher as string) || '',
+      date: (pub.releaseDate as string) || '',
+      url: (pub.url as string) || (pub.website as string) || '',
     });
   }
 
   // Awards
   const awards = (resume?.awards as Record<string, unknown>[]) || [];
   for (const award of awards) {
-    const label = (award.title as string) || "";
-    const awarder = (award.awarder as string) || "";
-    const date = (award.date as string) || "";
+    const label = (award.title as string) || '';
+    const awarder = (award.awarder as string) || '';
+    const date = (award.date as string) || '';
     cvSections.awards.push({
       label: awarder ? `${label}, ${awarder}` : label,
       details: date,
@@ -818,8 +832,8 @@ function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioCo
   for (const skill of skills) {
     const keywords = (skill.keywords as string[]) || [];
     cvSections.skills.push({
-      label: (skill.name as string) || "",
-      details: keywords.join(", "),
+      label: (skill.name as string) || '',
+      details: keywords.join(', '),
     });
   }
 
@@ -827,55 +841,56 @@ function writeCvConfig(resume: Record<string, unknown> | null, config: AlFolioCo
   const socialNetworks: Record<string, string>[] = [];
   const profiles = (basics.profiles as Record<string, string>[]) || [];
   for (const p of profiles) {
-    const network = p.network || "";
-    const username = p.username || p.url || "";
+    const network = p.network || '';
+    const username = p.username || p.url || '';
     if (network && username) {
       socialNetworks.push({ network, username });
     }
   }
   // Fallback from config
   if (socialNetworks.length === 0) {
-    if (config.github_username) socialNetworks.push({ network: "GitHub", username: config.github_username });
-    if (config.linkedin_username) socialNetworks.push({ network: "LinkedIn", username: config.linkedin_username });
+    if (config.github_username) socialNetworks.push({ network: 'GitHub', username: config.github_username });
+    if (config.linkedin_username) socialNetworks.push({ network: 'LinkedIn', username: config.linkedin_username });
   }
 
-  const locationStr = location
-    ? [location.city, location.region, location.countryCode].filter(Boolean).join(", ")
-    : "";
+  const locationStr = location ? [location.city, location.region, location.countryCode].filter(Boolean).join(', ') : '';
 
   const cvYml: Record<string, unknown> = {
     cv: {
       name: (basics.name as string) || fullName,
       location: locationStr,
-      email: (basics.email as string) || config.email || "",
-      phone: (basics.phone as string) || "",
-      website: (basics.url as string) || config.url || "",
+      email: (basics.email as string) || config.email || '',
+      phone: (basics.phone as string) || '',
+      website: (basics.url as string) || config.url || '',
       socialNetworks,
       sections: cvSections,
     },
-    design: { theme: "classic" },
+    design: { theme: 'classic' },
   };
 
-  const outPath = path.join(ROOT, "config", "cv.yml");
+  const outPath = path.join(ROOT, 'config', 'cv.yml');
   fs.writeFileSync(outPath, `# CV Configuration\n# Migrated from al-folio resume.json\n\n${yamlDump(cvYml)}`);
-  console.log("  Wrote config/cv.yml");
+  console.log('  Wrote config/cv.yml');
 }
 
 function writeResearchConfig(config: AlFolioConfig): void {
   // Generate research areas from keywords if available
-  const keywords = (config.keywords as string) || "";
+  const keywords = (config.keywords as string) || '';
   const areas: Record<string, unknown>[] = [];
 
   if (keywords) {
-    const kws = keywords.split(",").map((k) => k.trim()).filter(Boolean);
+    const kws = keywords
+      .split(',')
+      .map((k) => k.trim())
+      .filter(Boolean);
     if (kws.length > 0) {
       // Group into 2-3 areas
       const chunkSize = Math.ceil(kws.length / 3);
       for (let i = 0; i < kws.length; i += chunkSize) {
         const chunk = kws.slice(i, i + chunkSize);
         areas.push({
-          title: chunk[0] || "Research",
-          description: "",
+          title: chunk[0] || 'Research',
+          description: '',
           tags: chunk,
         });
       }
@@ -883,13 +898,13 @@ function writeResearchConfig(config: AlFolioConfig): void {
   }
 
   const researchYml: Record<string, unknown> = {
-    description: config.description || "",
+    description: config.description || '',
     areas,
   };
 
-  const outPath = path.join(ROOT, "config", "research.yml");
+  const outPath = path.join(ROOT, 'config', 'research.yml');
   fs.writeFileSync(outPath, yamlDump(researchYml));
-  console.log("  Wrote config/research.yml");
+  console.log('  Wrote config/research.yml');
 }
 
 function writePerson(
@@ -898,10 +913,8 @@ function writePerson(
   profileImagePath: string | null,
   personSlug: string,
 ): void {
-  const fullName = [config.first_name, config.last_name].filter(Boolean).join(" ") || "Academic";
-  const subtitle = about.data.subtitle
-    ? stripHtml(about.data.subtitle as string)
-    : "";
+  const fullName = [config.first_name, config.last_name].filter(Boolean).join(' ') || 'Academic';
+  const subtitle = about.data.subtitle ? stripHtml(about.data.subtitle as string) : '';
 
   // Build socials object
   const socials: Record<string, string> = {};
@@ -912,75 +925,75 @@ function writePerson(
   if (config.orcid_id) socials.orcid = `https://orcid.org/${config.orcid_id}`;
   if (config.mastodon_username) {
     const masto = config.mastodon_username;
-    if (masto.startsWith("http")) {
+    if (masto.startsWith('http')) {
       socials.mastodon = masto;
-    } else if (masto.includes("@")) {
-      const parts = masto.replace(/^@/, "").split("@");
+    } else if (masto.includes('@')) {
+      const parts = masto.replace(/^@/, '').split('@');
       if (parts.length === 2) socials.mastodon = `https://${parts[1]}/@${parts[0]}`;
     }
   }
 
   // Clean up the body: remove Liquid tags, HTML, profile blocks
-  let body = about.body
-    .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, "")
-    .replace(/\{%.*?%\}/g, "")
-    .replace(/\{\{.*?\}\}/g, "")
-    .replace(/<[^>]*>/g, "")
+  const body = about.body
+    .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, '')
+    .replace(/\{%.*?%\}/g, '')
+    .replace(/\{\{.*?\}\}/g, '')
+    .replace(/<[^>]*>/g, '')
     .trim();
 
   // Build frontmatter manually for clean output
-  let fmStr = "---\n";
+  let fmStr = '---\n';
   fmStr += `name: ${escapeYamlString(fullName)}\n`;
   fmStr += `role: "pi"\n`;
-  fmStr += `title: ${escapeYamlString(subtitle || "Researcher")}\n`;
+  fmStr += `title: ${escapeYamlString(subtitle || 'Researcher')}\n`;
   if (profileImagePath) fmStr += `photo: ${escapeYamlString(profileImagePath)}\n`;
   if (config.email) fmStr += `email: ${escapeYamlString(config.email)}\n`;
   if (Object.keys(socials).length > 0) {
-    fmStr += "socials:\n";
+    fmStr += 'socials:\n';
     for (const [k, v] of Object.entries(socials)) {
       fmStr += `  ${k}: ${escapeYamlString(v)}\n`;
     }
   }
-  fmStr += "sortOrder: 1\n";
-  fmStr += "active: true\n";
-  fmStr += "---\n";
+  fmStr += 'sortOrder: 1\n';
+  fmStr += 'active: true\n';
+  fmStr += '---\n';
 
-  const outDir = path.join(ROOT, "src/content/people");
+  const outDir = path.join(ROOT, 'src/content/people');
   ensureDir(outDir);
   fs.writeFileSync(path.join(outDir, `${personSlug}.md`), `${fmStr}\n${body}\n`);
   console.log(`  Wrote src/content/people/${personSlug}.md`);
 }
 
 function writePublications(entries: BibEntry[], cloneDir: string): Map<string, string> {
-  const outDir = path.join(ROOT, "src/content/publications");
+  const outDir = path.join(ROOT, 'src/content/publications');
   ensureDir(outDir);
 
   const pubPreviews = new Map<string, string>();
 
   for (const entry of entries) {
     const { fields, type, key, raw } = entry;
-    const title = (fields.title || "Untitled").replace(/[{}]/g, "");
-    const authors = parseBibAuthors(fields.author || "");
-    const venue = fields.journal || fields.booktitle || "";
-    const year = parseInt(fields.year || "0", 10);
-    const doi = fields.doi || "";
-    const url = fields.url || fields.href || "";
-    const abstract = fields.abstract || "";
-    const featured = fields.selected === "true";
+    const title = (fields.title || 'Untitled').replace(/[{}]/g, '');
+    const authors = parseBibAuthors(fields.author || '');
+    const venue = fields.journal || fields.booktitle || '';
+    const year = parseInt(fields.year || '0', 10);
+    const doi = fields.doi || '';
+    const url = fields.url || fields.href || '';
+    const abstract = fields.abstract || '';
+    const featured = fields.selected === 'true';
     const pubType = mapPubType(type);
-    const preview = fields.preview || "";
+    const preview = fields.preview || '';
     const bibtex = cleanBibtexForStorage(raw);
 
-    const slug = slugify(key) || slugify(`${authors[0] || "unknown"}${year}${title.split(" ")[0] || ""}`);
+    const slug = slugify(key) || slugify(`${authors[0] || 'unknown'}${year}${title.split(' ')[0] || ''}`);
 
     // Track preview images
-    let imageRef = "";
+    let imageRef = '';
     if (preview) {
       pubPreviews.set(slug, preview);
       // Check if the image file actually exists before referencing it
       const previewPaths = [
-        path.join(cloneDir, "assets/img/publication_preview", preview),
-        path.join(cloneDir, "assets/img", preview),
+        path.join(cloneDir, 'assets/img/publication_preview', preview),
+        path.join(cloneDir, 'assets/img', preview),
       ];
       const exists = previewPaths.some((p) => fs.existsSync(p));
       if (exists) {
@@ -989,9 +1002,9 @@ function writePublications(entries: BibEntry[], cloneDir: string): Map<string, s
     }
 
     // Build frontmatter manually
-    let fm = "---\n";
+    let fm = '---\n';
     fm += `title: ${escapeYamlString(title)}\n`;
-    fm += "authors:\n";
+    fm += 'authors:\n';
     for (const a of authors) fm += `  - ${escapeYamlString(a)}\n`;
     fm += `venue: ${escapeYamlString(venue)}\n`;
     fm += `year: ${year}\n`;
@@ -1002,7 +1015,7 @@ function writePublications(entries: BibEntry[], cloneDir: string): Map<string, s
     if (abstract) fm += `abstract: ${escapeYamlString(abstract)}\n`;
     if (bibtex) fm += `bibtex: ${escapeYamlString(bibtex)}\n`;
     if (imageRef) fm += `image: ${escapeYamlString(imageRef)}\n`;
-    fm += "---\n";
+    fm += '---\n';
 
     fs.writeFileSync(path.join(outDir, `${slug}.md`), fm);
   }
@@ -1012,18 +1025,18 @@ function writePublications(entries: BibEntry[], cloneDir: string): Map<string, s
 }
 
 function writeAnnouncements(items: NewsItem[]): void {
-  const outDir = path.join(ROOT, "src/content/announcements");
+  const outDir = path.join(ROOT, 'src/content/announcements');
   ensureDir(outDir);
 
   for (const item of items) {
-    let fm = "---\n";
+    let fm = '---\n';
     fm += `title: ${escapeYamlString(item.title)}\n`;
     fm += `date: ${item.date}\n`;
     fm += `category: ${escapeYamlString(item.category)}\n`;
-    fm += "pinned: false\n";
-    fm += "featured: false\n";
+    fm += 'pinned: false\n';
+    fm += 'featured: false\n';
     if (item.excerpt) fm += `excerpt: ${escapeYamlString(item.excerpt)}\n`;
-    fm += "---\n";
+    fm += '---\n';
 
     fs.writeFileSync(path.join(outDir, `${item.slug}.md`), `${fm}\n${item.body}\n`);
   }
@@ -1034,35 +1047,35 @@ function writeAnnouncements(items: NewsItem[]): void {
 function writeProjectFiles(items: ProjectItem[], personSlug: string): void {
   if (items.length === 0) return;
 
-  const outDir = path.join(ROOT, "src/content/projects");
+  const outDir = path.join(ROOT, 'src/content/projects');
   ensureDir(outDir);
 
   for (const item of items) {
     const title = (item.data.title as string) || item.slug;
-    const desc = (item.data.description as string) || "";
+    const desc = (item.data.description as string) || '';
 
     // Clean body from Liquid tags
     const body = item.body
-      .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, "")
-      .replace(/\{%-?\s*include.*?%\}/g, "")
-      .replace(/\{%.*?%\}/g, "")
-      .replace(/\{\{.*?\}\}/g, "")
+      .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, '')
+      .replace(/\{%-?\s*include.*?%\}/g, '')
+      .replace(/\{%.*?%\}/g, '')
+      .replace(/\{\{.*?\}\}/g, '')
       .trim();
 
-    const excerpt = desc || body.split("\n\n")[0]?.slice(0, 200) || "";
-    const repoUrl = (item.data.github as string) || (item.data.repo_url as string) || "";
-    const url = (item.data.url as string) || (item.data.website as string) || "";
+    const excerpt = desc || body.split('\n\n')[0]?.slice(0, 200) || '';
+    const repoUrl = (item.data.github as string) || (item.data.repo_url as string) || '';
+    const url = (item.data.url as string) || (item.data.website as string) || '';
 
-    let fm = "---\n";
+    let fm = '---\n';
     fm += `title: ${escapeYamlString(title)}\n`;
     fm += `type: "other"\n`;
     fm += `status: "completed"\n`;
     if (url) fm += `url: ${escapeYamlString(url)}\n`;
     if (repoUrl) fm += `repoUrl: ${escapeYamlString(repoUrl)}\n`;
-    fm += "team:\n";
+    fm += 'team:\n';
     fm += `  - ${escapeYamlString(personSlug)}\n`;
     if (excerpt) fm += `excerpt: ${escapeYamlString(excerpt)}\n`;
-    fm += "---\n";
+    fm += '---\n';
 
     fs.writeFileSync(path.join(outDir, `${item.slug}.md`), `${fm}\n${body}\n`);
   }
@@ -1073,38 +1086,36 @@ function writeProjectFiles(items: ProjectItem[], personSlug: string): void {
 function writePostFiles(items: PostItem[], personSlug: string): void {
   if (items.length === 0) return;
 
-  const outDir = path.join(ROOT, "src/content/posts");
+  const outDir = path.join(ROOT, 'src/content/posts');
   ensureDir(outDir);
 
   for (const item of items) {
     const title = (item.data.title as string) || item.slug;
-    const dateStr = item.data.date
-      ? new Date(item.data.date as string).toISOString().split("T")[0]
-      : "2024-01-01";
+    const dateStr = item.data.date ? new Date(item.data.date as string).toISOString().split('T')[0] : '2024-01-01';
     const tags = (item.data.tags as string[]) || [];
-    const desc = (item.data.description as string) || "";
+    const desc = (item.data.description as string) || '';
 
     // Clean body from Liquid tags and HTML
     const body = item.body
-      .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, "")
-      .replace(/\{%-?\s*include.*?%\}/g, "")
-      .replace(/\{%.*?%\}/g, "")
-      .replace(/\{\{.*?\}\}/g, "")
+      .replace(/\{%-?\s*if.*?endif\s*-?%\}/gs, '')
+      .replace(/\{%-?\s*include.*?%\}/g, '')
+      .replace(/\{%.*?%\}/g, '')
+      .replace(/\{\{.*?\}\}/g, '')
       .trim();
 
-    const excerpt = desc || body.split("\n\n")[0]?.slice(0, 200) || "";
+    const excerpt = desc || body.split('\n\n')[0]?.slice(0, 200) || '';
 
-    let fm = "---\n";
+    let fm = '---\n';
     fm += `title: ${escapeYamlString(title)}\n`;
     fm += `date: ${dateStr}\n`;
     fm += `author: ${escapeYamlString(personSlug)}\n`;
     if (excerpt) fm += `excerpt: ${escapeYamlString(excerpt)}\n`;
     if (tags.length > 0) {
-      fm += "tags:\n";
+      fm += 'tags:\n';
       for (const t of tags) fm += `  - ${escapeYamlString(t)}\n`;
     }
-    fm += "draft: false\n";
-    fm += "---\n";
+    fm += 'draft: false\n';
+    fm += '---\n';
 
     fs.writeFileSync(path.join(outDir, `${item.slug}.md`), `${fm}\n${body}\n`);
   }
@@ -1115,15 +1126,15 @@ function writePostFiles(items: PostItem[], personSlug: string): void {
 // ─── Site config helpers ──────────────────────────────────────────────
 
 function readAlfolioRepoFromSiteConfig(): string {
-  const siteConfigPath = path.join(ROOT, "config", "site.yml");
+  const siteConfigPath = path.join(ROOT, 'config', 'site.yml');
   const raw = readFileOpt(siteConfigPath);
-  if (!raw) return "";
+  if (!raw) return '';
   const config = yaml.load(raw) as Record<string, unknown>;
-  return ((config?.alfolioRepo as string) || "").trim();
+  return ((config?.alfolioRepo as string) || '').trim();
 }
 
 function clearAlfolioRepoInSiteConfig(): void {
-  const siteConfigPath = path.join(ROOT, "config", "site.yml");
+  const siteConfigPath = path.join(ROOT, 'config', 'site.yml');
   const raw = readFileOpt(siteConfigPath);
   if (!raw) return;
   const updated = raw.replace(/^(alfolioRepo:\s*)".+"/m, '$1""');
@@ -1134,13 +1145,13 @@ function clearAlfolioRepoInSiteConfig(): void {
 
 async function main() {
   // 1. Parse args — CLI arg takes priority, then config/site.yml alfolioRepo
-  let repoUrl = process.argv[2] || "";
+  let repoUrl = process.argv[2] || '';
   if (!repoUrl) {
     repoUrl = readAlfolioRepoFromSiteConfig();
   }
   if (!repoUrl) {
-    console.error("Usage: pnpm migrate:al-folio <github-url>");
-    console.error("  Or set alfolioRepo in config/site.yml");
+    console.error('Usage: pnpm migrate:al-folio <github-url>');
+    console.error('  Or set alfolioRepo in config/site.yml');
     process.exit(1);
   }
 
@@ -1149,10 +1160,10 @@ async function main() {
 
   // 2. Clone repo to temp dir
   const cloneDir = path.join(tmpdir(), `al-folio-migrate-${Date.now()}`);
-  console.log("Step 1: Cloning repository...");
+  console.log('Step 1: Cloning repository...');
   try {
-    execFileSync("git", ["clone", "--depth", "1", repoUrl, cloneDir], {
-      stdio: "pipe",
+    execFileSync('git', ['clone', '--depth', '1', repoUrl, cloneDir], {
+      stdio: 'pipe',
       timeout: 60_000,
     });
     console.log(`  Cloned to ${cloneDir}`);
@@ -1164,22 +1175,23 @@ async function main() {
 
   try {
     // 3. Parse al-folio config
-    console.log("\nStep 2: Parsing al-folio content...");
+    console.log('\nStep 2: Parsing al-folio content...');
     const config = parseAlFolioConfig(cloneDir);
-    const fullName = [config.first_name, config.last_name].filter(Boolean).join(" ") || "Academic";
+    const fullName = [config.first_name, config.last_name].filter(Boolean).join(' ') || 'Academic';
     const personSlug = slugify(fullName);
     console.log(`  Name: ${fullName}`);
     console.log(`  Slug: ${personSlug}`);
 
     // 4. Parse about page
     const about = parseAboutPage(cloneDir);
-    const profileImage = (about.data.profile as Record<string, string>)?.image
-      || (config as Record<string, unknown>).profile_image as string
-      || undefined;
-    console.log(`  Profile image: ${profileImage || "(not found)"}`);
+    const profileImage =
+      (about.data.profile as Record<string, string>)?.image ||
+      ((config as Record<string, unknown>).profile_image as string) ||
+      undefined;
+    console.log(`  Profile image: ${profileImage || '(not found)'}`);
 
     // 5. Parse BibTeX
-    const bibRaw = readFileOpt(path.join(cloneDir, "_bibliography/papers.bib"));
+    const bibRaw = readFileOpt(path.join(cloneDir, '_bibliography/papers.bib'));
     const bibEntries = bibRaw ? parseBibTeX(bibRaw) : [];
     console.log(`  Publications: ${bibEntries.length}`);
 
@@ -1201,35 +1213,35 @@ async function main() {
 
     // 10. Parse resume
     const resume = parseResume(cloneDir);
-    console.log(`  Resume: ${resume ? "found" : "not found"}`);
+    console.log(`  Resume: ${resume ? 'found' : 'not found'}`);
 
     // 11. Parse nav pages
     const navItems = parseNavPages(cloneDir);
     console.log(`  Nav pages: ${navItems.length}`);
 
     // 12. Clean existing content first
-    console.log("\nStep 3: Cleaning existing example content...");
+    console.log('\nStep 3: Cleaning existing example content...');
     const removedCount = cleanExistingContent();
     console.log(`  Removed ${removedCount} example files`);
 
     // 13. Write publications to get preview image map
-    console.log("\nStep 4: Writing content files...");
+    console.log('\nStep 4: Writing content files...');
     const pubPreviews = writePublications(bibEntries, cloneDir);
 
     // 14. Copy images
-    console.log("\nStep 5: Copying images...");
+    console.log('\nStep 5: Copying images...');
     const { profileDest, pubCount } = copyImages(cloneDir, profileImage, pubPreviews);
     console.log(`  Publication preview images: ${pubCount}`);
 
     // 14b. Copy CNAME if present
-    const cnameSrc = path.join(cloneDir, "CNAME");
+    const cnameSrc = path.join(cloneDir, 'CNAME');
     if (fs.existsSync(cnameSrc)) {
-      fs.copyFileSync(cnameSrc, path.join(ROOT, "public", "CNAME"));
-      console.log("  Copied CNAME file");
+      fs.copyFileSync(cnameSrc, path.join(ROOT, 'public', 'CNAME'));
+      console.log('  Copied CNAME file');
     }
 
     // 15. Write all config and content
-    console.log("\nStep 6: Writing config files...");
+    console.log('\nStep 6: Writing config files...');
     writeSiteConfig(config, about, repos, navItems, profileDest, personSlug);
     writeScholarConfig(config, fullName);
     writeFeedsConfig(config, personSlug);
@@ -1237,34 +1249,34 @@ async function main() {
     writeResearchConfig(config);
 
     // 15b. Sync RSS feeds to populate src/data/feeds.json with real data
-    console.log("\n  Syncing RSS feeds...");
+    console.log('\n  Syncing RSS feeds...');
     try {
-      execFileSync(
-        process.execPath,
-        ["--import", "tsx", path.join(ROOT, "scripts/sync-feeds.ts")],
-        { cwd: ROOT, stdio: "pipe", timeout: 30_000 },
-      );
-      console.log("  Feeds synced successfully");
+      execFileSync(process.execPath, ['--import', 'tsx', path.join(ROOT, 'scripts/sync-feeds.ts')], {
+        cwd: ROOT,
+        stdio: 'pipe',
+        timeout: 30_000,
+      });
+      console.log('  Feeds synced successfully');
     } catch {
-      console.warn("  Warning: Feed sync failed (will retry via GitHub Actions)");
+      console.warn('  Warning: Feed sync failed (will retry via GitHub Actions)');
     }
 
-    console.log("\nStep 7: Writing remaining content...");
+    console.log('\nStep 7: Writing remaining content...');
     writePerson(config, about, profileDest, personSlug);
     writeAnnouncements(newsItems);
     writeProjectFiles(projects, personSlug);
     writePostFiles(posts, personSlug);
 
     // 16. Summary
-    console.log("\nMigration complete!\n");
-    console.log("Summary:");
+    console.log('\nMigration complete!\n');
+    console.log('Summary:');
     console.log(`  Person:          ${fullName} (${personSlug})`);
     console.log(`  Publications:    ${bibEntries.length}`);
     console.log(`  Announcements:   ${newsItems.length}`);
     console.log(`  Projects:        ${projects.length}`);
     console.log(`  Blog posts:      ${posts.length}`);
     console.log(`  Pub images:      ${pubCount}`);
-    console.log(`  Profile photo:   ${profileDest ? "yes" : "no"}`);
+    console.log(`  Profile photo:   ${profileDest ? 'yes' : 'no'}`);
     console.log(`  Example files:   ${removedCount} removed`);
     // Clear alfolioRepo so the migration doesn't re-run
     clearAlfolioRepoInSiteConfig();
@@ -1275,7 +1287,7 @@ async function main() {
     console.log(`  3. Run: pnpm dev`);
   } finally {
     // 17. Cleanup temp dir
-    console.log("\nCleaning up temp directory...");
+    console.log('\nCleaning up temp directory...');
     fs.rmSync(cloneDir, { recursive: true, force: true });
   }
 }

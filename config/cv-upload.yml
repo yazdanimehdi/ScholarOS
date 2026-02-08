@@ -3,4 +3,4 @@
 # When enabled, this takes priority over the structured CV form fields in config/cv.yml.
 
 enabled: false
-content: ""
+content: ''

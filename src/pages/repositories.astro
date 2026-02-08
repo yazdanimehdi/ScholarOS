@@ -17,23 +17,21 @@ const { username, stats, trophies, pinnedRepos } = github;
 const statsBase = (github.statsBaseUrl ?? 'https://github-readme-stats.vercel.app').replace(/\/$/, '');
 const trophyBase = (github.trophyBaseUrl ?? 'https://github-profile-trophy.vercel.app').replace(/\/$/, '');
 
-const statsUrl = (user: string, theme: string) =>
-  `${statsBase}/api?username=${user}&show_icons=true&theme=${theme}`;
+const statsUrl = (user: string, theme: string) => `${statsBase}/api?username=${user}&show_icons=true&theme=${theme}`;
 const langsUrl = (user: string, theme: string) =>
   `${statsBase}/api/top-langs/?username=${user}&layout=compact&theme=${theme}`;
 const repoUrl = (user: string, repo: string, theme: string) =>
   `${statsBase}/api/pin/?username=${user}&repo=${repo}&theme=${theme}`;
-const trophyUrl = (theme: string) =>
-  `${trophyBase}/?username=${username}&theme=${theme}&no-frame=true&column=-1`;
+const trophyUrl = (theme: string) => `${trophyBase}/?username=${username}&theme=${theme}&no-frame=true&column=-1`;
 
 const lightTheme = 'default';
 const darkTheme = 'github_dark';
 
 // Get all active people who have a GitHub link
 const members = (await getCollection('people'))
-  .filter(p => p.data.active && p.data.socials?.github)
+  .filter((p) => p.data.active && p.data.socials?.github)
   .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
-  .map(p => ({
+  .map((p) => ({
     name: p.data.name,
     role: p.data.role,
     title: p.data.title,
@@ -41,109 +39,169 @@ const members = (await getCollection('people'))
     githubUsername: extractGitHubUsername(p.data.socials!.github!),
     githubUrl: p.data.socials!.github!,
   }))
-  .filter(m => m.githubUsername !== null);
+  .filter((m) => m.githubUsername !== null);
 ---
 
-<PageLayout title="Repositories" description={personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
-    Repositories
-  </h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-8">
-    {personal ? "My open-source projects and GitHub activity." : "Our open-source projects and GitHub activity."}
+<PageLayout
+  title="Repositories"
+  description={personal
+    ? 'My open-source projects and GitHub activity.'
+    : 'Our open-source projects and GitHub activity.'}
+>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">Repositories</h1>
+  <p class="mb-8 text-sm text-surface-500 dark:text-dm-muted">
+    {personal ? 'My open-source projects and GitHub activity.' : 'Our open-source projects and GitHub activity.'}
   </p>
 
   {/* GitHub Stats */}
-  {stats && (
-    <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        GitHub Stats
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <img class="dark:hidden w-full" src={statsUrl(username, lightTheme)} alt="GitHub Stats" loading="lazy" />
-          <img class="hidden dark:block w-full" src={statsUrl(username, darkTheme)} alt="GitHub Stats" loading="lazy" />
+  {
+    stats && (
+      <section class="mb-10">
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          GitHub Stats
+        </h2>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <img class="w-full dark:hidden" src={statsUrl(username, lightTheme)} alt="GitHub Stats" loading="lazy" />
+            <img
+              class="hidden w-full dark:block"
+              src={statsUrl(username, darkTheme)}
+              alt="GitHub Stats"
+              loading="lazy"
+            />
+          </div>
+          <div>
+            <img class="w-full dark:hidden" src={langsUrl(username, lightTheme)} alt="Top Languages" loading="lazy" />
+            <img
+              class="hidden w-full dark:block"
+              src={langsUrl(username, darkTheme)}
+              alt="Top Languages"
+              loading="lazy"
+            />
+          </div>
         </div>
-        <div>
-          <img class="dark:hidden w-full" src={langsUrl(username, lightTheme)} alt="Top Languages" loading="lazy" />
-          <img class="hidden dark:block w-full" src={langsUrl(username, darkTheme)} alt="Top Languages" loading="lazy" />
-        </div>
-      </div>
-    </section>
-  )}
+      </section>
+    )
+  }
 
   {/* Trophies */}
-  {trophies && (
-    <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        Trophies
-      </h2>
-      <div class="overflow-x-auto">
-        <img class="dark:hidden w-full" src={trophyUrl(lightTheme)} alt="GitHub Trophies" loading="lazy" />
-        <img class="hidden dark:block w-full" src={trophyUrl(darkTheme)} alt="GitHub Trophies" loading="lazy" />
-      </div>
-    </section>
-  )}
+  {
+    trophies && (
+      <section class="mb-10">
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Trophies
+        </h2>
+        <div class="overflow-x-auto">
+          <img class="w-full dark:hidden" src={trophyUrl(lightTheme)} alt="GitHub Trophies" loading="lazy" />
+          <img class="hidden w-full dark:block" src={trophyUrl(darkTheme)} alt="GitHub Trophies" loading="lazy" />
+        </div>
+      </section>
+    )
+  }
 
   {/* Pinned Repositories */}
-  {pinnedRepos && pinnedRepos.length > 0 && (
-    <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        Pinned Repositories
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {pinnedRepos.map((repo) => (
-          <a href={`https://github.com/${username}/${repo}`} target="_blank" rel="noopener noreferrer" class="block">
-            <img class="dark:hidden w-full" src={repoUrl(username, repo, lightTheme)} alt={repo} loading="lazy" />
-            <img class="hidden dark:block w-full" src={repoUrl(username, repo, darkTheme)} alt={repo} loading="lazy" />
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
+  {
+    pinnedRepos && pinnedRepos.length > 0 && (
+      <section class="mb-10">
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Pinned Repositories
+        </h2>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {pinnedRepos.map((repo) => (
+            <a href={`https://github.com/${username}/${repo}`} target="_blank" rel="noopener noreferrer" class="block">
+              <img class="w-full dark:hidden" src={repoUrl(username, repo, lightTheme)} alt={repo} loading="lazy" />
+              <img
+                class="hidden w-full dark:block"
+                src={repoUrl(username, repo, darkTheme)}
+                alt={repo}
+                loading="lazy"
+              />
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   {/* Team Members */}
-  {!personal && members.length > 0 && (
-    <section class="mb-10">
-      <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading pb-2 border-b border-surface-200 dark:border-dm-border mb-4">
-        Team Members
-      </h2>
-      <div class="space-y-8">
-        {members.map((member) => (
-          <div>
-            <div class="flex items-center gap-3 mb-3">
-              <a href={`/people/${member.id}`} class="text-sm font-medium text-surface-900 dark:text-dm-heading hover:text-primary-600 dark:hover:text-accent-400 transition-colors">
-                {member.name}
-              </a>
-              <span class="text-xs text-surface-400 dark:text-dm-faint">{member.title || getRoleName(member.role)}</span>
-              <a href={member.githubUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-primary-600 dark:text-accent-400 hover:underline">
-                @{member.githubUsername}
-              </a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <img class="dark:hidden w-full" src={statsUrl(member.githubUsername!, lightTheme)} alt={`${member.name} GitHub Stats`} loading="lazy" />
-                <img class="hidden dark:block w-full" src={statsUrl(member.githubUsername!, darkTheme)} alt={`${member.name} GitHub Stats`} loading="lazy" />
+  {
+    !personal && members.length > 0 && (
+      <section class="mb-10">
+        <h2 class="mb-4 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          Team Members
+        </h2>
+        <div class="space-y-8">
+          {members.map((member) => (
+            <div>
+              <div class="mb-3 flex items-center gap-3">
+                <a
+                  href={`/people/${member.id}`}
+                  class="text-sm font-medium text-surface-900 transition-colors hover:text-primary-600 dark:text-dm-heading dark:hover:text-accent-400"
+                >
+                  {member.name}
+                </a>
+                <span class="text-xs text-surface-400 dark:text-dm-faint">
+                  {member.title || getRoleName(member.role)}
+                </span>
+                <a
+                  href={member.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-primary-600 hover:underline dark:text-accent-400"
+                >
+                  @{member.githubUsername}
+                </a>
               </div>
-              <div>
-                <img class="dark:hidden w-full" src={langsUrl(member.githubUsername!, lightTheme)} alt={`${member.name} Top Languages`} loading="lazy" />
-                <img class="hidden dark:block w-full" src={langsUrl(member.githubUsername!, darkTheme)} alt={`${member.name} Top Languages`} loading="lazy" />
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <img
+                    class="w-full dark:hidden"
+                    src={statsUrl(member.githubUsername!, lightTheme)}
+                    alt={`${member.name} GitHub Stats`}
+                    loading="lazy"
+                  />
+                  <img
+                    class="hidden w-full dark:block"
+                    src={statsUrl(member.githubUsername!, darkTheme)}
+                    alt={`${member.name} GitHub Stats`}
+                    loading="lazy"
+                  />
+                </div>
+                <div>
+                  <img
+                    class="w-full dark:hidden"
+                    src={langsUrl(member.githubUsername!, lightTheme)}
+                    alt={`${member.name} Top Languages`}
+                    loading="lazy"
+                  />
+                  <img
+                    class="hidden w-full dark:block"
+                    src={langsUrl(member.githubUsername!, darkTheme)}
+                    alt={`${member.name} Top Languages`}
+                    loading="lazy"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  )}
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   {/* GitHub Profile Link */}
-  <div class="text-center pt-4 border-t border-surface-200 dark:border-dm-border">
+  <div class="border-t border-surface-200 pt-4 text-center dark:border-dm-border">
     <a
       href={`https://github.com/${username}`}
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex items-center gap-2 text-sm text-primary-600 dark:text-accent-400 hover:underline"
+      class="inline-flex items-center gap-2 text-sm text-primary-600 hover:underline dark:text-accent-400"
     >
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"
+        ><path
+          d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+        ></path></svg
+      >
       View full profile on GitHub
     </a>
   </div>

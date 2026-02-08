@@ -6,14 +6,14 @@ import { getImage } from 'astro:assets';
 
 export async function getStaticPaths() {
   const announcements = await getCollection('announcements');
-  const categories = [...new Set(announcements.map(a => a.data.category))];
+  const categories = [...new Set(announcements.map((a) => a.data.category))];
 
-  return categories.map(category => ({
+  return categories.map((category) => ({
     params: { category },
     props: {
       category,
       announcements: announcements
-        .filter(a => a.data.category === category)
+        .filter((a) => a.data.category === category)
         .sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
     },
   }));
@@ -21,63 +21,69 @@ export async function getStaticPaths() {
 
 const { category, announcements: announcementsRaw } = Astro.props;
 
-const announcements = await Promise.all(announcementsRaw.map(async (a: any) => {
-  let imageUrl: string | undefined;
-  if (a.data.image) {
-    const resolved = await getImage({ src: a.data.image, width: 200 });
-    imageUrl = resolved.src;
-  }
-  return { ...a, imageUrl };
-}));
+const announcements = await Promise.all(
+  announcementsRaw.map(async (a: any) => {
+    let imageUrl: string | undefined;
+    if (a.data.image) {
+      const resolved = await getImage({ src: a.data.image, width: 200 });
+      imageUrl = resolved.src;
+    }
+    return { ...a, imageUrl };
+  }),
+);
 
 const allAnnouncements = await getCollection('announcements');
-const categories = [...new Set(allAnnouncements.map(a => a.data.category))].sort();
+const categories = [...new Set(allAnnouncements.map((a) => a.data.category))].sort();
 ---
 
 <PageLayout title={`News: ${category}`} description={`News in the ${category} category.`}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2 capitalize">
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 capitalize sm:text-3xl dark:text-dm-heading">
     {category} News
   </h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
+  <p class="mb-6 text-sm text-surface-500 dark:text-dm-muted">
     {announcements.length} announcement{announcements.length !== 1 ? 's' : ''} in this category.
   </p>
 
   <!-- Category filters -->
-  <div class="flex flex-wrap items-center gap-1 mb-6 text-sm">
-    <span class="text-surface-400 dark:text-dm-faint me-1">Filter:</span>
+  <div class="mb-6 flex flex-wrap items-center gap-1 text-sm">
+    <span class="me-1 text-surface-400 dark:text-dm-faint">Filter:</span>
     <a
       href="/news"
-      class="px-2 py-1 text-surface-500 dark:text-dm-muted hover:text-surface-700 dark:hover:text-[#c9d1d9] border-b-2 border-transparent transition-colors"
+      class="border-b-2 border-transparent px-2 py-1 text-surface-500 transition-colors hover:text-surface-700 dark:text-dm-muted dark:hover:text-[#c9d1d9]"
     >
       All
     </a>
-    {categories.map(cat => (
-      <a
-        href={`/news/category/${cat}`}
-        class:list={[
-          'px-2 py-1 capitalize border-b-2 transition-colors',
-          cat === category
-            ? 'font-medium text-primary-600 dark:text-accent-400 border-primary-600 dark:border-accent-400'
-            : 'text-surface-500 dark:text-dm-muted hover:text-surface-700 dark:hover:text-[#c9d1d9] border-transparent',
-        ]}
-      >
-        {cat}
-      </a>
-    ))}
+    {
+      categories.map((cat) => (
+        <a
+          href={`/news/category/${cat}`}
+          class:list={[
+            'border-b-2 px-2 py-1 capitalize transition-colors',
+            cat === category
+              ? 'border-primary-600 font-medium text-primary-600 dark:border-accent-400 dark:text-accent-400'
+              : 'border-transparent text-surface-500 hover:text-surface-700 dark:text-dm-muted dark:hover:text-[#c9d1d9]',
+          ]}
+        >
+          {cat}
+        </a>
+      ))
+    }
   </div>
 
   <div class="divide-y divide-surface-100 dark:divide-dm-border">
-    {announcements.map(a => (
-      <AnnouncementCard
-        id={a.id}
-        title={a.data.title}
-        date={a.data.date}
-        category={a.data.category}
-        excerpt={a.data.excerpt}
-        pinned={a.data.pinned}
-        image={a.imageUrl}
-        emoji={a.data.emoji}
-      />
-    ))}
+    {
+      announcements.map((a) => (
+        <AnnouncementCard
+          id={a.id}
+          title={a.data.title}
+          date={a.data.date}
+          category={a.data.category}
+          excerpt={a.data.excerpt}
+          pinned={a.data.pinned}
+          image={a.imageUrl}
+          emoji={a.data.emoji}
+        />
+      ))
+    }
   </div>
 </PageLayout>

@@ -1,8 +1,8 @@
 ---
-title: "Undergraduate Research Assistant"
+title: 'Undergraduate Research Assistant'
 type: undergrad
 status: closed
-excerpt: "Research assistant opportunity for undergraduates interested in machine learning and NLP. Academic year and summer positions."
+excerpt: 'Research assistant opportunity for undergraduates interested in machine learning and NLP. Academic year and summer positions.'
 tags:
   - undergraduate
   - research-experience

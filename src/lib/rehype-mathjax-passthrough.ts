@@ -25,14 +25,9 @@ export function rehypeMathJaxPassthrough() {
         node.children[0].tagName === 'code'
       ) {
         const code = node.children[0];
-        const classes = Array.isArray(code.properties?.className)
-          ? code.properties.className
-          : [];
+        const classes = Array.isArray(code.properties?.className) ? code.properties.className : [];
 
-        if (
-          classes.includes('language-math') &&
-          classes.includes('math-display')
-        ) {
+        if (classes.includes('language-math') && classes.includes('math-display')) {
           const mathText = extractText(code);
           if (parent && typeof index === 'number') {
             parent.children[index] = {
@@ -49,14 +44,9 @@ export function rehypeMathJaxPassthrough() {
     // Handle inline math: <code class="language-math math-inline">
     visit(tree, 'element', (node, index, parent) => {
       if (node.tagName === 'code') {
-        const classes = Array.isArray(node.properties?.className)
-          ? node.properties.className
-          : [];
+        const classes = Array.isArray(node.properties?.className) ? node.properties.className : [];
 
-        if (
-          classes.includes('language-math') &&
-          classes.includes('math-inline')
-        ) {
+        if (classes.includes('language-math') && classes.includes('math-inline')) {
           const mathText = extractText(node);
           if (parent && typeof index === 'number') {
             parent.children[index] = {

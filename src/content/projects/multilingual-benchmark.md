@@ -1,19 +1,19 @@
 ---
-title: "MultiLingual Benchmark"
-type: "dataset"
-status: "active"
-url: "https://huggingface.co/datasets/example-lab/ml-bench"
-repoUrl: "https://github.com/example-lab/ml-bench"
+title: 'MultiLingual Benchmark'
+type: 'dataset'
+status: 'active'
+url: 'https://huggingface.co/datasets/example-lab/ml-bench'
+repoUrl: 'https://github.com/example-lab/ml-bench'
 team:
-  - "jane-smith"
-  - "maria-garcia"
+  - 'jane-smith'
+  - 'maria-garcia'
 tags:
-  - "Benchmark"
-  - "Multilingual"
-  - "Evaluation"
-  - "Dataset"
+  - 'Benchmark'
+  - 'Multilingual'
+  - 'Evaluation'
+  - 'Dataset'
 startDate: 2024-03-01
-excerpt: "A comprehensive benchmark for evaluating multilingual NLP models across 50+ languages."
+excerpt: 'A comprehensive benchmark for evaluating multilingual NLP models across 50+ languages.'
 ---
 
 ## Overview
@@ -22,13 +22,13 @@ MultiLingual Benchmark (ML-Bench) is a comprehensive evaluation suite for multil
 
 ## Tasks
 
-| Task | Languages | Metric |
-|------|-----------|--------|
-| Text Classification | 52 | F1 Score |
-| Named Entity Recognition | 40 | Entity F1 |
-| Question Answering | 35 | Exact Match / F1 |
-| Machine Translation | 28 pairs | BLEU / COMET |
-| Summarization | 20 | ROUGE-L |
+| Task                     | Languages | Metric           |
+| ------------------------ | --------- | ---------------- |
+| Text Classification      | 52        | F1 Score         |
+| Named Entity Recognition | 40        | Entity F1        |
+| Question Answering       | 35        | Exact Match / F1 |
+| Machine Translation      | 28 pairs  | BLEU / COMET     |
+| Summarization            | 20        | ROUGE-L          |
 
 ## Key Properties
 

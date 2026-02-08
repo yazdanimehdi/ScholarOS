@@ -1,17 +1,17 @@
 ---
-name: "Maria Garcia"
-role: "phd"
-title: "PhD Student"
-photo: "../../assets/images/people/placeholder-avatar.svg"
-email: "maria.garcia@example.com"
+name: 'Maria Garcia'
+role: 'phd'
+title: 'PhD Student'
+photo: '../../assets/images/people/placeholder-avatar.svg'
+email: 'maria.garcia@example.com'
 socials:
-  github: "https://github.com/mariagarcia"
-  twitter: "https://twitter.com/mariagarcia_ml"
-  linkedin: "https://linkedin.com/in/mariagarcia"
+  github: 'https://github.com/mariagarcia'
+  twitter: 'https://twitter.com/mariagarcia_ml'
+  linkedin: 'https://linkedin.com/in/mariagarcia'
 researchInterests:
-  - "Reinforcement Learning"
-  - "Robotics"
-  - "AI Safety"
+  - 'Reinforcement Learning'
+  - 'Robotics'
+  - 'AI Safety'
 startDate: 2022-09-01
 sortOrder: 20
 active: true

@@ -33,63 +33,73 @@ const darkBg = hero.dark?.bgColor ?? '#0d1117';
 >
   {/* Background layer */}
   <div class="absolute inset-0 z-0">
-    {hero.type === 'none' && (
-      <>
-        <div class="absolute inset-0 dark:hidden" style={`background-color: ${lightBg};`}></div>
-        <div class="absolute inset-0 hidden dark:block" style={`background-color: ${darkBg};`}></div>
-      </>
-    )}
+    {
+      hero.type === 'none' && (
+        <>
+          <div class="absolute inset-0 dark:hidden" style={`background-color: ${lightBg};`} />
+          <div class="absolute inset-0 hidden dark:block" style={`background-color: ${darkBg};`} />
+        </>
+      )
+    }
 
-    {hero.type === 'image' && (
-      <HeroBgImage light={hero.light} dark={hero.dark} />
-    )}
+    {hero.type === 'image' && <HeroBgImage light={hero.light} dark={hero.dark} />}
 
-    {hero.type === 'video' && hero.video && (
-      <HeroBgVideo video={hero.video} />
-    )}
+    {hero.type === 'video' && hero.video && <HeroBgVideo video={hero.video} />}
 
-    {hero.type === 'pattern' && hero.pattern && (
-      <HeroBgPattern name={hero.pattern.name} light={hero.light} dark={hero.dark} />
-    )}
+    {
+      hero.type === 'pattern' && hero.pattern && (
+        <HeroBgPattern name={hero.pattern.name} light={hero.light} dark={hero.dark} />
+      )
+    }
 
-    {hero.type === 'animation' && hero.animation && (
-      <HeroBgAnimation
-        client:load
-        preset={hero.animation.preset}
-        customScript={hero.animation.customScript || undefined}
-        lightBgColor={lightBg}
-        darkBgColor={darkBg}
-      />
-    )}
+    {
+      hero.type === 'animation' && hero.animation && (
+        <HeroBgAnimation
+          client:load
+          preset={hero.animation.preset}
+          customScript={hero.animation.customScript || undefined}
+          lightBgColor={lightBg}
+          darkBgColor={darkBg}
+        />
+      )
+    }
   </div>
 
   {/* Foreground content */}
-  <div class="relative z-10 max-w-[930px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
-    <h1 class="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-normal text-surface-900 dark:text-dm-heading leading-tight mb-4">
+  <div class="relative z-10 mx-auto max-w-[930px] px-4 py-12 sm:px-6 sm:py-16">
+    <h1
+      class="mb-4 font-serif text-3xl leading-tight font-normal text-surface-900 sm:text-4xl lg:text-[2.75rem] dark:text-dm-heading"
+    >
       {title}
     </h1>
-    {subtitle && (
-      <p class="text-base sm:text-lg text-surface-500 dark:text-dm-muted mb-6 max-w-2xl leading-relaxed">
-        {subtitle}
-      </p>
-    )}
+    {
+      subtitle && (
+        <p class="mb-6 max-w-2xl text-base leading-relaxed text-surface-500 sm:text-lg dark:text-dm-muted">
+          {subtitle}
+        </p>
+      )
+    }
     <div class="flex flex-wrap gap-3">
-      {ctaText && ctaHref && (
-        <a
-          href={ctaHref}
-          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-primary-600 dark:bg-accent-600 text-white hover:bg-primary-700 dark:hover:bg-accent-500 transition-colors"
-        >
-          {ctaText}
-        </a>
-      )}
-      {secondaryCtaText && secondaryCtaHref && (
-        <a
-          href={secondaryCtaHref}
-          class="inline-flex items-center px-4 py-2 text-sm font-medium rounded border border-surface-300 dark:border-dm-border-alt text-surface-700 dark:text-dm-text hover:border-surface-400 dark:hover:border-[#8b949e] hover:text-surface-900 dark:hover:text-white transition-colors"
-        >
-          {secondaryCtaText}
-        </a>
-      )}
+      {
+        ctaText && ctaHref && (
+          <a
+            href={ctaHref}
+            class="inline-flex items-center rounded bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-accent-600 dark:hover:bg-accent-500"
+          >
+            {ctaText}
+          </a>
+        )
+      }
+      {
+        secondaryCtaText && secondaryCtaHref && (
+          <a
+            href={secondaryCtaHref}
+            class="inline-flex items-center rounded border border-surface-300 px-4 py-2 text-sm font-medium text-surface-700 transition-colors hover:border-surface-400 hover:text-surface-900 dark:border-dm-border-alt dark:text-dm-text dark:hover:border-[#8b949e] dark:hover:text-white"
+          >
+            {secondaryCtaText}
+          </a>
+        )
+      }
     </div>
   </div>
 </section>

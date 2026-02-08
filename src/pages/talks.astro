@@ -15,52 +15,60 @@ const talks = (await getCollection('talks')).sort((a, b) => {
 });
 ---
 
-<PageLayout title="Talks & Presentations" description={personal ? "Recent talks, invited lectures, and tutorials." : "Recent talks, presentations, and tutorials by our lab members."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">Talks & Presentations</h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
-    {personal ? "Recent talks, invited lectures, and tutorials." : "Recent talks, invited lectures, and tutorials by our lab members."}
+<PageLayout
+  title="Talks & Presentations"
+  description={personal
+    ? 'Recent talks, invited lectures, and tutorials.'
+    : 'Recent talks, presentations, and tutorials by our lab members.'}
+>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
+    Talks & Presentations
+  </h1>
+  <p class="mb-6 text-sm text-surface-500 dark:text-dm-muted">
+    {
+      personal
+        ? 'Recent talks, invited lectures, and tutorials.'
+        : 'Recent talks, invited lectures, and tutorials by our lab members.'
+    }
   </p>
 
   <div class="divide-y divide-surface-100 dark:divide-dm-border">
-    {talks.map(talk => (
-      <div class="py-4 first:pt-0">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs text-surface-400 dark:text-dm-faint uppercase tracking-wide">
-                {talk.data.type}
-              </span>
+    {
+      talks.map((talk) => (
+        <div class="py-4 first:pt-0">
+          <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+            <div class="flex-1">
+              <div class="mb-1 flex items-center gap-2">
+                <span class="text-xs tracking-wide text-surface-400 uppercase dark:text-dm-faint">
+                  {talk.data.type}
+                </span>
+              </div>
+              <h3 class="mb-0.5 text-base font-medium text-surface-900 dark:text-dm-heading">{talk.data.title}</h3>
+              <p class="text-sm text-surface-500 dark:text-dm-muted">
+                {talk.data.event}
+                {talk.data.location && <> &middot; {talk.data.location}</>}
+              </p>
+              <p class="mt-0.5 text-xs text-surface-400 dark:text-dm-faint">{talk.data.date}</p>
             </div>
-            <h3 class="text-base font-medium text-surface-900 dark:text-dm-heading mb-0.5">{talk.data.title}</h3>
-            <p class="text-sm text-surface-500 dark:text-dm-muted">
-              {talk.data.event}{talk.data.location && <> &middot; {talk.data.location}</>}
-            </p>
-            <p class="text-xs text-surface-400 dark:text-dm-faint mt-0.5">{talk.data.date}</p>
-          </div>
 
-          <div class="flex gap-2 shrink-0 text-xs">
-            {talk.data.slidesUrl && (
-              <a
-                href={talk.data.slidesUrl}
-                class="text-primary-600 dark:text-accent-400 hover:underline"
-              >
-                Slides
-              </a>
-            )}
-            {talk.data.slidesUrl && talk.data.videoUrl && (
-              <span class="text-surface-300 dark:text-dm-border-alt">|</span>
-            )}
-            {talk.data.videoUrl && (
-              <a
-                href={talk.data.videoUrl}
-                class="text-primary-600 dark:text-accent-400 hover:underline"
-              >
-                Video
-              </a>
-            )}
+            <div class="flex shrink-0 gap-2 text-xs">
+              {talk.data.slidesUrl && (
+                <a href={talk.data.slidesUrl} class="text-primary-600 hover:underline dark:text-accent-400">
+                  Slides
+                </a>
+              )}
+              {talk.data.slidesUrl && talk.data.videoUrl && (
+                <span class="text-surface-300 dark:text-dm-border-alt">|</span>
+              )}
+              {talk.data.videoUrl && (
+                <a href={talk.data.videoUrl} class="text-primary-600 hover:underline dark:text-accent-400">
+                  Video
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    ))}
+      ))
+    }
   </div>
 </PageLayout>

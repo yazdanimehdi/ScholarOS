@@ -15,23 +15,25 @@ interface Props {
 const { id, title, date, category, excerpt, pinned, image, emoji } = Astro.props;
 ---
 
-<a href={`/news/${id}`} class="block group py-2" title={title}>
+<a href={`/news/${id}`} class="group block py-2" title={title}>
   <div class="flex items-start gap-2">
-    {emoji ? (
-      <span class="shrink-0 mt-0.5 w-7 h-7 flex items-center justify-center text-lg leading-none">{emoji}</span>
-    ) : image ? (
-      <img src={image} alt="" class="shrink-0 mt-0.5 w-7 h-7 rounded object-cover" loading="lazy" />
-    ) : (
-      <span class="news-bullet shrink-0 mt-1.5 text-sm"></span>
-    )}
+    {
+      emoji ? (
+        <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-lg leading-none">{emoji}</span>
+      ) : image ? (
+        <img src={image} alt="" class="mt-0.5 h-7 w-7 shrink-0 rounded object-cover" loading="lazy" />
+      ) : (
+        <span class="news-bullet mt-1.5 shrink-0 text-sm" />
+      )
+    }
     <div class="min-w-0">
-      <span class="text-sm font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors line-clamp-1">
+      <span
+        class="line-clamp-1 text-sm font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400"
+      >
         {title}
       </span>
-      {pinned && (
-        <span class="ms-1 text-xs text-primary-600 dark:text-accent-400">📌</span>
-      )}
-      <div class="text-xs text-surface-500 dark:text-dm-muted mt-0.5">
+      {pinned && <span class="ms-1 text-xs text-primary-600 dark:text-accent-400">📌</span>}
+      <div class="mt-0.5 text-xs text-surface-500 dark:text-dm-muted">
         {formatShortDate(date)}
       </div>
     </div>

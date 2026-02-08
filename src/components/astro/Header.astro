@@ -11,19 +11,23 @@ const siteName = getSiteName();
 const searchItems = await getSearchItems();
 ---
 
-<header class="w-full bg-white/95 dark:bg-dm/95 backdrop-blur-sm border-b border-surface-200 dark:border-dm-border">
-  <div class="max-w-[930px] mx-auto px-4 sm:px-6">
+<header class="w-full border-b border-surface-200 bg-white/95 backdrop-blur-sm dark:border-dm-border dark:bg-dm/95">
+  <div class="mx-auto max-w-[930px] px-4 sm:px-6">
     <div class="flex h-16 items-center justify-between">
       <!-- Logo / Lab name -->
-      <a href="/" class="shrink-0 whitespace-nowrap text-base font-medium text-surface-900 dark:text-dm-heading hover:text-primary-600 dark:hover:text-accent-400 transition-colors me-6" data-nav-logo>
+      <a
+        href="/"
+        class="me-6 shrink-0 text-base font-medium whitespace-nowrap text-surface-900 transition-colors hover:text-primary-600 dark:text-dm-heading dark:hover:text-accent-400"
+        data-nav-logo
+      >
         {siteName}
       </a>
 
       <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-1 min-w-0">
+      <div class="hidden min-w-0 items-center gap-1 md:flex">
         <Nav />
         <SearchDialog client:load items={searchItems} />
-        <div class="ms-2 ps-2 border-s border-surface-200 dark:border-dm-border">
+        <div class="ms-2 border-s border-surface-200 ps-2 dark:border-dm-border">
           <ThemeToggle client:only="vue" />
         </div>
       </div>
@@ -32,11 +36,11 @@ const searchItems = await getSearchItems();
       <div class="flex items-center gap-1 md:hidden">
         <button
           id="mobile-search-btn"
-          class="p-2 text-surface-500 dark:text-dm-muted hover:text-surface-700 dark:hover:text-dm-text transition-colors"
+          class="p-2 text-surface-500 transition-colors hover:text-surface-700 dark:text-dm-muted dark:hover:text-dm-text"
           aria-label="Search"
         >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </button>
         <ThemeToggle client:only="vue" />

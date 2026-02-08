@@ -13,8 +13,8 @@ function palette(hex: string, prefix: string): Record<string, string> {
     300: 55,
     400: 35,
     500: 15,
-    600: 0,   // base color
-    700: 0,   // darken
+    600: 0, // base color
+    700: 0, // darken
     800: 0,
     900: 0,
     950: 0,

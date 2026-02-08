@@ -9,11 +9,7 @@ import { rehypeMathJaxPassthrough } from './src/lib/rehype-mathjax-passthrough';
 
 export default defineConfig({
   site: 'https://example.com',
-  integrations: [
-    vue({ appEntrypoint: '/src/pages/_app.ts' }),
-    mdx(),
-    sitemap(),
-  ],
+  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeExternalLinks, rehypeMathJaxPassthrough],

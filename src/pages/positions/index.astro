@@ -34,61 +34,75 @@ function formatType(type: string): string {
 }
 ---
 
-<PageLayout title={personal ? "Prospective Students & Opportunities" : "Open Positions"} description={personal ? "Opportunities to work with me." : "Open positions and opportunities to join our research lab."}>
-  <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
-    {personal ? "Prospective Students & Opportunities" : "Open Positions"}
+<PageLayout
+  title={personal ? 'Prospective Students & Opportunities' : 'Open Positions'}
+  description={personal
+    ? 'Opportunities to work with me.'
+    : 'Open positions and opportunities to join our research lab.'}
+>
+  <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
+    {personal ? 'Prospective Students & Opportunities' : 'Open Positions'}
   </h1>
-  <p class="text-sm text-surface-500 dark:text-dm-muted mb-6">
-    {personal
-      ? "Current openings and opportunities to work with me."
-      : "Current openings and opportunities to join our research lab."}
+  <p class="mb-6 text-sm text-surface-500 dark:text-dm-muted">
+    {
+      personal
+        ? 'Current openings and opportunities to work with me.'
+        : 'Current openings and opportunities to join our research lab.'
+    }
   </p>
 
   <div class="space-y-3">
-    {positions.map(p => (
-      <a href={`/positions/${p.id}`} class="block group py-4 border-b border-surface-100 dark:border-dm-border last:border-b-0">
-        <div class="flex items-start justify-between gap-3 mb-1">
-          <h3 class="font-medium text-surface-900 dark:text-dm-heading group-hover:text-primary-600 dark:group-hover:text-accent-400 transition-colors">
-            {p.data.title}
-          </h3>
-          <div class="flex gap-2 shrink-0">
-            <span class="text-xs text-surface-400 dark:text-dm-faint">{formatType(p.data.type)}</span>
-            <span class:list={[
-              'text-xs px-2 py-0.5 rounded',
-              p.data.status === 'open'
-                ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                : 'bg-surface-100 text-surface-400 dark:bg-dm-alt dark:text-dm-faint',
-            ]}>
-              {p.data.status === 'open' ? 'Open' : 'Closed'}
-            </span>
-          </div>
-        </div>
-
-        {p.data.excerpt && (
-          <p class="text-sm text-surface-500 dark:text-dm-muted line-clamp-2 mb-2">{p.data.excerpt}</p>
-        )}
-
-        <div class="flex flex-wrap items-center gap-3">
-          {p.data.deadline && (
-            <span class="text-xs text-surface-400 dark:text-dm-faint">
-              Deadline: {formatDate(p.data.deadline)}
-            </span>
-          )}
-          {p.data.tags && p.data.tags.length > 0 && (
-            <div class="flex flex-wrap gap-1.5">
-              {p.data.tags.map(tag => (
-                <TagBadge tag={tag} size="sm" />
-              ))}
+    {
+      positions.map((p) => (
+        <a
+          href={`/positions/${p.id}`}
+          class="group block border-b border-surface-100 py-4 last:border-b-0 dark:border-dm-border"
+        >
+          <div class="mb-1 flex items-start justify-between gap-3">
+            <h3 class="font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400">
+              {p.data.title}
+            </h3>
+            <div class="flex shrink-0 gap-2">
+              <span class="text-xs text-surface-400 dark:text-dm-faint">{formatType(p.data.type)}</span>
+              <span
+                class:list={[
+                  'rounded px-2 py-0.5 text-xs',
+                  p.data.status === 'open'
+                    ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                    : 'bg-surface-100 text-surface-400 dark:bg-dm-alt dark:text-dm-faint',
+                ]}
+              >
+                {p.data.status === 'open' ? 'Open' : 'Closed'}
+              </span>
             </div>
+          </div>
+
+          {p.data.excerpt && (
+            <p class="mb-2 line-clamp-2 text-sm text-surface-500 dark:text-dm-muted">{p.data.excerpt}</p>
           )}
-        </div>
-      </a>
-    ))}
+
+          <div class="flex flex-wrap items-center gap-3">
+            {p.data.deadline && (
+              <span class="text-xs text-surface-400 dark:text-dm-faint">Deadline: {formatDate(p.data.deadline)}</span>
+            )}
+            {p.data.tags && p.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1.5">
+                {p.data.tags.map((tag) => (
+                  <TagBadge tag={tag} size="sm" />
+                ))}
+              </div>
+            )}
+          </div>
+        </a>
+      ))
+    }
   </div>
 
-  {positions.length === 0 && (
-    <p class="text-sm text-surface-400 dark:text-dm-faint py-8 text-center">
-      No positions are currently listed. Please check back later.
-    </p>
-  )}
+  {
+    positions.length === 0 && (
+      <p class="py-8 text-center text-sm text-surface-400 dark:text-dm-faint">
+        No positions are currently listed. Please check back later.
+      </p>
+    )
+  }
 </PageLayout>

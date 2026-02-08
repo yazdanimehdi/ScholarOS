@@ -8,7 +8,7 @@ import { getSiteConfig } from '../../lib/config';
 
 export async function getStaticPaths() {
   const positions = await getCollection('positions');
-  return positions.map(position => ({
+  return positions.map((position) => ({
     params: { id: position.id },
     props: { position },
   }));
@@ -44,44 +44,48 @@ function formatType(type: string): string {
 
   <div class="mt-4">
     <!-- Status & type badges -->
-    <div class="flex items-center gap-2 mb-3 text-xs">
-      <span class:list={[
-        'px-2 py-0.5 rounded',
-        position.data.status === 'open'
-          ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-          : 'bg-surface-100 text-surface-500 dark:bg-dm-alt dark:text-dm-muted',
-      ]}>
+    <div class="mb-3 flex items-center gap-2 text-xs">
+      <span
+        class:list={[
+          'rounded px-2 py-0.5',
+          position.data.status === 'open'
+            ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+            : 'bg-surface-100 text-surface-500 dark:bg-dm-alt dark:text-dm-muted',
+        ]}
+      >
         {position.data.status === 'open' ? 'Open' : 'Closed'}
       </span>
-      <span class="px-2 py-0.5 rounded bg-surface-100 text-surface-600 dark:bg-dm-alt dark:text-dm-muted">
+      <span class="rounded bg-surface-100 px-2 py-0.5 text-surface-600 dark:bg-dm-alt dark:text-dm-muted">
         {formatType(position.data.type)}
       </span>
     </div>
 
-    <h1 class="text-2xl sm:text-3xl font-serif font-normal text-surface-900 dark:text-dm-heading mb-2">
+    <h1 class="mb-2 font-serif text-2xl font-normal text-surface-900 sm:text-3xl dark:text-dm-heading">
       {position.data.title}
     </h1>
 
-    {position.data.excerpt && (
-      <p class="text-sm text-surface-500 dark:text-dm-muted mb-4">{position.data.excerpt}</p>
-    )}
+    {position.data.excerpt && <p class="mb-4 text-sm text-surface-500 dark:text-dm-muted">{position.data.excerpt}</p>}
 
     <!-- Deadline -->
-    {position.data.deadline && (
-      <p class="text-sm text-surface-500 dark:text-dm-muted mb-4">
-        <span class="font-medium text-surface-700 dark:text-dm-text">Application Deadline:</span>{' '}
-        {formatDate(position.data.deadline)}
-      </p>
-    )}
+    {
+      position.data.deadline && (
+        <p class="mb-4 text-sm text-surface-500 dark:text-dm-muted">
+          <span class="font-medium text-surface-700 dark:text-dm-text">Application Deadline:</span>{' '}
+          {formatDate(position.data.deadline)}
+        </p>
+      )
+    }
 
     <!-- Tags -->
-    {position.data.tags && position.data.tags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-6">
-        {position.data.tags.map(tag => (
-          <TagBadge tag={tag} />
-        ))}
-      </div>
-    )}
+    {
+      position.data.tags && position.data.tags.length > 0 && (
+        <div class="mb-6 flex flex-wrap gap-2">
+          {position.data.tags.map((tag) => (
+            <TagBadge tag={tag} />
+          ))}
+        </div>
+      )
+    }
 
     <!-- Content -->
     <div class="prose mb-8">
@@ -89,36 +93,45 @@ function formatType(type: string): string {
     </div>
 
     <!-- Application Form (only for open positions) -->
-    {position.data.status === 'open' && (
-      <section class="pt-6 border-t border-surface-200 dark:border-dm-border">
-        <h2 class="text-lg font-serif font-normal text-surface-900 dark:text-dm-heading mb-4">Apply for This Position</h2>
-        {web3formsKey ? (
-          <ApplicationForm
-            client:visible
-            positionTitle={position.data.title}
-            contactEmail={contactEmail}
-            accessKey={web3formsKey}
-          />
-        ) : (
-          <p class="text-sm text-surface-500 dark:text-dm-muted">
-            To apply for this position, please email{' '}
-            <a href={`mailto:${contactEmail}`} class="text-primary-600 dark:text-accent-400 hover:underline">{contactEmail}</a>{' '}
-            with your CV and research interests.
-          </p>
-        )}
-      </section>
-    )}
+    {
+      position.data.status === 'open' && (
+        <section class="border-t border-surface-200 pt-6 dark:border-dm-border">
+          <h2 class="mb-4 font-serif text-lg font-normal text-surface-900 dark:text-dm-heading">
+            Apply for This Position
+          </h2>
+          {web3formsKey ? (
+            <ApplicationForm
+              client:visible
+              positionTitle={position.data.title}
+              contactEmail={contactEmail}
+              accessKey={web3formsKey}
+            />
+          ) : (
+            <p class="text-sm text-surface-500 dark:text-dm-muted">
+              To apply for this position, please email{' '}
+              <a href={`mailto:${contactEmail}`} class="text-primary-600 hover:underline dark:text-accent-400">
+                {contactEmail}
+              </a>{' '}
+              with your CV and research interests.
+            </p>
+          )}
+        </section>
+      )
+    }
 
     <!-- Closed position notice -->
-    {position.data.status === 'closed' && (
-      <section class="pt-6 border-t border-surface-200 dark:border-dm-border">
-        <p class="text-sm text-surface-500 dark:text-dm-muted">
-          This position is currently closed. For general inquiries, please contact{' '}
-          <a href={`mailto:${contactEmail}`} class="text-primary-600 dark:text-accent-400 hover:underline">
-            {contactEmail}
-          </a>.
-        </p>
-      </section>
-    )}
+    {
+      position.data.status === 'closed' && (
+        <section class="border-t border-surface-200 pt-6 dark:border-dm-border">
+          <p class="text-sm text-surface-500 dark:text-dm-muted">
+            This position is currently closed. For general inquiries, please contact{' '}
+            <a href={`mailto:${contactEmail}`} class="text-primary-600 hover:underline dark:text-accent-400">
+              {contactEmail}
+            </a>
+            .
+          </p>
+        </section>
+      )
+    }
   </div>
 </PageLayout>
