@@ -36,7 +36,13 @@ const announcements = sections.includes('news')
   : [];
 
 const publicationsRaw = sections.includes('publications')
-  ? (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year).slice(0, 4)
+  ? (await getCollection('publications'))
+      .sort((a, b) => {
+        if (a.data.featured && !b.data.featured) return -1;
+        if (!a.data.featured && b.data.featured) return 1;
+        return b.data.year - a.data.year;
+      })
+      .slice(0, 4)
   : [];
 
 const publications = await Promise.all(
