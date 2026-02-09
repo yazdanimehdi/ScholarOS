@@ -72,6 +72,14 @@ function isOneLineEntry(e: unknown): e is { label: string; details: string } {
   return typeof e === 'object' && e !== null && 'label' in e && 'details' in e;
 }
 
+function isExperienceEntry(e: unknown): e is CvGenericEntry {
+  return typeof e === 'object' && e !== null && ('company' in e || 'position' in e);
+}
+
+function isPublicationEntry(e: unknown): e is CvGenericEntry {
+  return typeof e === 'object' && e !== null && 'title' in e && 'authors' in e;
+}
+
 function isNormalEntry(e: unknown): e is CvGenericEntry {
   return typeof e === 'object' && e !== null && ('name' in e || 'startDate' in e || 'highlights' in e);
 }
@@ -84,7 +92,11 @@ function isNormalEntry(e: unknown): e is CvGenericEntry {
         {cv.name || config.author}
       </h1>
       {cv.location && <p class="text-sm text-surface-500 dark:text-dm-muted">{cv.location}</p>}
-      <p class="text-sm text-surface-500 dark:text-dm-muted">{config.department}, {config.university}</p>
+      {(config.department || config.university) && (
+        <p class="text-sm text-surface-500 dark:text-dm-muted">
+          {[config.department, config.university].filter(Boolean).join(', ')}
+        </p>
+      )}
       <div class="mt-1 flex flex-wrap gap-3 text-xs text-surface-500 dark:text-dm-muted">
         {cv.email && <span>{cv.email}</span>}
         {
@@ -328,6 +340,7 @@ function isNormalEntry(e: unknown): e is CvGenericEntry {
         </h2>
         <div class="space-y-3">
           {entries.map((entry) => {
+            const e = entry as CvGenericEntry;
             if (typeof entry === 'string') {
               return <p class="text-sm text-surface-600 dark:text-dm-text">{entry}</p>;
             }
@@ -339,25 +352,91 @@ function isNormalEntry(e: unknown): e is CvGenericEntry {
                 </div>
               );
             }
-            if (isNormalEntry(entry)) {
+            if (isExperienceEntry(entry)) {
               return (
                 <div>
                   <div class="flex items-baseline justify-between">
                     <div>
-                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
-                        {(entry as CvGenericEntry).name ?? ''}
-                      </h3>
-                      {(entry as CvGenericEntry).location && (
-                        <p class="text-sm text-surface-500 dark:text-dm-muted">{(entry as CvGenericEntry).location}</p>
-                      )}
+                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">{e.position as string ?? ''}</h3>
+                      <p class="text-sm text-surface-500 dark:text-dm-muted">
+                        {[e.company, e.location].filter(Boolean).join(', ')}
+                      </p>
                     </div>
                     <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
-                      {formatDateRange((entry as CvGenericEntry).startDate, (entry as CvGenericEntry).endDate)}
+                      {formatDateRange(e.startDate, e.endDate)}
                     </span>
                   </div>
-                  {(entry as CvGenericEntry).highlights && (entry as CvGenericEntry).highlights!.length > 0 && (
+                  {e.highlights && e.highlights.length > 0 && (
                     <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                      {(entry as CvGenericEntry).highlights!.map((h) => (
+                      {e.highlights.map((h) => (
+                        <li>{h}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            }
+            if (isPublicationEntry(entry)) {
+              const authors = (e.authors as string[]) ?? [];
+              return (
+                <div class="text-sm">
+                  <p class="font-medium text-surface-900 dark:text-dm-heading">{e.title as string}</p>
+                  <p class="text-surface-500 dark:text-dm-muted">
+                    {authors.map((author: string, i: number) => {
+                      const clean = author.replace(/\*+/g, '');
+                      const isBold = author.startsWith('**');
+                      return (
+                        <>
+                          {i > 0 && ', '}
+                          {isBold ? <strong>{clean}</strong> : <span>{clean}</span>}
+                        </>
+                      );
+                    })}
+                  </p>
+                  <p class="text-surface-400 dark:text-dm-faint">
+                    {e.journal && <span>{e.journal as string}</span>}
+                    {e.journal && e.date && <span> · </span>}
+                    {e.date && <span>{e.date}</span>}
+                    {e.doi && (
+                      <>
+                        <span> · </span>
+                        <a
+                          href={`https://doi.org/${e.doi}`}
+                          class="text-primary-600 hover:underline dark:text-accent-400"
+                        >
+                          DOI
+                        </a>
+                      </>
+                    )}
+                    {e.url && (
+                      <>
+                        <span> · </span>
+                        <a href={e.url} class="text-primary-600 hover:underline dark:text-accent-400">
+                          Link
+                        </a>
+                      </>
+                    )}
+                  </p>
+                </div>
+              );
+            }
+            if (isNormalEntry(entry)) {
+              return (
+                <div>
+                  <div class="flex items-baseline justify-between">
+                    <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
+                      {e.name ?? ''}
+                    </h3>
+                    <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
+                      {e.startDate ? formatDateRange(e.startDate, e.endDate) : (e.date ?? '')}
+                    </span>
+                  </div>
+                  {e.location && (
+                    <p class="text-sm text-surface-500 dark:text-dm-muted">{e.location}</p>
+                  )}
+                  {e.highlights && e.highlights.length > 0 && (
+                    <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
+                      {e.highlights.map((h) => (
                         <li>{h}</li>
                       ))}
                     </ul>

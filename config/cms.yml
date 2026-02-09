@@ -440,7 +440,7 @@ collections:
             collapsed: true
             fields:
               - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true, hint: 'Show the announcement bar at the top of every page' }
-              - { label: 'Text', name: 'text', widget: 'string' }
+              - { label: 'Text', name: 'text', widget: 'string', required: false }
               - label: 'Links'
                 name: 'links'
                 widget: 'list'

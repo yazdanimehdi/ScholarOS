@@ -274,6 +274,12 @@ export interface CvGenericEntry {
   url?: string;
   label?: string;
   details?: string;
+  company?: string;
+  position?: string;
+  title?: string;
+  authors?: string[];
+  journal?: string;
+  doi?: string;
   [key: string]: unknown;
 }
 
