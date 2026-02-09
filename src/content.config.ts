@@ -1,6 +1,16 @@
 import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
+/** Treat empty/whitespace-only strings as absent (CMS writes '' instead of omitting). */
+const emptyToUndefined = z.string().optional()
+  .transform(v => (v?.trim() ? v.trim() : undefined));
+
+/** Same but with .url() validation after stripping empties. */
+const optionalUrl = emptyToUndefined.pipe(z.string().url().optional());
+
+/** Same but with .email() validation after stripping empties. */
+const optionalEmail = emptyToUndefined.pipe(z.string().email().optional());
+
 const people = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: 'src/content/people' }),
   schema: ({ image }) =>
@@ -9,17 +19,17 @@ const people = defineCollection({
       role: z.enum(['pi', 'postdoc', 'phd', 'masters', 'undergrad', 'research-assistant', 'visiting', 'alumni']),
       title: z.string().optional(),
       photo: image().optional(),
-      email: z.string().email().optional(),
+      email: optionalEmail,
       socials: z
         .object({
-          github: z.string().url().optional(),
-          scholar: z.string().url().optional(),
-          twitter: z.string().url().optional(),
-          linkedin: z.string().url().optional(),
-          orcid: z.string().url().optional(),
-          mastodon: z.string().url().optional(),
-          bluesky: z.string().url().optional(),
-          website: z.string().url().optional(),
+          github: optionalUrl,
+          scholar: optionalUrl,
+          twitter: optionalUrl,
+          linkedin: optionalUrl,
+          orcid: optionalUrl,
+          mastodon: optionalUrl,
+          bluesky: optionalUrl,
+          website: optionalUrl,
         })
         .optional(),
       researchInterests: z.array(z.string()).optional(),
@@ -54,9 +64,9 @@ const projects = defineCollection({
       type: z.enum(['software', 'dataset', 'benchmark', 'hardware', 'other']),
       status: z.enum(['active', 'completed', 'upcoming']),
       image: image().optional(),
-      url: z.string().url().optional(),
-      repoUrl: z.string().url().optional(),
-      paperUrl: z.string().url().optional(),
+      url: optionalUrl,
+      repoUrl: optionalUrl,
+      paperUrl: optionalUrl,
       team: z.array(z.string()).optional(),
       tags: z.array(z.string()).optional(),
       startDate: z.coerce.date().optional(),
@@ -88,9 +98,9 @@ const publications = defineCollection({
       authors: z.array(z.string()),
       venue: z.string(),
       year: z.number(),
-      doi: z.string().optional(),
-      url: z.string().url().optional(),
-      pdf: z.string().url().optional(),
+      doi: emptyToUndefined,
+      url: optionalUrl,
+      pdf: optionalUrl,
       bibtex: z.string().optional(),
       type: z.enum(['journal', 'conference', 'preprint', 'workshop', 'thesis', 'book-chapter']),
       featured: z.boolean().default(false),
@@ -121,8 +131,8 @@ const talks = defineCollection({
     date: z.string(),
     location: z.string().optional(),
     type: z.enum(['Conference Talk', 'Invited Talk', 'Seminar', 'Tutorial', 'Workshop', 'Keynote', 'Panel']),
-    slidesUrl: z.string().optional(),
-    videoUrl: z.string().optional(),
+    slidesUrl: optionalUrl,
+    videoUrl: optionalUrl,
     sortDate: z.coerce.date().optional(),
   }),
 });
