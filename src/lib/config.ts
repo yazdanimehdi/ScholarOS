@@ -51,6 +51,23 @@ export function getGridColumnCount(): number {
   return ['news', 'publications', 'blog'].filter((id) => sections.includes(id as HomepageSectionId)).length;
 }
 
+function snakeToCamel(s: string): string {
+  return s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+/** Recursively convert all object keys from snake_case to camelCase. */
+export function normalizeKeys<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => normalizeKeys(item)) as T;
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj as Record<string, unknown>).map(([k, v]) => [snakeToCamel(k), normalizeKeys(v)]),
+    ) as T;
+  }
+  return obj;
+}
+
 export function loadYamlConfig<T>(filename: string): T {
   const configPath = path.resolve(process.cwd(), `config/${filename}`);
   const raw = fs.readFileSync(configPath, 'utf-8');

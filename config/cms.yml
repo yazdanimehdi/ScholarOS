@@ -67,7 +67,7 @@ collections:
       - { label: 'Start Date', name: 'startDate', widget: 'datetime', required: false }
       - { label: 'End Date', name: 'endDate', widget: 'datetime', required: false }
       - { label: 'Sort Order', name: 'sortOrder', widget: 'number', default: 99, value_type: 'int' }
-      - { label: 'Active', name: 'active', widget: 'boolean', default: true }
+      - { label: 'Active', name: 'active', widget: 'boolean', default: true, hint: 'Inactive members are hidden from the People page' }
       - { label: 'Body', name: 'body', widget: 'markdown' }
 
   - name: 'announcements'
@@ -88,9 +88,8 @@ collections:
           - { label: 'Talk', value: 'talk' }
           - { label: 'Media', value: 'media' }
           - { label: 'General', value: 'general' }
-      - { label: 'Pinned', name: 'pinned', widget: 'boolean', default: false }
-      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
-      - { label: 'Image', name: 'image', widget: 'image', required: false }
+      - { label: 'Pinned', name: 'pinned', widget: 'boolean', default: false, hint: 'Pinned items always appear first on the homepage' }
+      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false, hint: 'Featured items are highlighted on the homepage' }
       - {
           label: 'Emoji Icon',
           name: 'emoji',
@@ -98,6 +97,7 @@ collections:
           required: false,
           hint: 'Optional emoji shown as icon (e.g. 🏆 📄 🎉). Used when no image is set.',
         }
+      - { label: 'Image', name: 'image', widget: 'image', required: false }
       - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
       - label: 'People'
         name: 'people'
@@ -156,6 +156,7 @@ collections:
     fields:
       - { label: 'Title', name: 'title', widget: 'string' }
       - { label: 'Date', name: 'date', widget: 'datetime' }
+      - { label: 'Draft (unpublished)', name: 'draft', widget: 'boolean', default: true, hint: 'Draft posts are hidden from the site. Turn off to publish.' }
       - { label: 'Author', name: 'author', widget: 'string', required: false }
       - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
       - { label: 'Cover Image', name: 'coverImage', widget: 'image', required: false }
@@ -165,7 +166,6 @@ collections:
         required: false
         field: { label: 'Tag', name: 'tag', widget: 'string' }
       - { label: 'Keywords', name: 'keywords', widget: 'string', required: false }
-      - { label: 'Draft', name: 'draft', widget: 'boolean', default: false }
       - { label: 'Body', name: 'body', widget: 'markdown' }
 
   - name: 'publications'
@@ -178,12 +178,10 @@ collections:
       - label: 'Authors'
         name: 'authors'
         widget: 'list'
+        required: false
         field: { label: 'Author', name: 'author', widget: 'string' }
       - { label: 'Venue', name: 'venue', widget: 'string' }
       - { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
-      - { label: 'DOI', name: 'doi', widget: 'string', required: false }
-      - { label: 'URL', name: 'url', widget: 'string', required: false }
-      - { label: 'PDF', name: 'pdf', widget: 'string', required: false }
       - label: 'Type'
         name: 'type'
         widget: 'select'
@@ -194,7 +192,10 @@ collections:
           - { label: 'Workshop', value: 'workshop' }
           - { label: 'Thesis', value: 'thesis' }
           - { label: 'Book Chapter', value: 'book-chapter' }
-      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
+      - { label: 'Featured', name: 'featured', widget: 'boolean', default: false, hint: 'Featured publications appear first on the homepage' }
+      - { label: 'DOI', name: 'doi', widget: 'string', required: false }
+      - { label: 'URL', name: 'url', widget: 'string', required: false }
+      - { label: 'PDF', name: 'pdf', widget: 'string', required: false }
       - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
       - {
           label: 'Image',
@@ -347,6 +348,7 @@ collections:
                       label: 'Authors',
                       name: 'authors',
                       widget: 'list',
+                      required: false,
                       field: { label: 'Author', name: 'author', widget: 'string' },
                     }
                   - { label: 'Journal', name: 'journal', widget: 'string', required: false }
@@ -437,15 +439,16 @@ collections:
             widget: 'object'
             collapsed: true
             fields:
-              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true, hint: 'Show the announcement bar at the top of every page' }
               - { label: 'Text', name: 'text', widget: 'string' }
               - label: 'Links'
                 name: 'links'
                 widget: 'list'
+                required: false
                 fields:
                   - { label: 'Label', name: 'label', widget: 'string' }
                   - { label: 'URL', name: 'href', widget: 'string' }
-                  - { label: 'External', name: 'external', widget: 'boolean', required: false, default: false }
+                  - { label: 'External', name: 'external', widget: 'boolean', required: false, default: true, hint: 'Opens in a new tab' }
           - label: 'Hero Background'
             name: 'hero'
             widget: 'object'
@@ -560,13 +563,14 @@ collections:
             widget: 'object'
             collapsed: true
             fields:
-              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true, hint: 'Show the About section on the homepage' }
               - { label: 'Title', name: 'title', widget: 'string' }
               - { label: 'Text', name: 'text', widget: 'text' }
               - { label: 'Image', name: 'image', widget: 'image', required: false }
           - label: 'Homepage Sections'
             name: 'homepageSections'
             widget: 'list'
+            required: false
             hint: 'Drag to reorder homepage sections. Toggle enabled to show/hide.'
             collapsed: false
             fields:
@@ -579,7 +583,7 @@ collections:
                   - { label: 'News / Announcements', value: 'news' }
                   - { label: 'Publications', value: 'publications' }
                   - { label: 'Blog', value: 'blog' }
-              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true }
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: true, hint: 'Show or hide this section on the homepage' }
           - label: 'Typography'
             name: 'fonts'
             widget: 'object'
@@ -771,6 +775,7 @@ collections:
           - label: 'Navigation'
             name: 'nav'
             widget: 'list'
+            required: false
             fields:
               - { label: 'Label', name: 'label', widget: 'string' }
               - { label: 'URL', name: 'href', widget: 'string' }
@@ -794,9 +799,9 @@ collections:
             collapsed: true
             fields:
               - { label: 'Username', name: 'username', widget: 'string' }
-              - { label: 'Show Stats', name: 'stats', widget: 'boolean', default: true }
-              - { label: 'Show Trophies', name: 'trophies', widget: 'boolean', default: true }
-              - { label: 'Show Pinned Repos', name: 'showPinnedRepos', widget: 'boolean', default: true }
+              - { label: 'Show Stats', name: 'stats', widget: 'boolean', default: true, hint: 'Display GitHub contribution stats card' }
+              - { label: 'Show Trophies', name: 'trophies', widget: 'boolean', default: true, hint: 'Display GitHub trophy badges' }
+              - { label: 'Show Pinned Repos', name: 'showPinnedRepos', widget: 'boolean', default: true, hint: 'Display pinned repository cards' }
               - label: 'Pinned Repos'
                 name: 'pinnedRepos'
                 widget: 'list'
@@ -865,7 +870,7 @@ collections:
             collapsed: true
             required: false
             fields:
-              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: false }
+              - { label: 'Enabled', name: 'enabled', widget: 'boolean', default: false, hint: 'Show the newsletter signup form on the site' }
               - {
                   label: 'Access Key',
                   name: 'accessKey',
@@ -911,6 +916,7 @@ collections:
               - label: 'Links'
                 name: 'links'
                 widget: 'list'
+                required: false
                 fields:
                   - { label: 'Label', name: 'label', widget: 'string' }
                   - { label: 'URL', name: 'href', widget: 'string' }
@@ -921,17 +927,17 @@ collections:
             required: false
             hint: 'GitHub usernames who can edit any profile in the CMS'
             field: { label: 'GitHub Username', name: 'username', widget: 'string' }
-          - { label: 'Cookie Consent', name: 'cookieConsent', widget: 'boolean', default: false }
+          - { label: 'Cookie Consent', name: 'cookieConsent', widget: 'boolean', default: false, hint: 'Show a cookie consent banner to visitors' }
 
       - name: 'cv-upload'
         label: 'CV (Raw YAML Upload)'
         file: 'config/cv-upload.yml'
         fields:
-          - label: 'Use uploaded YAML'
+          - label: 'Use raw YAML instead of structured editor'
             name: 'enabled'
             widget: 'boolean'
             default: false
-            hint: 'When enabled, the raw YAML below is used instead of the structured CV form fields.'
+            hint: 'When enabled, raw YAML is used instead of the structured CV editor'
           - label: 'RenderCV YAML'
             name: 'content'
             widget: 'code'
@@ -974,6 +980,7 @@ collections:
                   - label: 'Education'
                     name: 'education'
                     widget: 'list'
+                    required: false
                     fields:
                       - { label: 'Institution', name: 'institution', widget: 'string' }
                       - { label: 'Area', name: 'area', widget: 'string' }
@@ -994,6 +1001,7 @@ collections:
                   - label: 'Experience'
                     name: 'experience'
                     widget: 'list'
+                    required: false
                     fields:
                       - { label: 'Company / Institution', name: 'company', widget: 'string' }
                       - { label: 'Position', name: 'position', widget: 'string' }
@@ -1019,6 +1027,7 @@ collections:
                       - label: 'Authors'
                         name: 'authors'
                         widget: 'list'
+                        required: false
                         field: { label: 'Author', name: 'author', widget: 'string' }
                         hint: 'Wrap a name in ** for bold (e.g. **Jane Smith**)'
                       - { label: 'Journal / Venue', name: 'journal', widget: 'string', required: false }
@@ -1058,6 +1067,7 @@ collections:
           - label: 'Feeds'
             name: 'feeds'
             widget: 'list'
+            required: false
             fields:
               - { label: 'Name', name: 'name', widget: 'string' }
               - { label: 'URL', name: 'url', widget: 'string' }
@@ -1078,6 +1088,7 @@ collections:
           - label: 'Authors'
             name: 'authors'
             widget: 'list'
+            required: false
             hint: 'Google Scholar authors to sync publications from'
             fields:
               - { label: 'Name', name: 'name', widget: 'string' }
@@ -1118,6 +1129,7 @@ collections:
               - label: 'Authors'
                 name: 'authors'
                 widget: 'list'
+                required: false
                 field: { label: 'Author', name: 'author', widget: 'string' }
               - { label: 'Venue', name: 'venue', widget: 'string' }
               - { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
@@ -1134,7 +1146,7 @@ collections:
                   - { label: 'Workshop', value: 'workshop' }
                   - { label: 'Thesis', value: 'thesis' }
                   - { label: 'Book Chapter', value: 'book-chapter' }
-              - { label: 'Featured', name: 'featured', widget: 'boolean', default: false }
+              - { label: 'Featured', name: 'featured', widget: 'boolean', default: false, hint: 'Featured publications appear first on the homepage' }
               - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
           - label: 'Excluded DOIs'
             name: 'exclude'
@@ -1153,7 +1165,7 @@ collections:
                 name: 'set'
                 widget: 'object'
                 fields:
-                  - { label: 'Featured', name: 'featured', widget: 'boolean', required: false }
+                  - { label: 'Featured', name: 'featured', widget: 'boolean', required: false, hint: 'Override the featured status of a synced publication' }
                   - { label: 'PDF URL', name: 'pdf', widget: 'string', required: false }
                   - { label: 'URL', name: 'url', widget: 'string', required: false }
                   - { label: 'Type', name: 'type', widget: 'string', required: false }
@@ -1171,6 +1183,7 @@ collections:
           - label: 'Research Areas'
             name: 'areas'
             widget: 'list'
+            required: false
             hint: 'Define your research focus areas shown on the Research page'
             fields:
               - { label: 'Title', name: 'title', widget: 'string' }

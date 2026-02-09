@@ -264,12 +264,26 @@ export interface CvSocialNetwork {
   username: string;
 }
 
+export interface CvGenericEntry {
+  name?: string;
+  location?: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+  highlights?: string[];
+  url?: string;
+  label?: string;
+  details?: string;
+  [key: string]: unknown;
+}
+
 export interface CvSections {
   education?: CvEducation[];
   experience?: CvExperience[];
   publications?: CvPublication[];
   awards?: CvAward[];
   skills?: CvSkill[];
+  [key: string]: CvGenericEntry[] | CvEducation[] | CvExperience[] | CvPublication[] | CvAward[] | CvSkill[] | string[] | undefined;
 }
 
 export interface CvData {

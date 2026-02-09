@@ -2,8 +2,8 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import PublicationEntry from '../components/astro/PublicationEntry.astro';
 import { getCollection } from 'astro:content';
-import { getSiteConfig, loadYamlConfig } from '../lib/config';
-import type { CvConfig, CvMetadata } from '../lib/types';
+import { getSiteConfig, loadYamlConfig, normalizeKeys } from '../lib/config';
+import type { CvConfig, CvMetadata, CvGenericEntry } from '../lib/types';
 import yaml from 'js-yaml';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,7 +16,7 @@ let usingUpload = false;
 try {
   const upload = loadYamlConfig<{ enabled?: boolean; content?: string }>('cv-upload.yml');
   if (upload?.enabled && upload.content?.trim()) {
-    const parsed = yaml.load(upload.content) as CvConfig;
+    const parsed = normalizeKeys(yaml.load(upload.content) as CvConfig);
     if (parsed?.cv) {
       cvConfig = parsed;
       usingUpload = true;
@@ -53,6 +53,27 @@ function formatDateRange(start?: string, end?: string): string {
   const s = start.length === 7 ? start : start;
   const e = end === 'present' ? 'Present' : (end ?? '');
   return `${s} – ${e}`;
+}
+
+// Compute extra sections not handled by the 5 known blocks
+const KNOWN_SECTIONS = new Set(['education', 'experience', 'publications', 'awards', 'skills']);
+const extraSections = Object.entries(sections)
+  .filter(([key]) => !KNOWN_SECTIONS.has(key))
+  .filter(([, entries]) => Array.isArray(entries) && entries.length > 0) as [string, unknown[]][];
+
+function sectionTitle(key: string): string {
+  // camelCase → spaced, then title-case each word
+  return key
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/^./, (c) => c.toUpperCase());
+}
+
+function isOneLineEntry(e: unknown): e is { label: string; details: string } {
+  return typeof e === 'object' && e !== null && 'label' in e && 'details' in e;
+}
+
+function isNormalEntry(e: unknown): e is CvGenericEntry {
+  return typeof e === 'object' && e !== null && ('name' in e || 'startDate' in e || 'highlights' in e);
 }
 ---
 
@@ -282,7 +303,7 @@ function formatDateRange(start?: string, end?: string): string {
   <!-- Skills -->
   {
     sections.skills && sections.skills.length > 0 && (
-      <section>
+      <section class="mb-8">
         <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
           Skills
         </h2>
@@ -296,5 +317,58 @@ function formatDateRange(start?: string, end?: string): string {
         </div>
       </section>
     )
+  }
+
+  <!-- Extra / generic sections -->
+  {
+    extraSections.map(([key, entries]) => (
+      <section class="mb-8">
+        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+          {sectionTitle(key)}
+        </h2>
+        <div class="space-y-3">
+          {entries.map((entry) => {
+            if (typeof entry === 'string') {
+              return <p class="text-sm text-surface-600 dark:text-dm-text">{entry}</p>;
+            }
+            if (isOneLineEntry(entry)) {
+              return (
+                <div class="flex items-baseline gap-2 text-sm">
+                  <span class="shrink-0 font-medium text-surface-900 dark:text-dm-heading">{entry.label}:</span>
+                  <span class="text-surface-600 dark:text-dm-text">{entry.details}</span>
+                </div>
+              );
+            }
+            if (isNormalEntry(entry)) {
+              return (
+                <div>
+                  <div class="flex items-baseline justify-between">
+                    <div>
+                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
+                        {(entry as CvGenericEntry).name ?? ''}
+                      </h3>
+                      {(entry as CvGenericEntry).location && (
+                        <p class="text-sm text-surface-500 dark:text-dm-muted">{(entry as CvGenericEntry).location}</p>
+                      )}
+                    </div>
+                    <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
+                      {formatDateRange((entry as CvGenericEntry).startDate, (entry as CvGenericEntry).endDate)}
+                    </span>
+                  </div>
+                  {(entry as CvGenericEntry).highlights && (entry as CvGenericEntry).highlights!.length > 0 && (
+                    <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
+                      {(entry as CvGenericEntry).highlights!.map((h) => (
+                        <li>{h}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
+      </section>
+    ))
   }
 </PageLayout>

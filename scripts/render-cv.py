@@ -136,6 +136,7 @@ def transform_section_entries(sections: dict) -> dict:
             ]
         else:
             # Pass through unknown sections as-is
+            print(f"INFO: Passing through unknown section '{section_name}' ({len(entries)} entries)")
             result[section_name] = entries
 
     return result
@@ -243,7 +244,7 @@ def render_cv(rendercv_input: dict) -> Path:
         print(f"Running rendercv render on {input_file}...")
 
         result = subprocess.run(
-            ["rendercv", "render", str(input_file), "--output-folder-name", "output"],
+            ["rendercv", "render", str(input_file)],
             capture_output=True,
             text=True,
             cwd=tmpdir,
@@ -258,8 +259,13 @@ def render_cv(rendercv_input: dict) -> Path:
         if result.returncode != 0:
             raise RuntimeError(f"rendercv exited with code {result.returncode}")
 
-        output_dir = tmpdir_path / "output"
+        # RenderCV outputs to rendercv_output/ by default
+        output_dir = tmpdir_path / "rendercv_output"
         pdf_path = find_output_pdf(output_dir)
+
+        # Fallback: search entire tmpdir if not found in expected location
+        if pdf_path is None:
+            pdf_path = find_output_pdf(tmpdir_path)
 
         if pdf_path is None:
             raise RuntimeError("RenderCV did not produce a PDF file")
