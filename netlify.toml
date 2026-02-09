@@ -5,6 +5,24 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[[headers]]
+  # Hashed assets built by Astro/Vite — immutable forever
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Static assets (favicon, images, etc.)
+  for = "/favicon.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  # Images
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
 [[redirects]]
   from = "/*"
   to = "/404"

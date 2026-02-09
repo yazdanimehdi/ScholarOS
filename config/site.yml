@@ -129,7 +129,7 @@ nav:
 github:
   username: 'example-lab'
   stats: true
-  trophies: true
+  trophies: false
   showPinnedRepos: true
   pinnedRepos:
     - 'nlp-toolkit'

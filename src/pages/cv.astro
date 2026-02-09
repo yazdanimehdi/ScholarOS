@@ -55,17 +55,25 @@ function formatDateRange(start?: string, end?: string): string {
   return `${s} – ${e}`;
 }
 
-// Compute extra sections not handled by the 5 known blocks
-const KNOWN_SECTIONS = new Set(['education', 'experience', 'publications', 'awards', 'skills']);
-const extraSections = Object.entries(sections)
-  .filter(([key]) => !KNOWN_SECTIONS.has(key))
-  .filter(([, entries]) => Array.isArray(entries) && entries.length > 0) as [string, unknown[]][];
-
 function sectionTitle(key: string): string {
-  // camelCase → spaced, then title-case each word
   return key
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/^./, (c) => c.toUpperCase());
+}
+
+// Iterate ALL sections in YAML order
+const allSections = Object.entries(sections)
+  .filter(([, entries]) => Array.isArray(entries) && entries.length > 0) as [string, unknown[]][];
+
+// Detect if any publication-like section exists in the YAML (to skip content collection fallback)
+const hasYamlPublications = allSections.some(([, entries]) => {
+  const first = entries[0];
+  return typeof first === 'object' && first !== null && 'title' in first && 'authors' in first;
+});
+
+// Type guards
+function isEducationEntry(e: unknown): e is CvGenericEntry {
+  return typeof e === 'object' && e !== null && 'institution' in e;
 }
 
 function isOneLineEntry(e: unknown): e is { label: string; details: string } {
@@ -136,135 +144,223 @@ function isNormalEntry(e: unknown): e is CvGenericEntry {
     )
   }
 
-  <!-- Education -->
+  <!-- All sections in YAML order -->
   {
-    sections.education && sections.education.length > 0 && (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          Education
-        </h2>
-        <div class="space-y-3">
-          {sections.education.map((edu) => (
-            <div>
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
-                    {edu.degree} in {edu.area}
-                  </h3>
-                  <p class="text-sm text-surface-500 dark:text-dm-muted">{edu.institution}</p>
-                </div>
-                <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
-                  {formatDateRange(edu.startDate, edu.endDate)}
-                </span>
-              </div>
-              {edu.highlights && edu.highlights.length > 0 && (
-                <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                  {edu.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
-              )}
+    allSections.map(([key, entries]) => {
+      const title = sectionTitle(key);
+      const first = entries[0];
+
+      // String entries (summary, academic services, etc.)
+      if (typeof first === 'string') {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-2">
+              {(entries as string[]).map((text) => (
+                <p class="text-sm text-surface-600 dark:text-dm-text">{text}</p>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
-    )
+          </section>
+        );
+      }
+
+      // Education entries (institution, area, degree)
+      if (isEducationEntry(first)) {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-3">
+              {entries.map((entry) => {
+                const edu = entry as CvGenericEntry;
+                return (
+                  <div>
+                    <div class="flex items-baseline justify-between">
+                      <div>
+                        <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
+                          {[edu.degree, edu.area].filter(Boolean).join(' in ')}
+                        </h3>
+                        <p class="text-sm text-surface-500 dark:text-dm-muted">{edu.institution}</p>
+                      </div>
+                      <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
+                        {formatDateRange(edu.startDate, edu.endDate)}
+                      </span>
+                    </div>
+                    {edu.highlights && edu.highlights.length > 0 && (
+                      <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
+                        {edu.highlights.map((h) => <li>{h}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      }
+
+      // One-line entries (label + details — skills, etc.)
+      if (isOneLineEntry(first)) {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-2">
+              {entries.map((entry) => {
+                const item = entry as { label: string; details: string };
+                return (
+                  <div class="flex items-baseline gap-2 text-sm">
+                    <span class="shrink-0 font-medium text-surface-900 dark:text-dm-heading">{item.label}:</span>
+                    <span class="text-surface-600 dark:text-dm-text">{item.details}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      }
+
+      // Experience-like entries (company, position)
+      if (isExperienceEntry(first)) {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-3">
+              {entries.map((entry) => {
+                const exp = entry as CvGenericEntry;
+                return (
+                  <div>
+                    <div class="flex items-baseline justify-between">
+                      <div>
+                        <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">{exp.position ?? ''}</h3>
+                        <p class="text-sm text-surface-500 dark:text-dm-muted">
+                          {[exp.company, exp.location].filter(Boolean).join(', ')}
+                        </p>
+                      </div>
+                      <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
+                        {formatDateRange(exp.startDate, exp.endDate)}
+                      </span>
+                    </div>
+                    {exp.highlights && exp.highlights.length > 0 && (
+                      <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
+                        {exp.highlights.map((h) => <li>{h}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      }
+
+      // Publication-like entries (title, authors)
+      if (isPublicationEntry(first)) {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-3">
+              {entries.map((entry) => {
+                const pub = entry as CvGenericEntry;
+                const authors = (pub.authors ?? []) as string[];
+                return (
+                  <div class="text-sm">
+                    <p class="font-medium text-surface-900 dark:text-dm-heading">{pub.title}</p>
+                    <p class="text-surface-500 dark:text-dm-muted">
+                      {authors.map((author: string, i: number) => {
+                        const clean = author.replace(/\*+/g, '');
+                        const isBold = author.startsWith('**');
+                        return (
+                          <>
+                            {i > 0 && ', '}
+                            {isBold ? <strong>{clean}</strong> : <span>{clean}</span>}
+                          </>
+                        );
+                      })}
+                    </p>
+                    <p class="text-surface-400 dark:text-dm-faint">
+                      {pub.journal && <span>{pub.journal}</span>}
+                      {pub.journal && pub.date && <span> · </span>}
+                      {pub.date && <span>{pub.date}</span>}
+                      {pub.doi && (
+                        <>
+                          <span> · </span>
+                          <a
+                            href={`https://doi.org/${pub.doi}`}
+                            class="text-primary-600 hover:underline dark:text-accent-400"
+                          >
+                            DOI
+                          </a>
+                        </>
+                      )}
+                      {pub.url && (
+                        <>
+                          <span> · </span>
+                          <a href={pub.url} class="text-primary-600 hover:underline dark:text-accent-400">
+                            Link
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      }
+
+      // Normal entries (name, date, highlights — awards, projects, certificates, references)
+      if (isNormalEntry(first)) {
+        return (
+          <section class="mb-8">
+            <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
+              {title}
+            </h2>
+            <div class="space-y-3">
+              {entries.map((entry) => {
+                const e = entry as CvGenericEntry;
+                return (
+                  <div>
+                    <div class="flex items-baseline justify-between">
+                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
+                        {e.name ?? ''}
+                      </h3>
+                      <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
+                        {e.startDate ? formatDateRange(e.startDate, e.endDate) : (e.date ?? '')}
+                      </span>
+                    </div>
+                    {e.location && (
+                      <p class="text-sm text-surface-500 dark:text-dm-muted">{e.location}</p>
+                    )}
+                    {e.highlights && e.highlights.length > 0 && (
+                      <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
+                        {e.highlights.map((h) => <li>{h}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      }
+
+      return null;
+    })
   }
 
-  <!-- Experience -->
+  <!-- Content collection publications fallback (only when no publication sections in YAML) -->
   {
-    sections.experience && sections.experience.length > 0 && (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          Experience
-        </h2>
-        <div class="space-y-3">
-          {sections.experience.map((exp) => (
-            <div>
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">{exp.position}</h3>
-                  <p class="text-sm text-surface-500 dark:text-dm-muted">{exp.company}</p>
-                </div>
-                <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
-                  {formatDateRange(exp.startDate, exp.endDate)}
-                </span>
-              </div>
-              {exp.highlights && exp.highlights.length > 0 && (
-                <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                  {exp.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Publications -->
-  {
-    sections.publications && sections.publications.length > 0 ? (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          Publications
-          <a
-            href="/publications"
-            class="float-end font-sans text-xs text-primary-600 hover:underline dark:text-accent-400"
-          >
-            View all &rarr;
-          </a>
-        </h2>
-        <div class="space-y-3">
-          {sections.publications.map((pub) => {
-            const cleanAuthors = pub.authors.map((a) => a.replace(/\*+/g, ''));
-            return (
-              <div class="text-sm">
-                <p class="font-medium text-surface-900 dark:text-dm-heading">{pub.title}</p>
-                <p class="text-surface-500 dark:text-dm-muted">
-                  {pub.authors.map((author, i) => {
-                    const clean = author.replace(/\*+/g, '');
-                    const isBold = author.startsWith('**');
-                    return (
-                      <>
-                        {i > 0 && ', '}
-                        {isBold ? <strong>{clean}</strong> : <span>{clean}</span>}
-                      </>
-                    );
-                  })}
-                </p>
-                <p class="text-surface-400 dark:text-dm-faint">
-                  {pub.journal && <span>{pub.journal}</span>}
-                  {pub.journal && pub.date && <span> · </span>}
-                  {pub.date && <span>{pub.date}</span>}
-                  {pub.doi && (
-                    <>
-                      <span> · </span>
-                      <a
-                        href={`https://doi.org/${pub.doi}`}
-                        class="text-primary-600 hover:underline dark:text-accent-400"
-                      >
-                        DOI
-                      </a>
-                    </>
-                  )}
-                  {pub.url && (
-                    <>
-                      <span> · </span>
-                      <a href={pub.url} class="text-primary-600 hover:underline dark:text-accent-400">
-                        Link
-                      </a>
-                    </>
-                  )}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-    ) : (
+    !hasYamlPublications && publications.length > 0 && (
       <section class="mb-8">
         <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
           Selected Publications
@@ -291,163 +387,5 @@ function isNormalEntry(e: unknown): e is CvGenericEntry {
         </div>
       </section>
     )
-  }
-
-  <!-- Awards -->
-  {
-    sections.awards && sections.awards.length > 0 && (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          Awards & Honors
-        </h2>
-        <div class="space-y-2">
-          {sections.awards.map((item) => (
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-surface-700 dark:text-dm-text">{item.label}</span>
-              <span class="text-xs text-surface-400 dark:text-dm-faint">{item.details}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Skills -->
-  {
-    sections.skills && sections.skills.length > 0 && (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          Skills
-        </h2>
-        <div class="space-y-2">
-          {sections.skills.map((item) => (
-            <div class="flex items-baseline gap-2 text-sm">
-              <span class="shrink-0 font-medium text-surface-900 dark:text-dm-heading">{item.label}:</span>
-              <span class="text-surface-600 dark:text-dm-text">{item.details}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Extra / generic sections -->
-  {
-    extraSections.map(([key, entries]) => (
-      <section class="mb-8">
-        <h2 class="mb-3 border-b border-surface-200 pb-2 font-serif text-lg font-normal text-surface-900 dark:border-dm-border dark:text-dm-heading">
-          {sectionTitle(key)}
-        </h2>
-        <div class="space-y-3">
-          {entries.map((entry) => {
-            const e = entry as CvGenericEntry;
-            if (typeof entry === 'string') {
-              return <p class="text-sm text-surface-600 dark:text-dm-text">{entry}</p>;
-            }
-            if (isOneLineEntry(entry)) {
-              return (
-                <div class="flex items-baseline gap-2 text-sm">
-                  <span class="shrink-0 font-medium text-surface-900 dark:text-dm-heading">{entry.label}:</span>
-                  <span class="text-surface-600 dark:text-dm-text">{entry.details}</span>
-                </div>
-              );
-            }
-            if (isExperienceEntry(entry)) {
-              return (
-                <div>
-                  <div class="flex items-baseline justify-between">
-                    <div>
-                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">{e.position as string ?? ''}</h3>
-                      <p class="text-sm text-surface-500 dark:text-dm-muted">
-                        {[e.company, e.location].filter(Boolean).join(', ')}
-                      </p>
-                    </div>
-                    <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
-                      {formatDateRange(e.startDate, e.endDate)}
-                    </span>
-                  </div>
-                  {e.highlights && e.highlights.length > 0 && (
-                    <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                      {e.highlights.map((h) => (
-                        <li>{h}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            }
-            if (isPublicationEntry(entry)) {
-              const authors = (e.authors as string[]) ?? [];
-              return (
-                <div class="text-sm">
-                  <p class="font-medium text-surface-900 dark:text-dm-heading">{e.title as string}</p>
-                  <p class="text-surface-500 dark:text-dm-muted">
-                    {authors.map((author: string, i: number) => {
-                      const clean = author.replace(/\*+/g, '');
-                      const isBold = author.startsWith('**');
-                      return (
-                        <>
-                          {i > 0 && ', '}
-                          {isBold ? <strong>{clean}</strong> : <span>{clean}</span>}
-                        </>
-                      );
-                    })}
-                  </p>
-                  <p class="text-surface-400 dark:text-dm-faint">
-                    {e.journal && <span>{e.journal as string}</span>}
-                    {e.journal && e.date && <span> · </span>}
-                    {e.date && <span>{e.date}</span>}
-                    {e.doi && (
-                      <>
-                        <span> · </span>
-                        <a
-                          href={`https://doi.org/${e.doi}`}
-                          class="text-primary-600 hover:underline dark:text-accent-400"
-                        >
-                          DOI
-                        </a>
-                      </>
-                    )}
-                    {e.url && (
-                      <>
-                        <span> · </span>
-                        <a href={e.url} class="text-primary-600 hover:underline dark:text-accent-400">
-                          Link
-                        </a>
-                      </>
-                    )}
-                  </p>
-                </div>
-              );
-            }
-            if (isNormalEntry(entry)) {
-              return (
-                <div>
-                  <div class="flex items-baseline justify-between">
-                    <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
-                      {e.name ?? ''}
-                    </h3>
-                    <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
-                      {e.startDate ? formatDateRange(e.startDate, e.endDate) : (e.date ?? '')}
-                    </span>
-                  </div>
-                  {e.location && (
-                    <p class="text-sm text-surface-500 dark:text-dm-muted">{e.location}</p>
-                  )}
-                  {e.highlights && e.highlights.length > 0 && (
-                    <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                      {e.highlights.map((h) => (
-                        <li>{h}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            }
-            return null;
-          })}
-        </div>
-      </section>
-    ))
   }
 </PageLayout>

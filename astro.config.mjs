@@ -22,5 +22,24 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      modulePreload: {
+        polyfill: true,
+      },
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // Merge the tiny Vue export helper (~0.77 KiB) into the Vue
+            // runtime chunk to eliminate one hop in critical request chains
+            if (id.includes('plugin-vue') && id.includes('export-helper')) {
+              return 'runtime-dom.esm-bundler';
+            }
+            if (id.includes('vue') && id.includes('runtime-dom')) {
+              return 'runtime-dom.esm-bundler';
+            }
+          },
+        },
+      },
+    },
   },
 });

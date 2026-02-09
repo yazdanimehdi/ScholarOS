@@ -2,7 +2,7 @@
   <div>
     <!-- Trigger button -->
     <button
-      class="hidden items-center gap-2 rounded-lg border border-surface-200 bg-surface-100 px-3 py-1.5 text-sm text-surface-500 transition-colors hover:border-surface-300 sm:inline-flex dark:border-surface-700 dark:bg-surface-800 dark:text-surface-400 dark:hover:border-surface-600"
+      class="hidden items-center gap-2 rounded-lg border border-surface-200 bg-surface-100 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:border-surface-300 sm:inline-flex dark:border-surface-700 dark:bg-surface-800 dark:text-surface-400 dark:hover:border-surface-600"
       aria-label="Search"
       @click="openDialog"
     >

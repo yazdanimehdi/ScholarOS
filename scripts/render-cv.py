@@ -30,8 +30,12 @@ PERSON_META_PATH = ROOT / "src" / "data" / "cv-people.json"
 MAX_PDF_SIZE = 10 * 1024 * 1024  # 10 MB limit
 
 
-def load_upload() -> dict | None:
-    """Load raw YAML upload if enabled and non-empty."""
+def load_upload() -> tuple[str, dict] | None:
+    """Load raw YAML upload if enabled and non-empty.
+
+    Returns (raw_content_string, parsed_dict) so the renderer can write
+    the original YAML verbatim (preserving section order and all entries).
+    """
     if not UPLOAD_PATH.exists():
         return None
     with open(UPLOAD_PATH, "r") as f:
@@ -46,7 +50,7 @@ def load_upload() -> dict | None:
         print("WARNING: Uploaded YAML is missing 'cv' key, falling back to structured config")
         return None
     print("Using raw YAML from cv-upload.yml")
-    return parsed
+    return content, parsed
 
 
 def load_config() -> dict:
@@ -232,14 +236,21 @@ def find_output_pdf(output_dir: Path) -> Path | None:
     return None
 
 
-def render_cv(rendercv_input: dict) -> Path:
-    """Run RenderCV and return path to the generated PDF."""
+def render_cv(rendercv_input: dict | str) -> Path:
+    """Run RenderCV and return path to the generated PDF.
+
+    rendercv_input can be a dict (YAML-dumped) or a raw YAML string
+    (written verbatim to preserve section order).
+    """
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir_path = Path(tmpdir)
         input_file = tmpdir_path / "cv_input.yaml"
 
         with open(input_file, "w") as f:
-            yaml.dump(rendercv_input, f, default_flow_style=False, allow_unicode=True)
+            if isinstance(rendercv_input, str):
+                f.write(rendercv_input)
+            else:
+                yaml.dump(rendercv_input, f, default_flow_style=False, allow_unicode=True)
 
         print(f"Running rendercv render on {input_file}...")
 
@@ -373,13 +384,14 @@ def render_person_cvs() -> None:
 
 def main():
     # Check for raw YAML upload first (takes priority)
-    uploaded = load_upload()
+    upload_result = load_upload()
 
-    if uploaded:
+    if upload_result:
+        raw_content, uploaded = upload_result
         # Sync upload to structured config and disable upload
         sync_upload_to_structured(uploaded)
-        # Raw upload is already in RenderCV-native format — use directly
-        rendercv_input = uploaded
+        # Use the raw YAML string directly to preserve section order and all entries
+        rendercv_input = raw_content
     else:
         if not CONFIG_PATH.exists():
             print(f"ERROR: CV config not found at {CONFIG_PATH}")
