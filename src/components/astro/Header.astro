@@ -26,7 +26,7 @@ const searchItems = await getSearchItems();
       <!-- Desktop Nav -->
       <div class="hidden min-w-0 items-center gap-1 md:flex">
         <Nav />
-        <SearchDialog client:load items={searchItems} />
+        <SearchDialog client:only="vue" items={searchItems} />
         <div class="ms-2 border-s border-surface-200 ps-2 dark:border-dm-border">
           <ThemeToggle client:only="vue" />
         </div>

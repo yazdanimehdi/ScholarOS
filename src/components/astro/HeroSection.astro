@@ -55,7 +55,7 @@ const darkBg = hero.dark?.bgColor ?? '#0d1117';
     {
       hero.type === 'animation' && hero.animation && (
         <HeroBgAnimation
-          client:load
+          client:only="vue"
           preset={hero.animation.preset}
           customScript={hero.animation.customScript || undefined}
           lightBgColor={lightBg}

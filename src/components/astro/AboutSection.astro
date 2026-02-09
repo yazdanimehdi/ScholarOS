@@ -28,7 +28,8 @@ const shapeClass = getImageShapeClass();
                 width="280"
                 height="280"
                 class:list={['w-full object-cover', shapeClass]}
-                loading="lazy"
+                loading="eager"
+                fetchpriority="high"
                 decoding="async"
               />
             </div>

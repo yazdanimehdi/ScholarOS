@@ -2,7 +2,7 @@
   <div>
     <!-- Trigger button -->
     <button
-      class="hidden items-center gap-2 rounded-lg border border-surface-200 bg-surface-100 px-3 py-1.5 text-sm text-surface-400 transition-colors hover:border-surface-300 sm:inline-flex dark:border-surface-700 dark:bg-surface-800 dark:hover:border-surface-600"
+      class="hidden items-center gap-2 rounded-lg border border-surface-200 bg-surface-100 px-3 py-1.5 text-sm text-surface-500 transition-colors hover:border-surface-300 sm:inline-flex dark:border-surface-700 dark:bg-surface-800 dark:text-surface-400 dark:hover:border-surface-600"
       aria-label="Search"
       @click="openDialog"
     >
@@ -11,7 +11,7 @@
       </svg>
       <span>Search...</span>
       <kbd
-        class="hidden items-center gap-0.5 rounded bg-surface-200 px-1.5 py-0.5 font-mono text-xs sm:inline-flex dark:bg-surface-700"
+        class="hidden items-center gap-0.5 rounded bg-surface-200 px-1.5 py-0.5 font-mono text-xs text-surface-600 sm:inline-flex dark:bg-surface-700 dark:text-surface-300"
       >
         <span class="text-xs">&#8984;</span>K
       </kbd>
