@@ -17,6 +17,12 @@ test('sniffImage recognizes each allowed type by its bytes, not its name', () =>
     sniffImage(bytes('<?xml version="1.0"?>\n<!-- c -->\n<svg xmlns="http://www.w3.org/2000/svg"/>')),
     'svg',
   );
+  assert.equal(
+    sniffImage(
+      bytes('<!doctype svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg/>'),
+    ),
+    'svg',
+  );
   assert.equal(sniffImage(bytes('<html><svg></svg></html>')), null);
   assert.equal(sniffImage(bytes('%PDF-1.7')), null);
   assert.equal(sniffImage(new Uint8Array([0xc3, 0x28])), null, 'invalid UTF-8 is not an SVG');

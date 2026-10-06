@@ -469,7 +469,7 @@ async function generatePdf() {
           <p>
             Publications: {{ preview.summary.newPublications }} new,
             {{ preview.summary.updatedPublications }} updated<span v-if="preview.summary.skipped"
-              >, {{ preview.summary.skipped }} skipped (MDX)</span
+              >, {{ preview.summary.skipped }} skipped (MDX or duplicate)</span
             >.
           </p>
         </div>

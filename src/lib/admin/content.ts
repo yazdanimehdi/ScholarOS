@@ -20,6 +20,16 @@ export interface Entry {
   readonly: boolean;
 }
 
+/** Like readConfig: a broken file names itself instead of surfacing as an opaque 500. */
+function parseEntry(path: string, content: string) {
+  try {
+    return parseMarkdown(content);
+  } catch (e) {
+    const message = (e as Error).message.split('\n')[0].replace(/:$/, '');
+    throw new HttpError(500, `${path} has invalid front matter: ${message}. Fix it in the repository.`);
+  }
+}
+
 const slugOf = (path: string) => path.slice(path.lastIndexOf('/') + 1).replace(/\.mdx?$/, '');
 
 export async function listEntries(store: ContentStore, name: CollectionName): Promise<EntrySummary[]> {
@@ -30,7 +40,7 @@ export async function listEntries(store: ContentStore, name: CollectionName): Pr
       const file = await store.read(f.path);
       return {
         slug: slugOf(f.path),
-        data: file ? parseMarkdown(file.content).data : {},
+        data: file ? parseEntry(f.path, file.content).data : {},
         version: f.version,
         ...(f.path.endsWith('.mdx') ? { readonly: true } : {}),
       };
@@ -41,7 +51,7 @@ export async function listEntries(store: ContentStore, name: CollectionName): Pr
 export async function readEntry(store: ContentStore, name: CollectionName, slug: string): Promise<Entry | null> {
   for (const ext of ['md', 'mdx'] as const) {
     const file = await store.read(collectionPath(name, slug, ext));
-    if (file) return { ...parseMarkdown(file.content), version: file.version, readonly: ext === 'mdx' };
+    if (file) return { ...parseEntry(file.path, file.content), version: file.version, readonly: ext === 'mdx' };
   }
   return null;
 }

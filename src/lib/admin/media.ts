@@ -101,7 +101,7 @@ function isSvgRoot(text: string): boolean {
       i = text.indexOf('-->', i + 4);
       if (i === -1) return false;
       i += 3;
-    } else if (text.substr(i, 9) === '<!DOCTYPE') {
+    } else if (text.substr(i, 9).toUpperCase() === '<!DOCTYPE') {
       const stop = doctypeStop(text, i + 9);
       if (stop === -1) return false;
       // An internal subset `[ … ]` can hold `>`; skip to its closing `]>`.

@@ -146,6 +146,8 @@ export class GitHubStore implements ContentStore {
     const branch = encodePath(this.cfg.branch);
     const ref = await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${branch}`, undefined, true);
     if (!ref) {
+      // A token without access to a private repo also gets 404 here: if the repo itself 404s, blame the token.
+      await this.gh('GET', '');
       const { owner, repo } = this.cfg;
       throw new UpstreamError(
         `Branch "${this.cfg.branch}" was not found in ${owner}/${repo}. Set GITHUB_BRANCH to an existing branch.`,
@@ -233,11 +235,17 @@ export class GitHubStore implements ContentStore {
       probe(`/contents${this.ref()}`),
       probe('/actions/workflows?per_page=1'),
     ]);
-    const error = !contents
-      ? `The GitHub token can't read ${this.cfg.owner}/${this.cfg.repo}. It needs Contents: read and write.`
-      : !actions
-        ? 'The GitHub token lacks Actions: read and write, so "Generate PDF" will not work.'
-        : undefined;
+    const branchMissing =
+      !contents &&
+      (await probe('')) &&
+      (await this.gh('GET', `/git/ref/heads/${encodePath(this.cfg.branch)}`, undefined, true)) === null;
+    const error = branchMissing
+      ? `Branch "${this.cfg.branch}" was not found in ${this.cfg.owner}/${this.cfg.repo}. Set GITHUB_BRANCH.`
+      : !contents
+        ? `The GitHub token can't read ${this.cfg.owner}/${this.cfg.repo}. It needs Contents: read and write.`
+        : !actions
+          ? 'The GitHub token lacks Actions: read and write, so "Generate PDF" will not work.'
+          : undefined;
     return { contents, actions, ...(error ? { error } : {}) };
   }
 }

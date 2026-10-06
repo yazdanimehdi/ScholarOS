@@ -191,7 +191,7 @@ test('githubConfig: explicit repo and branch win over Vercel metadata', () => {
 });
 
 test('a missing branch is named as such, not as a token permission', async () => {
-  const { fetchFn } = fakeGitHub({});
+  const { fetchFn } = fakeGitHub({ 'GET ': () => ({ json: { id: 1 } }) });
   await assert.rejects(
     new GitHubStore(cfg, author, fetchFn).commit([{ path: 'config/cv.yml', content: 'x' }], 'm', {}),
     (e) =>
@@ -218,4 +218,23 @@ test('capabilities probes the repo root, so a repo without config/site.yml is re
     'GET /actions/workflows?per_page=1': () => ({ json: { workflows: [] } }),
   });
   assert.deepEqual(await new GitHubStore(cfg, author, fetchFn).capabilities(), { contents: true, actions: true });
+});
+
+const REPO_OK = { 'GET ': () => ({ json: { id: 1 } }) };
+
+test('a ref 404 on an unreadable repo blames the token, not the branch', async () => {
+  const { fetchFn } = fakeGitHub({});
+  await assert.rejects(
+    new GitHubStore(cfg, author, fetchFn).commit([{ path: 'config/cv.yml', content: 'x' }], 'm', {}),
+    (e) => e instanceof UpstreamError && /token needs/.test(e.message) && !/Branch/.test(e.message),
+  );
+});
+
+test('capabilities reports a missing branch separately from an unreadable repo', async () => {
+  const actions = { 'GET /actions/workflows?per_page=1': () => ({ json: {} }) };
+  const missing = await new GitHubStore(cfg, author, fakeGitHub({ ...REPO_OK, ...actions }).fetchFn).capabilities();
+  assert.equal(missing.contents, false);
+  assert.equal(missing.error, 'Branch "main" was not found in o/r. Set GITHUB_BRANCH.');
+  const denied = await new GitHubStore(cfg, author, fakeGitHub(actions).fetchFn).capabilities();
+  assert.match(denied.error!, /token can't read o\/r/);
 });

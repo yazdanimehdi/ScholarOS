@@ -381,3 +381,17 @@ test('me: capabilities.error carries UpstreamError messages only', async () => {
     console.error = realError;
   }
 });
+
+test('collections: a post with broken front matter names the file instead of a bare 500', async () => {
+  await store.commit(
+    [{ path: 'src/content/posts/bad.md', content: '---\ntitle: [unclosed\n---\n\nBody\n' }],
+    'seed',
+    {},
+  );
+  const res = await call(listCollection, { params: { name: 'posts' } });
+  assert.equal(res.status, 500);
+  assert.match(
+    (await res.json()).error,
+    /^src\/content\/posts\/bad\.md has invalid front matter: .+\. Fix it in the repository\.$/,
+  );
+});
