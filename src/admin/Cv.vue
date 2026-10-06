@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import AdminShell from './AdminShell.vue';
 import DocBanners from './DocBanners.vue';
 import FormFields from './FormFields.vue';
@@ -51,6 +51,38 @@ const importing = ref(false);
 const importText = ref('');
 const preview = ref<ImportPreview | null>(null);
 const pdf = ref<Run | null>(null);
+// The imported publications and the upload switch belong to the CV draft: keep them across reloads with it.
+const IMPORT_KEY = 'scholaros-cv-import';
+try {
+  const saved = JSON.parse(localStorage.getItem(IMPORT_KEY) ?? 'null');
+  if (saved) {
+    pending.value = saved.pending ?? [];
+    turnOffUpload.value = !!saved.turnOffUpload;
+  }
+} catch {
+  // Storage blocked or corrupt: nothing to restore.
+}
+watch(
+  [pending, turnOffUpload],
+  () => {
+    try {
+      if (pending.value.length || turnOffUpload.value) {
+        localStorage.setItem(
+          IMPORT_KEY,
+          JSON.stringify({ pending: pending.value, turnOffUpload: turnOffUpload.value }),
+        );
+      } else localStorage.removeItem(IMPORT_KEY);
+    } catch {
+      // Storage full or blocked: drafts are a convenience.
+    }
+  },
+  { deep: true },
+);
+function discardDraft() {
+  doc.discard();
+  pending.value = [];
+  turnOffUpload.value = false;
+}
 let pdfTimer: number | undefined;
 let pdfStarted = 0;
 
@@ -287,7 +319,7 @@ async function generatePdf() {
       :conflict="doc.conflict"
       :stale="doc.draftStale ? doc.draftChanges : null"
       @restore="doc.restore()"
-      @discard="doc.discard()"
+      @discard="discardDraft"
       @reload="doc.reload()"
     />
 
