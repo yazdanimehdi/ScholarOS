@@ -172,6 +172,7 @@ If your website should behave more like a research instrument than a static page
   - [SEO & Structured Data](#seo--structured-data)
   - [RSS Feed](#rss-feed)
   - [CMS Admin Panel](#cms-admin-panel)
+  - [Deploy on Vercel (custom admin)](#deploy-on-vercel-custom-admin)
   - [Cookie Consent (GDPR)](#cookie-consent-gdpr)
   - [Internationalization (i18n)](#internationalization-i18n)
   - [View Transitions](#view-transitions)
@@ -505,6 +506,35 @@ Built-in content management system at `/admin`:
 - **Collection management** -- full CRUD for all content types
 - **Media uploads** -- image and file management
 - **Access control** -- configurable admin user list
+
+### Deploy on Vercel (custom admin)
+
+On Vercel, ScholarOS replaces Sveltia with its own admin at `/<adminPath>` (default `/admin`). It has a dashboard, a post editor with math, a three-column CV editor with RenderCV import, and forms for every other kind of content. Every publish is one commit to your repository; Vercel redeploys and the change is live in about a minute. Public pages stay static, and GitHub Pages and Netlify keep using Sveltia.
+
+1. **Import the repository in Vercel** (New Project → your repository). No build settings are needed.
+2. **Create a GitHub OAuth App** (GitHub → Settings → Developer settings → OAuth Apps → New OAuth App).
+   - Homepage URL: `https://<your-domain>`
+   - Authorization callback URL: `https://<your-domain>/api/admin/auth/callback`
+   - Keep the client ID, and generate a client secret.
+3. **Create a fine-grained personal access token** (GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens).
+   - Repository access: only this repository.
+   - Permissions: **Contents: Read and write**, and **Actions: Read and write** (needed for "Generate PDF").
+4. **Set the environment variables** in Vercel (Project → Settings → Environment Variables):
+
+   | Variable               | Value                                                                            |
+   | ---------------------- | -------------------------------------------------------------------------------- |
+   | `GITHUB_CLIENT_ID`     | OAuth App client ID                                                              |
+   | `GITHUB_CLIENT_SECRET` | OAuth App client secret                                                          |
+   | `GITHUB_TOKEN`         | the fine-grained token                                                           |
+   | `SESSION_SECRET`       | at least 32 random characters (`openssl rand -base64 48`)                        |
+   | `GITHUB_REPO`          | optional: `owner/name` (defaults to the repository Vercel deploys)               |
+   | `GITHUB_BRANCH`        | optional: the branch to commit to (defaults to the deployed branch, then `main`) |
+
+5. **Add your GitHub username to `adminUsers`** in `config/site.yml`, commit, and let Vercel redeploy.
+
+Sign in at `https://<your-domain>/<adminPath>`. Only `adminUsers` can sign in, and the token never leaves the server. `.env.example` lists the same variables.
+
+To try the admin locally without GitHub, run `VERCEL=1 ADMIN_STORE=memory SESSION_SECRET=<32+ characters> pnpm dev` and open `http://localhost:4321/api/admin/auth/dev`. Edits stay in memory and are never written to disk.
 
 ### Cookie Consent (GDPR)
 
