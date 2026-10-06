@@ -103,7 +103,7 @@ export function useDocument<T extends object>() {
   watch(
     () => doc.current,
     (value) => {
-      if (tracking && value && doc.key) writeDraft(doc.key, value);
+      if (tracking && !doc.draft && value && doc.key) writeDraft(doc.key, value);
     },
     { deep: true },
   );
