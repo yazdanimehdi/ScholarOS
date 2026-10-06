@@ -1,0 +1,35 @@
+---
+import { adminSettings } from '../../lib/admin/settings';
+
+export const prerender = false;
+
+const { siteName } = adminSettings();
+const screen = (Astro.params.path ?? '').split('/')[0];
+const error = Astro.url.searchParams.get('error');
+if (screen === 'login' && error === 'denied') Astro.response.status = 403;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Site admin · {siteName}</title>
+  </head>
+  <body>
+    {
+      screen === 'login' ? (
+        <main>
+          <h1>{siteName}</h1>
+          <a href="/api/admin/auth/login">Sign in with GitHub</a>
+          {error && <p role="alert">{error === 'denied' ? 'Not on the admin list.' : 'Sign-in expired. Try again.'}</p>}
+        </main>
+      ) : (
+        <main>
+          <p>Signed in as {Astro.locals.user?.login}</p>
+        </main>
+      )
+    }
+  </body>
+</html>

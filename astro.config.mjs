@@ -2,14 +2,18 @@ import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import { rehypeExternalLinks } from './src/lib/rehype-external-links';
 import { rehypeMathJaxPassthrough } from './src/lib/rehype-mathjax-passthrough';
+import admin from './src/integrations/admin';
 
 export default defineConfig({
   site: 'https://example.com',
-  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), sitemap()],
+  // Vercel only: the custom admin's routes run as functions. Every public page stays prerendered.
+  adapter: process.env.VERCEL ? vercel() : undefined,
+  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), sitemap(), admin()],
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeExternalLinks, rehypeMathJaxPassthrough],

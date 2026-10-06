@@ -27,6 +27,22 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: Static build (no adapter output; Sveltia admin present)
+        run: |
+          pnpm build
+          admin_path=$(node -e "const y=require('js-yaml');console.log(y.load(require('fs').readFileSync('config/site.yml','utf8')).adminPath||'admin')")
+          test -f "dist/$admin_path/index.html"
+          test ! -e .vercel/output
+
+      - name: Vercel build (admin routes are functions)
+        env:
+          VERCEL: '1'
+          SESSION_SECRET: ci-build-only-not-a-real-secret-0000
+        run: |
+          pnpm build
+          test -d .vercel/output/functions
+          if grep -rq "__SCHOLAROS_ADMIN__" .vercel/output/functions; then echo "admin settings were not baked in"; exit 1; fi
+
       # Full demo assertions only in the template repo; forks edit content, so they get the structural check.
       # The dist-baseline comparison is a local pre-merge gate (gitignored), so CI always skips it.
       - name: Build both themes (template, full check)

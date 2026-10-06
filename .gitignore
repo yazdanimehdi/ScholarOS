@@ -33,3 +33,6 @@ pnpm-debug.log*
 
 # theme check builds (scripts/check-themes.mjs)
 dist-*/
+
+# Vercel build output (VERCEL=1 pnpm build)
+.vercel/

@@ -2,7 +2,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getSiteConfig } from '../lib/config';
+import { getSiteConfig } from '../../lib/config';
 
 export const getStaticPaths: GetStaticPaths = () => {
   const config = getSiteConfig();
