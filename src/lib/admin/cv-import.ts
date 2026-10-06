@@ -42,7 +42,10 @@ export interface CvImport {
 
 /** Fields the CV is authoritative for; everything else on an existing entry (topic, abstract, type, …) is kept. */
 const CV_OWNED = ['title', 'authors', 'venue', 'year', 'doi', 'url'];
-const titleKey = (title: unknown) => String(title ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const titleKey = (title: unknown) =>
+  String(title ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
 const doiKey = (doi: unknown) => (doi ? bareDoi(String(doi)).toLowerCase() : '');
 
 // ponytail: keyword heuristic for `type`; the owner fixes it in the Publications screen and re-imports keep the fix.
@@ -107,7 +110,7 @@ export function importRenderCv(text: string, existing: ExistingPublication[]): C
   let skipped = 0;
   for (const entry of found) {
     const mapped = toPublication(entry);
-    const match = (mapped.doi && byDoi.get(doiKey(mapped.doi))) || byTitle.get(titleKey(mapped.title));
+    const match = (mapped.doi ? byDoi.get(doiKey(mapped.doi)) : undefined) ?? byTitle.get(titleKey(mapped.title));
     if (match?.readonly) {
       skipped++;
     } else if (match) {
@@ -115,7 +118,8 @@ export function importRenderCv(text: string, existing: ExistingPublication[]): C
       publications.push({ slug: match.slug, data: { ...match.data, ...owned }, version: match.version });
       updated++;
     } else {
-      const base = bibtexKey(mapped as { title: string; authors: string[]; year: number }).slice(0, 76) || 'publication';
+      const base =
+        bibtexKey(mapped as { title: string; authors: string[]; year: number }).slice(0, 76) || 'publication';
       let slug = base;
       for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
       slugs.add(slug);

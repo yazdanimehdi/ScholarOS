@@ -28,7 +28,8 @@ const isMap = (v: unknown): v is Record<string, unknown> => v !== null && typeof
 function apply(doc: Document, path: (string | number)[], prev: unknown, next: unknown): void {
   if (isMap(prev) && isMap(next)) {
     for (const key of Object.keys(prev)) if (next[key] === undefined) doc.deleteIn([...path, key]);
-    for (const [key, value] of Object.entries(next)) if (value !== undefined) apply(doc, [...path, key], prev[key], value);
+    for (const [key, value] of Object.entries(next))
+      if (value !== undefined) apply(doc, [...path, key], prev[key], value);
     return;
   }
   if (Array.isArray(prev) && Array.isArray(next)) {
@@ -42,7 +43,7 @@ function apply(doc: Document, path: (string | number)[], prev: unknown, next: un
 /** Rewrites a YAML file to hold `next`, keeping comments, key order and the quoting of untouched values. */
 export function updateYaml(source: string, next: unknown): string {
   const doc = parseDocument(source);
-  if (doc.contents === null) doc.contents = doc.createNode(next);
+  if (doc.contents === null) doc.contents = doc.createNode(next) as typeof doc.contents;
   else apply(doc, [], doc.toJS(), next);
   return doc.toString(YAML_OUT);
 }
