@@ -9,6 +9,7 @@ import {
   sectionKey,
   sectionLabel,
   setIn,
+  validSectionKey,
   type FieldDef,
 } from './fields';
 
@@ -90,6 +91,8 @@ test('cvEntryPreview mirrors the public CV layout (title / org / dates / points)
     points: [],
   });
   assert.equal(cvEntryPreview('Plain text').title, 'Plain text');
+  assert.equal(cvEntryPreview({ company: 'C', position: 'P', startDate: '2020' }).when, '2020', 'no end date, no dash');
+  assert.equal(cvEntryPreview({ name: 'N', startDate: '2020-01', endDate: '2021-02' }).when, '2020-01 – 2021-02');
 });
 
 test('section names ↔ camelCase keys', () => {
@@ -97,4 +100,12 @@ test('section names ↔ camelCase keys', () => {
   assert.equal(sectionKey('Teaching experience'), 'teachingExperience');
   assert.equal(sectionKey('  Awards & Honors '), 'awardsHonors');
   assert.equal(sectionKey('!!!'), '');
+});
+
+test('validSectionKey: a section key needs a letter (an all-digit key would sort first)', () => {
+  assert.equal(validSectionKey('awards'), true);
+  assert.equal(validSectionKey(sectionKey('2024 awards')), true);
+  assert.equal(validSectionKey(sectionKey('2024')), false);
+  assert.equal(validSectionKey(sectionKey('!!!')), false);
+  assert.equal(validSectionKey(''), false);
 });

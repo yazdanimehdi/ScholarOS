@@ -300,9 +300,8 @@ const joined = (parts: unknown[], sep: string) => parts.map(str).filter(Boolean)
 export function cvEntryPreview(entry: unknown): { title: string; org: string; when: string; points: string[] } {
   if (typeof entry === 'string') return { title: entry, org: '', when: '', points: [] };
   const e = (entry ?? {}) as Record<string, any>;
-  const when = e.startDate
-    ? `${str(e.startDate)} – ${e.endDate === 'present' ? 'Present' : str(e.endDate)}`
-    : str(e.date);
+  const end = e.endDate === 'present' ? 'Present' : str(e.endDate);
+  const when = e.startDate ? (end ? `${str(e.startDate)} – ${end}` : str(e.startDate)) : str(e.date);
   const points = Array.isArray(e.highlights) ? e.highlights.map(str).filter(Boolean) : [];
   switch (cvEntryKind(entry)) {
     case 'education':
@@ -338,3 +337,6 @@ export function sectionKey(name: string): string {
     .filter(Boolean);
   return words.map((w, i) => (i === 0 ? w : w[0].toUpperCase() + w.slice(1))).join('');
 }
+
+/** A section key needs a letter: an all-digit key ("2024") is integer-like and JS objects order it first. */
+export const validSectionKey = (key: string) => /[a-z]/i.test(key);

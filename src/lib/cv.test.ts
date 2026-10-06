@@ -27,6 +27,8 @@ test('formatDateRange and sectionTitle keep the classic formatting', () => {
   assert.equal(formatDateRange('2020-01', 'present'), '2020-01 – Present');
   assert.equal(formatDateRange('2015-09', '2019-12'), '2015-09 – 2019-12');
   assert.equal(formatDateRange(undefined, '2019'), '');
+  assert.equal(formatDateRange('2020', undefined), '2020', 'no end date: no trailing dash');
+  assert.equal(formatDateRange('2020', ''), '2020');
   assert.equal(sectionTitle('selectedPublications'), 'Selected Publications');
   assert.equal(sectionTitle('education'), 'Education');
 });

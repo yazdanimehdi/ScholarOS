@@ -38,8 +38,8 @@ export function loadCvMeta(): CvMetadata | null {
 
 export function formatDateRange(start?: string, end?: string): string {
   if (!start) return '';
-  const e = end === 'present' ? 'Present' : (end ?? '');
-  return `${start} – ${e}`;
+  const e = end === 'present' ? 'Present' : end;
+  return e ? `${start} – ${e}` : start;
 }
 
 export function sectionTitle(key: string): string {

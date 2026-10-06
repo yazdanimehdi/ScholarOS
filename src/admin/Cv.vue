@@ -4,7 +4,16 @@ import AdminShell from './AdminShell.vue';
 import DocBanners from './DocBanners.vue';
 import FormFields from './FormFields.vue';
 import { api, report, toast } from './api';
-import { CV_BLANK, CV_FIELDS, cvEntryKind, cvEntryPreview, sectionKey, sectionLabel, type CvEntryKind } from './fields';
+import {
+  CV_BLANK,
+  CV_FIELDS,
+  cvEntryKind,
+  cvEntryPreview,
+  sectionKey,
+  sectionLabel,
+  validSectionKey,
+  type CvEntryKind,
+} from './fields';
 import { useDocument } from './useDocument';
 import type { AdminCtx, CommitResult, Entry } from './types';
 
@@ -85,6 +94,7 @@ function discardDraft() {
 }
 let pdfTimer: number | undefined;
 let pdfStarted = 0;
+let unmounted = false;
 
 const KINDS: [CvEntryKind, string][] = [
   ['normal', 'Normal (name, dates, highlights)'],
@@ -101,9 +111,6 @@ const keys = computed(() => Object.keys(sections.value));
 const entries = computed(() => (section.value ? (sections.value[section.value] ?? []) : []));
 const entry = computed(() => (index.value === null ? undefined : entries.value[index.value]));
 const entryPreview = computed(() => cvEntryPreview(entry.value));
-const hasPublicationSection = computed(() =>
-  Object.values(sections.value).some((list) => list.some((e) => cvEntryKind(e) === 'publication')),
-);
 const pdfLabel = computed(() => {
   if (!pdf.value) return '';
   if (pdf.value.status !== 'completed') return 'PDF: generating…';
@@ -134,7 +141,10 @@ onMounted(async () => {
   }
   checkPdf();
 });
-onBeforeUnmount(() => clearTimeout(pdfTimer));
+onBeforeUnmount(() => {
+  unmounted = true;
+  clearTimeout(pdfTimer);
+});
 
 // ── Sections ──
 function selectSection(key: string | null) {
@@ -143,9 +153,11 @@ function selectSection(key: string | null) {
   confirmSection.value = false;
   confirmEntry.value = false;
 }
+const NEEDS_LETTER = 'Section names need at least one letter';
 function addSection() {
+  if (!newSection.value.trim()) return;
   const key = sectionKey(newSection.value);
-  if (!key) return;
+  if (!validSectionKey(key)) return toast(NEEDS_LETTER);
   if (key in sections.value) return toast(`There is already a "${sectionLabel(key)}" section`);
   setSections({ ...sections.value, [key]: [] });
   newSection.value = '';
@@ -154,8 +166,10 @@ function addSection() {
 function renameSection() {
   if (!section.value) return;
   const name = window.prompt('Section name', sectionLabel(section.value));
-  const key = name ? sectionKey(name) : '';
-  if (!key || key === section.value) return;
+  if (!name?.trim()) return;
+  const key = sectionKey(name);
+  if (!validSectionKey(key)) return toast(NEEDS_LETTER);
+  if (key === section.value) return;
   if (key in sections.value) return toast(`There is already a "${sectionLabel(key)}" section`);
   const old = section.value;
   setSections(Object.fromEntries(Object.entries(sections.value).map(([k, v]) => [k === old ? key : k, v])));
@@ -275,6 +289,7 @@ async function checkPdf() {
     const { run } = await api<{ run: Run | null }>('cv/pdf');
     pdf.value = run;
     const justStarted = Date.now() - pdfStarted < 60_000; // a new run takes a moment to appear
+    if (unmounted) return;
     if ((run && run.status !== 'completed') || justStarted) pdfTimer = window.setTimeout(checkPdf, 5000);
   } catch (e) {
     report(e);
@@ -286,7 +301,7 @@ async function generatePdf() {
     pdfStarted = Date.now();
     toast('PDF generation started on GitHub Actions');
     clearTimeout(pdfTimer);
-    pdfTimer = window.setTimeout(checkPdf, 4000);
+    if (!unmounted) pdfTimer = window.setTimeout(checkPdf, 4000);
   } catch (e) {
     report(e);
   }
@@ -332,9 +347,11 @@ async function generatePdf() {
               ><span class="adm-muted">{{ sections[key].length }}</span>
             </button>
           </li>
-          <li v-if="!hasPublicationSection">
+        </ul>
+        <ul class="adm-pick">
+          <li>
             <a :href="`/${ctx.adminPath}/publications`"
-              ><span>Publications</span><span class="adm-muted">{{ publicationCount }} ↗</span></a
+              ><span>Publications collection ↗</span><span class="adm-muted">{{ publicationCount }}</span></a
             >
           </li>
         </ul>
