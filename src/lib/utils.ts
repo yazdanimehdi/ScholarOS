@@ -94,3 +94,22 @@ export function extractGitHubUsername(url: string): string | null {
   } catch {}
   return null;
 }
+
+/** Minutes to read `body` at 230 words per minute; never less than 1. */
+export function readingTime(body: string): number {
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 230));
+}
+
+export type DatePrecision = 'day' | 'month' | 'year';
+
+/** "Oct 3, 2025" / "Oct 2025" / "2025". UTC, because date-only frontmatter parses as UTC midnight. */
+export function formatNewsDate(date: Date, precision: DatePrecision = 'month'): string {
+  const parts: Intl.DateTimeFormatOptions =
+    precision === 'year'
+      ? { year: 'numeric' }
+      : precision === 'day'
+        ? { year: 'numeric', month: 'short', day: 'numeric' }
+        : { year: 'numeric', month: 'short' };
+  return date.toLocaleDateString('en-US', { ...parts, timeZone: 'UTC' });
+}
