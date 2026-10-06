@@ -1,4 +1,5 @@
 ---
+import Collection from '../Collection.vue';
 import Dashboard from '../Dashboard.vue';
 import Media from '../Media.vue';
 import PostEditor from '../PostEditor.vue';
@@ -11,8 +12,10 @@ export const prerender = false;
 
 const { adminPath, siteName } = adminSettings();
 const [screen = '', arg = ''] = (Astro.params.path ?? '').split('/');
-const SCREENS = new Set(['', 'login', 'media', 'posts']);
+const SCREENS = new Set(['', 'login', 'media', 'posts', 'publications', 'content']);
+const CONTENT = ['announcements', 'people', 'projects', 'talks', 'positions'];
 if (!SCREENS.has(screen)) return new Response('Not found', { status: 404 });
+if (screen === 'content' && !CONTENT.includes(arg)) return new Response('Not found', { status: 404 });
 
 const ctx = { adminPath, siteName, user: Astro.locals.user ?? null };
 const error = Astro.url.searchParams.get('error');
@@ -58,5 +61,7 @@ const LOGIN_ERRORS: Record<string, string> = {
     {screen === '' && <Dashboard client:only="vue" ctx={ctx} />}
     {screen === 'posts' && !arg && <Posts client:only="vue" ctx={ctx} />}
     {screen === 'posts' && arg && <PostEditor client:only="vue" ctx={ctx} slug={arg} />}
+    {screen === 'publications' && <Collection client:only="vue" ctx={ctx} name="publications" />}
+    {screen === 'content' && <Collection client:only="vue" ctx={ctx} name={arg} />}
   </body>
 </html>

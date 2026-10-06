@@ -54,3 +54,24 @@ test('dashboard: hide and unhide an imported post', async ({ page }) => {
   await same.getByRole('button', { name: 'Unhide' }).click();
   await expect(same.getByText('Published')).toBeVisible();
 });
+
+test('publications: edit a field, regenerate BibTeX, publish', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/publications`);
+  await page.getByRole('region', { name: 'Entries' }).getByRole('button').first().click();
+  await page.getByLabel('Note', { exact: true }).fill('E2E note');
+  await page.getByRole('button', { name: 'Regenerate' }).click();
+  await expect(page.getByLabel('BibTeX (leave empty to generate)')).toHaveValue(/^@(article|inproceedings)\{/);
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+});
+
+test('news: create an item', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/content/announcements`);
+  await page.getByRole('button', { name: 'New news item' }).click();
+  await page.getByLabel('Title', { exact: true }).fill(`E2E news ${Date.now()}`);
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Entries' }).getByText(/E2E news/)).toBeVisible();
+});
