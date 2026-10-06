@@ -100,13 +100,13 @@ export function cvEntryView(entry: unknown): CvEntryView | null {
   const points = Array.isArray(e.highlights) ? e.highlights.filter((h): h is string => typeof h === 'string') : [];
   const range = e.startDate ? formatDateRange(e.startDate, e.endDate) : str(e.date);
 
-  if (isEducationEntry(e)) return view(joined([e.degree, e.area], ' in '), joined([e.institution, e.location], ', '), range, points);
-  if (isOneLineEntry(e)) return view(str(e.label), str(e.details), '', []);
-  if (isExperienceEntry(e)) return view(str(e.position), joined([e.company, e.location], ', '), range, points);
-  if (isPublicationEntry(e)) {
+  if (isEducationEntry(entry)) return view(joined([e.degree, e.area], ' in '), joined([e.institution, e.location], ', '), range, points);
+  if (isOneLineEntry(entry)) return view(str(e.label), str(e.details), '', []);
+  if (isExperienceEntry(entry)) return view(str(e.position), joined([e.company, e.location], ', '), range, points);
+  if (isPublicationEntry(entry)) {
     const authors = (Array.isArray(e.authors) ? e.authors : []).map((a) => str(a).replace(/\*+/g, ''));
     return view(str(e.title), joined([authors.join(', '), e.journal], ' · '), str(e.date), points);
   }
-  if (isNormalEntry(e)) return view(str(e.name), str(e.location), range, points);
+  if (isNormalEntry(entry)) return view(str(e.name), str(e.location), range, points);
   return null;
 }

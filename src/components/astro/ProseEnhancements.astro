@@ -60,6 +60,7 @@
     if (blocks.length === 0) return;
 
     const { Chart, registerables } = (await import(
+      // @ts-expect-error -- remote ESM module, no type declarations
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.js/+esm'
     )) as any;
     Chart.register(...registerables);
@@ -111,6 +112,7 @@
     if (blocks.length === 0) return;
 
     const { default: mermaid } = (await import(
+      // @ts-expect-error -- remote ESM module, no type declarations
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
     )) as any;
 
@@ -141,6 +143,7 @@
     if (containers.length === 0) return;
 
     const { default: mermaid } = (await import(
+      // @ts-expect-error -- remote ESM module, no type declarations
       /* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
     )) as any;
 

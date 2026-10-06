@@ -1,6 +1,8 @@
 ---
+import type { SocialLinks as SocialLinksConfig } from '../../lib/types';
+
 interface Props {
-  socials: Record<string, string | undefined>;
+  socials: SocialLinksConfig | Record<string, string | undefined>;
   size?: 'sm' | 'md';
   inline?: boolean;
 }

@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build both themes
+        run: pnpm check:themes
+
       - name: ESLint
         continue-on-error: true
         run: pnpm eslint .

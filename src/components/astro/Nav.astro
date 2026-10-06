@@ -74,13 +74,14 @@ function isActive(href: string): boolean {
     const items = Array.from(nav.querySelectorAll<HTMLAnchorElement>('[data-nav-item]'));
     if (items.length === 0) return;
 
+    // Hoisted function declarations lose the null-narrowing from the guard above; `!` is type-only.
     function measure() {
       // Reset: show all items, hide More
       items.forEach((item) => item.classList.remove('hidden'));
-      moreWrapper.classList.add('hidden');
-      while (moreMenu.firstChild) moreMenu.removeChild(moreMenu.firstChild);
-      moreMenu.classList.add('hidden');
-      moreBtn.setAttribute('aria-expanded', 'false');
+      moreWrapper!.classList.add('hidden');
+      while (moreMenu!.firstChild) moreMenu!.removeChild(moreMenu!.firstChild);
+      moreMenu!.classList.add('hidden');
+      moreBtn!.setAttribute('aria-expanded', 'false');
 
       // Walk up to find the header row (flex justify-between container)
       const headerRow = container.closest('.flex.justify-between') as HTMLElement | null;
@@ -94,7 +95,7 @@ function isActive(href: string): boolean {
       // Reserve space for the "More" button (~70px) + gaps (~24px)
       const totalReserved = logoWidth + toggleWidth + 70 + 24;
       const availableWidth = headerRow.clientWidth - totalReserved;
-      const navLeft = nav.getBoundingClientRect().left;
+      const navLeft = nav!.getBoundingClientRect().left;
 
       let overflowStartIndex = items.length;
       for (let i = 0; i < items.length; i++) {
@@ -121,9 +122,9 @@ function isActive(href: string): boolean {
             link.className =
               'block px-3 py-1.5 text-sm text-surface-600 hover:text-primary-600 hover:bg-surface-50 dark:text-dm-muted dark:hover:text-accent-400 dark:hover:bg-[#1c2128] transition-colors';
           }
-          moreMenu.appendChild(link);
+          moreMenu!.appendChild(link);
         }
-        moreWrapper.classList.remove('hidden');
+        moreWrapper!.classList.remove('hidden');
       }
     }
 
