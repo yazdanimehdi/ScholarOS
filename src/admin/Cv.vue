@@ -285,6 +285,7 @@ async function generatePdf() {
     <DocBanners
       :draft="!!doc.draft"
       :conflict="doc.conflict"
+      :stale="doc.draftStale ? doc.draftChanges : null"
       @restore="doc.restore()"
       @discard="doc.discard()"
       @reload="doc.reload()"

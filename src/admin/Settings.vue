@@ -135,6 +135,7 @@ onMounted(() => {
     <DocBanners
       :draft="!!site.draft"
       :conflict="site.conflict"
+      :stale="site.draftStale ? site.draftChanges : null"
       @restore="site.restore()"
       @discard="site.discard()"
       @reload="site.reload()"
@@ -151,6 +152,7 @@ onMounted(() => {
       <DocBanners
         :draft="!!feeds.draft"
         :conflict="feeds.conflict"
+        :stale="feeds.draftStale ? feeds.draftChanges : null"
         @restore="feeds.restore()"
         @discard="feeds.discard()"
         @reload="feeds.reload()"

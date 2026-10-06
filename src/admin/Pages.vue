@@ -114,6 +114,7 @@ onMounted(() => {
       <DocBanners
         :draft="!!home.draft"
         :conflict="home.conflict"
+        :stale="home.draftStale ? home.draftChanges : null"
         @restore="home.restore()"
         @discard="home.discard()"
         @reload="home.reload()"
@@ -131,6 +132,7 @@ onMounted(() => {
       <DocBanners
         :draft="!!research.draft"
         :conflict="research.conflict"
+        :stale="research.draftStale ? research.draftChanges : null"
         @restore="research.restore()"
         @discard="research.discard()"
         @reload="research.reload()"

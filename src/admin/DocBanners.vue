@@ -1,5 +1,6 @@
 <script setup lang="ts">
-defineProps<{ draft: boolean; conflict: boolean }>();
+/** `stale`: the draft predates the loaded version; lists the top-level keys that differ (null when not stale). */
+defineProps<{ draft: boolean; conflict: boolean; stale?: string[] | null }>();
 defineEmits<{ restore: []; discard: []; reload: [] }>();
 const vFocus = { mounted: (el: HTMLElement) => el.focus() };
 </script>
@@ -18,7 +19,14 @@ const vFocus = { mounted: (el: HTMLElement) => el.focus() };
     </div>
   </div>
   <p v-if="draft" class="adm-banner" role="status">
-    <span>You have unsaved edits from an earlier session.</span>
+    <span>
+      You have unsaved edits from an earlier session.
+      <strong v-if="stale">
+        This draft was made from an older version. Restoring it replaces the newer version, including changes made
+        since<template v-if="stale.length">: {{ stale.join(', ') }}</template
+        >.
+      </strong>
+    </span>
     <span class="adm-actions">
       <button type="button" class="adm-btn adm-btn-small" @click="$emit('restore')">Restore edits</button>
       <button type="button" class="adm-btn adm-btn-small" @click="$emit('discard')">Discard</button>
