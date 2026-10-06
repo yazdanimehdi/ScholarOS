@@ -91,3 +91,13 @@ test('dashboard: posts, feed items, feeds config and counts in one response', as
   assert.equal(typeof d.publications, 'number');
   assert.ok('version' in d.feeds && 'data' in d.feeds);
 });
+
+test('collections: an .mdx entry refuses PUT and DELETE and never commits', async () => {
+  const params = { name: 'posts', slug: 'route-mdx' };
+  await store.commit([{ path: 'src/content/posts/route-mdx.mdx', content: '---\ntitle: M\n---\n\nHi\n' }], 'seed', { 'src/content/posts/route-mdx.mdx': null });
+  const commits = store.log.length;
+  const data = { title: 'M', date: '2024-06-01' };
+  assert.equal((await call(putEntry, { method: 'PUT', params, body: { data, body: '', version: null } })).status, 409);
+  assert.equal((await call(deleteEntry, { method: 'DELETE', params, body: { version: 'x' } })).status, 409);
+  assert.equal(store.log.length, commits);
+});
