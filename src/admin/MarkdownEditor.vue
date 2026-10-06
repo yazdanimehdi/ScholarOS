@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ChainedCommands } from '@tiptap/core';
+import { Editor, type ChainedCommands } from '@tiptap/core';
 import type { Node as PMNode } from '@tiptap/pm/model';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import 'katex/dist/katex.min.css';
 import { ref, watch } from 'vue';
 import MediaGrid from './MediaGrid.vue';
-import { editorExtensions } from './editor/extensions';
+import { editorExtensions, isLossless } from './editor/extensions';
 
 const props = defineProps<{ modelValue: string; compact?: boolean; preview?: boolean }>();
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
@@ -23,6 +23,16 @@ function editMath(kind: 'inline' | 'block', node: PMNode, pos: number) {
   (kind === 'inline' ? chain.updateInlineMath({ latex }) : chain.updateBlockMath({ latex })).focus().run();
 }
 
+// Markdown the editor can't represent (HTML, comments, footnotes, …) is edited as plain text instead of being rewritten.
+const headless = (markdown: string) =>
+  new Editor({ extensions: editorExtensions(), content: markdown, contentType: 'markdown' });
+const plain = ref(!isLossless(props.modelValue, headless));
+let emitted: string | undefined;
+function emitMarkdown(markdown: string) {
+  emitted = markdown;
+  emit('update:modelValue', markdown);
+}
+
 const editor = useEditor({
   extensions: editorExtensions(editMath),
   content: props.modelValue,
@@ -30,7 +40,7 @@ const editor = useEditor({
   editable: !props.preview,
   editorProps: { attributes: { class: contentClass(props.preview) } },
   onUpdate: ({ editor: e }) => {
-    emit('update:modelValue', e.getMarkdown());
+    emitMarkdown(e.getMarkdown());
     updateSlash();
   },
   onSelectionUpdate: () => updateSlash(),
@@ -39,7 +49,9 @@ const editor = useEditor({
 watch(
   () => props.modelValue,
   (markdown) => {
-    if (editor.value && markdown !== editor.value.getMarkdown()) {
+    if (markdown === emitted) return; // our own edit coming back
+    plain.value = !isLossless(markdown, headless);
+    if (!plain.value && editor.value && markdown !== editor.value.getMarkdown()) {
       editor.value.commands.setContent(markdown, { contentType: 'markdown', emitUpdate: false });
     }
   },
@@ -132,7 +144,20 @@ function choose(action: () => void) {
 
 <template>
   <div ref="host" class="adm-editor" :class="{ 'is-compact': compact }" @keydown.esc="slash = null">
-    <div v-if="!preview" class="adm-toolbar" role="toolbar" aria-label="Formatting">
+    <template v-if="plain">
+      <p class="adm-banner" role="status">
+        This text uses Markdown the visual editor can't keep (HTML, footnotes, …). Editing it as plain Markdown so
+        nothing is lost.
+      </p>
+      <textarea
+        class="adm-md-plain"
+        aria-label="Markdown"
+        :value="modelValue"
+        :readonly="preview"
+        @input="emitMarkdown(($event.target as HTMLTextAreaElement).value)"
+      ></textarea>
+    </template>
+    <div v-if="!preview && !plain" class="adm-toolbar" role="toolbar" aria-label="Formatting">
       <button
         v-for="t in TOOLBAR"
         :key="t.title"
@@ -145,7 +170,7 @@ function choose(action: () => void) {
         {{ t.label }}
       </button>
     </div>
-    <EditorContent :editor="editor" />
+    <EditorContent v-show="!plain" :editor="editor" />
     <div v-if="slash" class="adm-slash" role="menu" :style="{ top: `${slash.top}px`, left: `${slash.left}px` }">
       <button
         v-for="[label, action] in SLASH"

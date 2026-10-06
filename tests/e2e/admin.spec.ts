@@ -42,6 +42,27 @@ test('posts: create, save a draft, then publish', async ({ page }) => {
   await expect(page.getByRole('row', { name: new RegExp(title) }).getByText('Published')).toBeVisible();
 });
 
+test('posts: a body with raw HTML opens as plain Markdown and is kept', async ({ page, baseURL }) => {
+  await signIn(page);
+  const slug = `e2e-html-${Date.now()}`;
+  const body = 'Watch:\n\n<iframe src="https://example.com/embed"></iframe>\n';
+  const created = await page.request.put(`/api/admin/collections/posts/${slug}`, {
+    headers: { Origin: baseURL! },
+    data: { data: { title: 'HTML body', date: '2024-06-01', draft: true }, body, version: null },
+  });
+  expect(created.ok()).toBe(true);
+  await page.goto(`${ADMIN}/posts/${slug}`);
+  await expect(page.getByText("This text uses Markdown the visual editor can't keep")).toBeVisible();
+  const markdown = page.getByLabel('Markdown', { exact: true });
+  await expect(markdown).toHaveValue(/<iframe src="https:\/\/example.com\/embed"><\/iframe>/);
+  await markdown.press('End');
+  await markdown.type(' More.');
+  await page.getByRole('button', { name: 'Save draft' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+  const saved = await (await page.request.get(`/api/admin/collections/posts/${slug}`)).json();
+  expect(saved.body).toContain('<iframe src="https://example.com/embed"></iframe>');
+});
+
 test('dashboard: hide and unhide an imported post', async ({ page }) => {
   await signIn(page);
   await page.goto(ADMIN);

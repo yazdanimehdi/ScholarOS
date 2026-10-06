@@ -20,7 +20,7 @@ for (const key of [
 }
 
 const { Editor } = await import('@tiptap/core');
-const { editorExtensions } = await import('./extensions');
+const { editorExtensions, isLossless } = await import('./extensions');
 
 const editor = (markdown: string) =>
   new Editor({ extensions: editorExtensions(), content: markdown, contentType: 'markdown' });
@@ -73,4 +73,16 @@ test('dollar amounts stay text; real inline math is math', () => {
   assert.ok(!JSON.stringify(editor('Costs $500K and $1M per year.').getJSON()).includes('inlineMath'));
   assert.ok(JSON.stringify(editor('Inline $E = mc^2$ and $x$.').getJSON()).includes('"latex":"E = mc^2"'));
   assert.equal(roundTrip('Inline $E = mc^2$ and $x$.').trim(), 'Inline $E = mc^2$ and $x$.');
+});
+
+test('isLossless: true for Markdown the editor keeps, false for HTML, comments and footnotes', () => {
+  assert.equal(isLossless(CANONICAL, editor), true);
+  assert.equal(isLossless('', editor), true);
+  for (const lossy of [
+    'Watch:\n\n<iframe src="https://www.youtube.com/embed/x"></iframe>',
+    'Text\n\n<!-- note to self -->\n\nMore',
+    'A claim.[^1]\n\n[^1]: The source.',
+  ]) {
+    assert.equal(isLossless(lossy, editor), false, lossy);
+  }
 });

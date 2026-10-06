@@ -487,6 +487,15 @@
 .adm-editor.is-compact .tiptap {
   min-height: 140px;
 }
+.adm .adm-md-plain {
+  display: block;
+  min-height: 320px;
+  border: 0;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.adm-editor.is-compact .adm-md-plain {
+  min-height: 140px;
+}
 .adm-editor .tiptap table {
   border-collapse: collapse;
 }

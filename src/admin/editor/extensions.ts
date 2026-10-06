@@ -39,3 +39,21 @@ export function editorExtensions(onMathClick?: MathClick): AnyExtension[] {
     TableKit,
   ];
 }
+
+const tidy = (markdown: string) => markdown.replace(/\n{3,}/g, '\n\n').trim();
+
+/**
+ * True when the editor writes `markdown` back unchanged (blank-line runs and outer whitespace aside). When false
+ * (raw HTML, comments, footnotes, …), editing it visually would silently drop or rewrite parts of it.
+ */
+export function isLossless(
+  markdown: string,
+  createEditor: (markdown: string) => { getMarkdown(): string; destroy(): void },
+): boolean {
+  const editor = createEditor(markdown);
+  try {
+    return tidy(editor.getMarkdown()) === tidy(markdown);
+  } finally {
+    editor.destroy();
+  }
+}
