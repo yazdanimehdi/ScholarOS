@@ -1,7 +1,9 @@
 ---
 import ClassicResearch from '../themes/classic/Research.astro';
+import EditorialResearch from '../themes/editorial/Research.astro';
+import { loadResearch } from '../themes/editorial/data';
 import { getCollection } from 'astro:content';
-import { isPersonalMode, loadYamlConfig } from '../lib/config';
+import { getTheme, isPersonalMode, loadYamlConfig } from '../lib/config';
 import { byId } from '../lib/utils';
 
 const personal = isPersonalMode();
@@ -23,6 +25,13 @@ try {
 } catch {}
 const researchAreas = researchConfig.areas || [];
 const researchDescription = researchConfig.description || '';
+const editorialResearch = getTheme() === 'editorial' ? await loadResearch() : null;
 ---
 
-<ClassicResearch {personal} {projects} {publications} {researchAreas} {researchDescription} />
+{
+  editorialResearch ? (
+    <EditorialResearch {...editorialResearch} />
+  ) : (
+    <ClassicResearch {personal} {projects} {publications} {researchAreas} {researchDescription} />
+  )
+}

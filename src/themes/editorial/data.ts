@@ -90,3 +90,28 @@ export async function loadHome() {
 }
 
 export type HomeData = Awaited<ReturnType<typeof loadHome>>;
+
+export async function loadResearch() {
+  const config = getSiteConfig();
+  const research = loadResearchConfig();
+  const pubs = await getCollection('publications');
+  const byId = new Map(pubs.map((p) => [p.id, p]));
+  const areas = await Promise.all(
+    normalizeAreas(research.areas).map(async (a) => ({
+      ...a,
+      bodyHtml: await renderMarkdown(a.body || a.description),
+      papers: pick(a.publications, byId, `research.yml area "${a.id}"`),
+    })),
+  );
+  const software = (await getCollection('projects'))
+    .filter((p) => p.data.type === 'software')
+    .map((p) => ({
+      name: p.data.title,
+      href: p.data.repoUrl ?? p.data.url,
+      description: p.data.excerpt,
+      tech: (p.data.tags ?? []).join(' · '),
+    }));
+  return { config, headline: research.headline, description: research.description, areas, software };
+}
+
+export type ResearchData = Awaited<ReturnType<typeof loadResearch>>;

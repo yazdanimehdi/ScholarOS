@@ -69,6 +69,20 @@ for (const theme of THEMES) {
   assert.doesNotMatch(html, /astro-island/, 'editorial /: no framework islands');
 }
 
+{
+  const html = ed('research/index.html');
+  for (const id of ['nlp', 'multimodal', 'safety']) {
+    assert.match(html, new RegExp(`<section id="${id}" class="ed-area"`), `editorial /research: section #${id}`);
+  }
+  assert.match(html, /<nav class="ed-toc" aria-label="On this page">/, 'editorial /research: on-this-page nav');
+  assert.match(html, /<strong>parameter-efficient fine-tuning<\/strong>/, 'editorial /research: Markdown body');
+  assert.match(html, /<b>Result\.<\/b>/, 'editorial /research: result aside');
+  assert.match(html, /<b>Fig\. 1\.<\/b>/, 'editorial /research: numbered figure caption');
+  assert.match(html, /href="\/publications#garcia2024safe"/, 'editorial /research: related paper rows');
+  assert.match(html, /<section id="software" class="ed-software"/, 'editorial /research: software grid');
+  assert.match(html, /Python · Transformers/, 'editorial /research: software tech line from tags');
+}
+
 // --- classic regression ---
 const BASELINE = 'dist-baseline';
 

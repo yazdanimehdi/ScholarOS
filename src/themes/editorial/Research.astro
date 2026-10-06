@@ -1,0 +1,124 @@
+---
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import { shortTitle } from '../../lib/editorial';
+import type { ResearchData } from './data';
+
+type Props = ResearchData;
+
+const { config, headline, description, areas, software } = Astro.props;
+const personal = config.siteMode === 'personal';
+const intro =
+  description ||
+  (personal
+    ? 'My research focuses on artificial intelligence, with an emphasis on building systems that are capable, safe, and beneficial.'
+    : 'Our lab explores the frontiers of artificial intelligence, with a focus on building systems that are capable, safe, and beneficial.');
+let figureCount = 0;
+const figureNumbers = areas.map((a) => (a.figure ? ++figureCount : 0));
+---
+
+<Layout
+  title="Research"
+  description={personal ? 'My research areas and current projects.' : 'Our research areas and current projects.'}
+>
+  <div class="ed-wrap ed-main ed-main--flush">
+    <div class="ed-research-intro">
+      <Eyebrow>Research</Eyebrow>
+      <h1 class="ed-h1">{headline || 'Research'}</h1>
+      <p class="ed-lede">{intro}</p>
+    </div>
+
+    {
+      (areas.length > 0 || software.length > 0) && (
+        <nav class="ed-toc" aria-label="On this page">
+          <span class="ed-toc-label">On this page</span>
+          {areas.map((a) => (
+            <a href={`#${a.id}`} class="ul">
+              {a.numeral} {a.title}
+            </a>
+          ))}
+          {software.length > 0 && (
+            <a href="#software" class="ul">
+              Software
+            </a>
+          )}
+        </nav>
+      )
+    }
+
+    {
+      areas.map((a, i) => (
+        <section id={a.id} class="ed-area" aria-labelledby={`${a.id}-title`}>
+          <div class="ed-area-text">
+            <span class="ed-area-num" aria-hidden="true">
+              {a.numeral}
+            </span>
+            <h2 id={`${a.id}-title`}>{a.title}</h2>
+            <div class="ed-md" set:html={a.bodyHtml} />
+            {a.result && (
+              <aside class="ed-result">
+                <b>Result.</b> {a.result}
+              </aside>
+            )}
+            {a.papers.length > 0 && (
+              <div class="ed-related">
+                <span class="ed-label">Papers</span>
+                {a.papers.map((p) => (
+                  <a href={`/publications#${p.id}`} class="row">
+                    <span>
+                      {shortTitle(p.data.title)}{' '}
+                      <span class="ed-related-venue">
+                        · {p.data.venueShort ? `${p.data.venueShort} ${p.data.year}` : p.data.venue}
+                      </span>
+                    </span>
+                    <span class="arr" aria-hidden="true">
+                      →
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+          {a.figure && (
+            <figure class="ed-area-fig">
+              <div class="ed-figure-box">
+                <img src={a.figure} alt={a.caption || a.title} loading="lazy" decoding="async" />
+              </div>
+              {a.caption && (
+                <figcaption class="ed-figcaption">
+                  <b>Fig. {figureNumbers[i]}.</b> {a.caption}
+                </figcaption>
+              )}
+            </figure>
+          )}
+        </section>
+      ))
+    }
+
+    {
+      software.length > 0 && (
+        <section id="software" class="ed-software" aria-labelledby="software-title">
+          <Eyebrow as="h2" id="software-title">
+            Software
+          </Eyebrow>
+          <div class="ed-software-grid">
+            {software.map((s) => (
+              <a href={s.href} class="row ed-software-card">
+                <span class="ed-software-name">
+                  {s.name}
+                  {s.href && (
+                    <span class="arr" aria-hidden="true">
+                      ↗
+                    </span>
+                  )}
+                </span>
+                {s.description && <span class="ed-software-desc">{s.description}</span>}
+                {s.tech && <span class="ed-software-tech">{s.tech}</span>}
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Layout>
