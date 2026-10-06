@@ -34,11 +34,13 @@ const { config, cv, cvMeta, hasPdf, pdfHref, allSections, hasYamlPublications, p
         {cv.name || config.author}
       </h1>
       {cv.location && <p class="text-sm text-surface-500 dark:text-dm-muted">{cv.location}</p>}
-      {(config.department || config.university) && (
-        <p class="text-sm text-surface-500 dark:text-dm-muted">
-          {[config.department, config.university].filter(Boolean).join(', ')}
-        </p>
-      )}
+      {
+        (config.department || config.university) && (
+          <p class="text-sm text-surface-500 dark:text-dm-muted">
+            {[config.department, config.university].filter(Boolean).join(', ')}
+          </p>
+        )
+      }
       <div class="mt-1 flex flex-wrap gap-3 text-xs text-surface-500 dark:text-dm-muted">
         {cv.email && <span>{cv.email}</span>}
         {
@@ -125,7 +127,9 @@ const { config, cv, cvMeta, hasPdf, pdfHref, allSections, hasYamlPublications, p
                     </div>
                     {edu.highlights && edu.highlights.length > 0 && (
                       <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                        {edu.highlights.map((h) => <li>{h}</li>)}
+                        {edu.highlights.map((h) => (
+                          <li>{h}</li>
+                        ))}
                       </ul>
                     )}
                   </div>
@@ -183,7 +187,9 @@ const { config, cv, cvMeta, hasPdf, pdfHref, allSections, hasYamlPublications, p
                     </div>
                     {exp.highlights && exp.highlights.length > 0 && (
                       <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                        {exp.highlights.map((h) => <li>{h}</li>)}
+                        {exp.highlights.map((h) => (
+                          <li>{h}</li>
+                        ))}
                       </ul>
                     )}
                   </div>
@@ -265,19 +271,17 @@ const { config, cv, cvMeta, hasPdf, pdfHref, allSections, hasYamlPublications, p
                 return (
                   <div>
                     <div class="flex items-baseline justify-between">
-                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">
-                        {e.name ?? ''}
-                      </h3>
+                      <h3 class="text-sm font-medium text-surface-900 dark:text-dm-heading">{e.name ?? ''}</h3>
                       <span class="ms-4 shrink-0 text-xs text-surface-400 dark:text-dm-faint">
                         {e.startDate ? formatDateRange(e.startDate, e.endDate) : (e.date ?? '')}
                       </span>
                     </div>
-                    {e.location && (
-                      <p class="text-sm text-surface-500 dark:text-dm-muted">{e.location}</p>
-                    )}
+                    {e.location && <p class="text-sm text-surface-500 dark:text-dm-muted">{e.location}</p>}
                     {e.highlights && e.highlights.length > 0 && (
                       <ul class="mt-1 list-inside list-disc text-xs text-surface-500 dark:text-dm-muted">
-                        {e.highlights.map((h) => <li>{h}</li>)}
+                        {e.highlights.map((h) => (
+                          <li>{h}</li>
+                        ))}
                       </ul>
                     )}
                   </div>

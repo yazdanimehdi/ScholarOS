@@ -22,14 +22,14 @@ const editorialCv = getTheme() === 'editorial' ? await loadCvPage() : null;
     <EditorialCv {...editorialCv} />
   ) : (
     <ClassicCv
-  {config}
-  {cv}
-  {cvMeta}
-  {hasPdf}
-  {pdfHref}
-  {allSections}
-  hasYamlPublications={hasYamlPublications(allSections)}
-  {publications}
-/>
+      {config}
+      {cv}
+      {cvMeta}
+      {hasPdf}
+      {pdfHref}
+      {allSections}
+      hasYamlPublications={hasYamlPublications(allSections)}
+      {publications}
+    />
   )
 }

@@ -5,3 +5,9 @@ pnpm-lock.yaml
 src/data/*.json
 src/components/astro/Analytics.astro
 dist-*/
+
+# design reference and planning docs (not code)
+personal-site-handoff/
+HANDOFF.md
+docs/superpowers/
+.superpowers/

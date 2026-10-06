@@ -9,13 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const THEMES = ['classic', 'editorial'];
-const PAGES = [
-  'index.html',
-  'research/index.html',
-  'publications/index.html',
-  'cv/index.html',
-  'blog/index.html',
-];
+const PAGES = ['index.html', 'research/index.html', 'publications/index.html', 'cv/index.html', 'blog/index.html'];
 
 if (!process.argv.includes('--no-build')) {
   for (const theme of THEMES) {
@@ -47,7 +41,11 @@ for (const theme of THEMES) {
 {
   const html = ed('contact/index.html');
   assert.match(html, /<header class="ed-header">/, 'editorial /contact: editorial header on an undesigned page');
-  assert.match(html, /<a href="\/contact" aria-current="page">\s*Contact\s*<\/a>/, 'editorial /contact: active nav item');
+  assert.match(
+    html,
+    /<a href="\/contact" aria-current="page">\s*Contact\s*<\/a>/,
+    'editorial /contact: active nav item',
+  );
   assert.match(html, /<footer class="ed-footer">/, 'editorial /contact: light footer');
   assert.doesNotMatch(html, /ThemeToggle/, 'editorial: no theme toggle');
   assert.doesNotMatch(read('classic', 'contact/index.html'), /class="ed-header"/, 'classic /contact: classic header');
@@ -56,11 +54,19 @@ for (const theme of THEMES) {
 {
   const html = ed('index.html');
   assert.match(html, /<h1 class="ed-hero-name">Prof\. Jane Smith<\/h1>/, 'editorial /: hero name');
-  assert.match(html, /<div class="ed-bio"><p>I lead the Smith Research Lab at the <strong>/, 'editorial /: bio rendered from Markdown');
+  assert.match(
+    html,
+    /<div class="ed-bio"><p>I lead the Smith Research Lab at the <strong>/,
+    'editorial /: bio rendered from Markdown',
+  );
   assert.match(html, /"@type":"Person"/, 'editorial /: Person JSON-LD');
   assert.match(html, /class="ed-band-item">University of Technology</, 'editorial /: affiliations band');
   assert.match(html, /href="\/research#nlp"/, 'editorial /: research card links to its area');
-  assert.match(html, /Adaptive Fine-Tuning Strategies for Large Language Models in Low-Resource Domains · Fairness-Aware/, 'editorial /: card lists related papers by short title');
+  assert.match(
+    html,
+    /Adaptive Fine-Tuning Strategies for Large Language Models in Low-Resource Domains · Fairness-Aware/,
+    'editorial /: card lists related papers by short title',
+  );
   assert.match(html, /All 5 publications/, 'editorial /: publication count');
   assert.match(html, /href="\/publications#smith2024adaptive"/, 'editorial /: Cite link');
   assert.match(html, /<strong>Jane Smith<\/strong>/, 'editorial /: owner bold in author lists');
@@ -88,12 +94,24 @@ for (const theme of THEMES) {
   assert.equal((html.match(/data-topic="/g) ?? []).length, 5, 'editorial /publications: one filterable row per paper');
   assert.match(html, /<li id="smith2024adaptive"/, 'editorial /publications: row anchors for Cite links');
   assert.match(html, /data-topic="other"/, 'editorial /publications: unmatched topic → Other');
-  assert.match(html, /data-filter="nlp"[^>]*>\s*NLP <span class="ed-tab-count num">1<\/span>/, 'editorial /publications: topic filter with count');
+  assert.match(
+    html,
+    /data-filter="nlp"[^>]*>\s*NLP <span class="ed-tab-count num">1<\/span>/,
+    'editorial /publications: topic filter with count',
+  );
   assert.match(html, /data-filter="other"/, 'editorial /publications: Other filter');
-  assert.match(html, /<details class="ed-bib">\s*<summary class="ul">Cite<\/summary>\s*<pre>@inproceedings\{smith2024adaptive,/, 'editorial /publications: BibTeX expander');
+  assert.match(
+    html,
+    /<details class="ed-bib">\s*<summary class="ul">Cite<\/summary>\s*<pre>@inproceedings\{smith2024adaptive,/,
+    'editorial /publications: BibTeX expander',
+  );
   assert.match(html, /@article\{smith2023fairness,/, 'editorial /publications: bibtex field used as-is');
   assert.match(html, /"@type":"ScholarlyArticle"/, 'editorial /publications: ScholarlyArticle JSON-LD');
-  assert.match(html, /https:\/\/arxiv\.org\/abs\/2024\.00003/, 'editorial /publications: arXiv prefix stripped in sameAs');
+  assert.match(
+    html,
+    /https:\/\/arxiv\.org\/abs\/2024\.00003/,
+    'editorial /publications: arXiv prefix stripped in sameAs',
+  );
   assert.match(html, /data-first-only/, 'editorial /publications: first-author toggle');
 }
 
@@ -109,11 +127,19 @@ for (const theme of THEMES) {
   const html = ed('blog/index.html');
   assert.match(html, /<li class="ed-entry" data-kind="site">/, 'editorial /blog: site rows');
   assert.match(html, /<li class="ed-entry" data-kind="external">/, 'editorial /blog: external rows');
-  assert.match(html, /data-filter="external"[^>]*>\s*Elsewhere\s*</, 'editorial /blog: mixed feed sources → "Elsewhere"');
+  assert.match(
+    html,
+    /data-filter="external"[^>]*>\s*Elsewhere\s*</,
+    'editorial /blog: mixed feed sources → "Elsewhere"',
+  );
   assert.match(html, /Published on Medium ↗/, 'editorial /blog: external rows link out');
   assert.match(html, /href="\/feed\.xml"/, 'editorial /blog: RSS link');
   const post = ed('blog/research-update-summer-2024/index.html');
-  assert.match(post, /<p class="ed-subtitle">Three papers, a toolkit release and two new lab members\.<\/p>/, 'editorial post: subtitle');
+  assert.match(
+    post,
+    /<p class="ed-subtitle">Three papers, a toolkit release and two new lab members\.<\/p>/,
+    'editorial post: subtitle',
+  );
   assert.match(post, /<span class="ed-aside-label">Related paper<\/span>/, 'editorial post: related paper');
   assert.match(post, /\d+ min read/, 'editorial post: reading time');
   assert.match(post, /<div class="ed-prose">/, 'editorial post: prose wrapper');

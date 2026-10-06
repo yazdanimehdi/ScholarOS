@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { elsewhereLabel, homeBlocks, isOwner, jsonLd, mergeWriting, normalizeAreas, paperLink, shortTitle, socialLinks, toRoman, topicFilters, topicOf } from './editorial';
+import {
+  elsewhereLabel,
+  homeBlocks,
+  isOwner,
+  jsonLd,
+  mergeWriting,
+  normalizeAreas,
+  paperLink,
+  shortTitle,
+  socialLinks,
+  toRoman,
+  topicFilters,
+  topicOf,
+} from './editorial';
 
 test('paperLink: url, then doi, then arXiv', () => {
   assert.equal(paperLink({ url: 'https://a.org/p', doi: '10.1/x', arxiv: '2401.1' }), 'https://a.org/p');
@@ -102,7 +115,12 @@ test('elsewhereLabel: the single shared feed source, else "Elsewhere"', () => {
 
 test('socialLinks: known profiles in a fixed order, blanks and email skipped', () => {
   assert.deepEqual(
-    socialLinks({ github: 'https://github.com/x', scholar: 'https://scholar.google.com/x', twitter: '', email: 'a@b.c' }),
+    socialLinks({
+      github: 'https://github.com/x',
+      scholar: 'https://scholar.google.com/x',
+      twitter: '',
+      email: 'a@b.c',
+    }),
     [
       { label: 'Google Scholar', href: 'https://scholar.google.com/x' },
       { label: 'GitHub', href: 'https://github.com/x' },
@@ -112,13 +130,10 @@ test('socialLinks: known profiles in a fixed order, blanks and email skipped', (
 });
 
 test('homeBlocks: hero, affiliations, research, then papers/updates in configured order', () => {
-  assert.deepEqual(homeBlocks(['hero', 'about', 'news', 'publications', 'blog'], { affiliations: true, research: true }), [
-    'hero',
-    'affiliations',
-    'research',
-    'updates',
-    'publications',
-  ]);
+  assert.deepEqual(
+    homeBlocks(['hero', 'about', 'news', 'publications', 'blog'], { affiliations: true, research: true }),
+    ['hero', 'affiliations', 'research', 'updates', 'publications'],
+  );
   assert.deepEqual(homeBlocks(['publications', 'blog'], { affiliations: false, research: true }), [
     'research',
     'publications',

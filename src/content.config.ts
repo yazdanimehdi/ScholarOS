@@ -2,8 +2,10 @@ import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
 /** Treat empty/whitespace-only strings as absent (CMS writes '' instead of omitting). */
-const emptyToUndefined = z.string().optional()
-  .transform(v => (v?.trim() ? v.trim() : undefined));
+const emptyToUndefined = z
+  .string()
+  .optional()
+  .transform((v) => (v?.trim() ? v.trim() : undefined));
 
 /** Same but with .url() validation after stripping empties. */
 const optionalUrl = emptyToUndefined.pipe(z.string().url().optional());

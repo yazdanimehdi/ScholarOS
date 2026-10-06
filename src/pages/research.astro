@@ -9,7 +9,8 @@ import { byId } from '../lib/utils';
 const personal = isPersonalMode();
 
 const projects = (await getCollection('projects')).filter((p) => p.data.status === 'active');
-const publications = (await getCollection('publications')).sort(byId)
+const publications = (await getCollection('publications'))
+  .sort(byId)
   .filter((p) => p.data.featured)
   .sort((a, b) => b.data.year - a.data.year)
   .slice(0, 5);

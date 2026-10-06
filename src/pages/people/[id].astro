@@ -21,7 +21,8 @@ export async function getStaticPaths() {
 const { person } = Astro.props;
 const { Content } = await render(person);
 
-const publications = (await getCollection('publications')).sort(byId)
+const publications = (await getCollection('publications'))
+  .sort(byId)
   .filter((p) =>
     p.data.authors.some((a) => a.toLowerCase().includes(person.data.name.split(' ')[1]?.toLowerCase() || '')),
   )

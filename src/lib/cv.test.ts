@@ -7,7 +7,8 @@ const structured: CvConfig = { cv: { name: 'Structured', sections: {} } };
 const fromStructured = () => structured;
 
 test('resolveCvConfig: an enabled upload wins, with snake_case keys normalized', () => {
-  const content = 'cv:\n  name: Uploaded\n  sections:\n    work_experience:\n      - company: X\n        start_date: 2020-01\n';
+  const content =
+    'cv:\n  name: Uploaded\n  sections:\n    work_experience:\n      - company: X\n        start_date: 2020-01\n';
   const cv = resolveCvConfig({ enabled: true, content }, fromStructured).cv;
   assert.equal(cv.name, 'Uploaded');
   assert.deepEqual(Object.keys(cv.sections), ['workExperience']);
@@ -57,18 +58,24 @@ test('cvEntryView: each RenderCV entry shape', () => {
     org: 'Python, Rust',
     points: [],
   });
-  assert.deepEqual(cvEntryView({ company: 'U of T', position: 'Professor', startDate: '2020-01', endDate: 'present' }), {
-    title: 'Professor',
-    org: 'U of T',
-    when: '2020-01 – Present',
-    points: [],
-  });
-  assert.deepEqual(cvEntryView({ title: 'Paper', authors: ['**Jane Smith**', 'Alex Chen'], journal: 'ACL', date: 2024 }), {
-    title: 'Paper',
-    org: 'Jane Smith, Alex Chen · ACL',
-    when: '2024',
-    points: [],
-  });
+  assert.deepEqual(
+    cvEntryView({ company: 'U of T', position: 'Professor', startDate: '2020-01', endDate: 'present' }),
+    {
+      title: 'Professor',
+      org: 'U of T',
+      when: '2020-01 – Present',
+      points: [],
+    },
+  );
+  assert.deepEqual(
+    cvEntryView({ title: 'Paper', authors: ['**Jane Smith**', 'Alex Chen'], journal: 'ACL', date: 2024 }),
+    {
+      title: 'Paper',
+      org: 'Jane Smith, Alex Chen · ACL',
+      when: '2024',
+      points: [],
+    },
+  );
   assert.deepEqual(cvEntryView({ name: 'Best Paper', date: '2023', highlights: ['x', 3] }), {
     title: 'Best Paper',
     when: '2023',

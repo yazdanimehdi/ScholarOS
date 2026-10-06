@@ -65,10 +65,7 @@ const {
       if (id === 'news' && announcementData.length > 0) {
         return (
           <div class="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
-            <SectionHeading
-              title={personal ? 'Recent Updates' : 'Latest Announcements'}
-              viewAllHref="/news"
-            />
+            <SectionHeading title={personal ? 'Recent Updates' : 'Latest Announcements'} viewAllHref="/news" />
             <div class="mt-3 space-y-0">
               {announcementData.map((a) => (
                 <AnnouncementCard
@@ -135,7 +132,9 @@ const {
                               )}
                               <div class="min-w-0">
                                 <h3 class="line-clamp-2 text-sm leading-snug font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400">
-                                  {pub.data.featured && <span class="me-1 text-xs text-primary-600 dark:text-accent-400">📌</span>}
+                                  {pub.data.featured && (
+                                    <span class="me-1 text-xs text-primary-600 dark:text-accent-400">📌</span>
+                                  )}
                                   {pub.data.title}
                                 </h3>
                                 <p class="mt-0.5 text-xs text-surface-500 dark:text-dm-muted">

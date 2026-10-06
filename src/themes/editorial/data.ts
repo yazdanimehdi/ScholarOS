@@ -1,5 +1,13 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { cvEntryView, cvSections, hasYamlPublications, loadCv, loadCvMeta, sectionTitle, type CvEntryView } from '../../lib/cv';
+import {
+  cvEntryView,
+  cvSections,
+  hasYamlPublications,
+  loadCv,
+  loadCvMeta,
+  sectionTitle,
+  type CvEntryView,
+} from '../../lib/cv';
 import { getHomepageSections, getSiteConfig, getSiteName, loadYamlConfig } from '../../lib/config';
 import {
   elsewhereLabel,

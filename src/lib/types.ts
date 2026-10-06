@@ -309,7 +309,15 @@ export interface CvSections {
   publications?: CvPublication[];
   awards?: CvAward[];
   skills?: CvSkill[];
-  [key: string]: CvGenericEntry[] | CvEducation[] | CvExperience[] | CvPublication[] | CvAward[] | CvSkill[] | string[] | undefined;
+  [key: string]:
+    | CvGenericEntry[]
+    | CvEducation[]
+    | CvExperience[]
+    | CvPublication[]
+    | CvAward[]
+    | CvSkill[]
+    | string[]
+    | undefined;
 }
 
 export interface CvData {
