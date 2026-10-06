@@ -27,6 +27,7 @@ METADATA_PATH = ROOT / "src" / "data" / "cv.json"
 PERSON_CV_DIR = ROOT / "cv"
 PERSON_OUTPUT_DIR = ROOT / "public" / "cv"
 PERSON_META_PATH = ROOT / "src" / "data" / "cv-people.json"
+PUBLICATIONS_DIR = ROOT / "src" / "content" / "publications"
 MAX_PDF_SIZE = 10 * 1024 * 1024  # 10 MB limit
 
 
@@ -208,13 +209,71 @@ def transform_one_line_entry(entry: dict) -> dict:
     }
 
 
-def build_rendercv_input(config: dict) -> dict:
-    """Convert our cv.yml format to RenderCV's expected YAML input."""
+def drop_hidden(sections: dict) -> dict:
+    """Remove entries marked visible: false and strip the key from the rest (RenderCV rejects unknown keys)."""
+    result = {}
+    for name, entries in (sections or {}).items():
+        if not isinstance(entries, list):
+            result[name] = entries
+            continue
+        kept = []
+        for entry in entries:
+            if isinstance(entry, dict):
+                if entry.get("visible") is False:
+                    continue
+                entry = {k: v for k, v in entry.items() if k != "visible"}
+            kept.append(entry)
+        result[name] = kept
+    return result
+
+
+def is_publication(entry) -> bool:
+    return isinstance(entry, dict) and "title" in entry and "authors" in entry
+
+
+def read_front_matter(path: Path) -> dict:
+    match = re.match(r"^---\r?\n(.*?)\r?\n---", path.read_text(encoding="utf-8"), re.S)
+    return (yaml.safe_load(match.group(1)) or {}) if match else {}
+
+
+def collection_publications(directory: Path = PUBLICATIONS_DIR) -> list:
+    """RenderCV publication entries built from the publications collection, newest first."""
+    entries = []
+    for path in sorted(directory.glob("*.md*")):
+        data = read_front_matter(path)
+        if not data.get("title"):
+            continue
+        entry = {"title": data["title"], "authors": data.get("authors") or []}
+        if data.get("venue"):
+            entry["journal"] = data["venue"]
+        if data.get("year"):
+            entry["date"] = str(data["year"])
+        if data.get("doi"):
+            entry["doi"] = data["doi"]
+        if data.get("url"):
+            entry["url"] = data["url"]
+        entries.append(entry)
+    return sorted(entries, key=lambda e: e.get("date", ""), reverse=True)
+
+
+def build_rendercv_input(config: dict, with_collection: bool = False) -> dict:
+    """Convert our cv.yml format to RenderCV's expected YAML input.
+
+    with_collection: when no section lists publications, add one from src/content/publications
+    (the collection is the single source of publications for the site CV).
+    """
     # Convert all keys from camelCase to snake_case
     converted = convert_keys(config)
 
     cv = converted.get("cv", {})
-    sections_raw = cv.pop("sections", {})
+    sections_raw = drop_hidden(cv.pop("sections", {}))
+
+    if with_collection and not any(
+        isinstance(entries, list) and entries and is_publication(entries[0]) for entries in sections_raw.values()
+    ):
+        publications = collection_publications()
+        if publications:
+            sections_raw["publications"] = publications
 
     # Transform section entries to proper RenderCV types
     cv["sections"] = transform_section_entries(sections_raw)
@@ -405,7 +464,7 @@ def main():
             sys.exit(1)
 
         # Build RenderCV input from structured config
-        rendercv_input = build_rendercv_input(config)
+        rendercv_input = build_rendercv_input(config, with_collection=True)
 
     # Render PDF
     try:
