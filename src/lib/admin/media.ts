@@ -22,11 +22,33 @@ const SIGNATURES: [ext: string, test: (b: Uint8Array) => boolean][] = [
   ['avif', (b) => ascii(b, 4, 8) === 'ftyp' && ['avif', 'avis'].includes(ascii(b, 8, 12))],
 ];
 
-const SVG_DANGER: [RegExp, string][] = [
+/**
+ * True when some `<!DOCTYPE` reaches a `[` outside quoted strings before its `>`: an internal subset.
+ * Every `<!DOCTYPE` starts a scan, but scans in the same state (outside, in "…", in '…') behave alike from
+ * then on, so one forward pass tracks at most three of them: linear time on any input.
+ */
+function hasInternalSubset(text: string): boolean {
+  let outside = false;
+  let inDouble = false;
+  let inSingle = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '<' && text.slice(i, i + 9).toUpperCase() === '<!DOCTYPE') {
+      outside = true;
+      i += 8; // none of the token's characters change a scan's state
+    } else if (c === '[') {
+      if (outside) return true;
+    } else if (c === '>') outside = false;
+    else if (c === '"') [outside, inDouble] = [inDouble, outside];
+    else if (c === "'") [outside, inSingle] = [inSingle, outside];
+  }
+  return false;
+}
+
+const SVG_DANGER: [{ test(text: string): boolean }, string][] = [
   // Internal DTD entities expand into markup (e.g. a <script>) that the checks below never see.
   [/<!ENTITY/i, 'DTD entities'],
-  // A `[` outside quoted identifiers opens an internal subset.
-  [/<!DOCTYPE(?:[^>["']|"[^"]*"|'[^']*')*\[/i, 'DTD entities'],
+  [{ test: hasInternalSubset }, 'DTD entities'],
   [/<([\w.-]+:)?script/i, 'scripts'],
   [/[\s"'/]on[a-z]+\s*=/i, 'event handler attributes'],
   [/javascript:/i, 'javascript: URLs'],

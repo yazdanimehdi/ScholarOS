@@ -105,3 +105,32 @@ test('a `[` inside a quoted DOCTYPE identifier is not an internal subset', () =>
   assert.equal(sniffImage(subset), 'svg');
   assert.throws(() => prepareUpload('x.svg', subset), isMediaError(415));
 });
+
+test('hostile DOCTYPE-heavy SVGs are checked in linear time', () => {
+  const n = 2 * 1024 * 1024;
+  const shapes = [
+    '<!DOCTYPE ' + '"'.repeat(n),
+    '<!DOCTYPE x [' + "'a".repeat(n / 2),
+    '<svg>' + '<!DOCTYPE '.repeat(n / 10),
+    '<svg><!DOCTYPE x ' + '"a'.repeat(n / 2),
+    '<!DOCTYPE x ' + '"a"'.repeat(n / 3) + '><svg>',
+  ];
+  for (const shape of shapes) {
+    const input = bytes(shape);
+    const start = Date.now();
+    sniffImage(input);
+    try {
+      prepareUpload('x.svg', input);
+    } catch {
+      // rejected is fine; only the time matters
+    }
+    const elapsed = Date.now() - start;
+    assert(elapsed < 500, `${shape.slice(0, 20)}…: took ${elapsed}ms, expected < 500ms`);
+  }
+});
+
+test('an internal subset after a decoy DOCTYPE (e.g. in a comment) is still rejected', () => {
+  const svg = '<!--<!DOCTYPE "--><!DOCTYPE svg [<!ATTLIST svg x CDATA \'1\'>]><svg><text>"</text></svg>';
+  assert.equal(sniffImage(bytes(svg)), 'svg');
+  assert.throws(() => prepareUpload('x.svg', bytes(svg)), isMediaError(415));
+});
