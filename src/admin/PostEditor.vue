@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/no-explicit-any -- front matter is user data */
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import AdminShell from './AdminShell.vue';
 import DocBanners from './DocBanners.vue';
 import FormFields from './FormFields.vue';
@@ -34,6 +34,7 @@ const suggested = computed(() => slugify(String(doc.current?.data.title ?? '')))
 const loadPost = (target: string) => async () => {
   const entry = await api<Post & { version: string; readonly: boolean }>(`collections/posts/${target}`);
   readonly.value = entry.readonly;
+  if (entry.readonly) doc.key = ''; // MDX can't be saved here: no draft key, so no drafts are offered or recorded
   return { value: { data: entry.data, body: entry.body }, version: entry.version };
 };
 
@@ -59,17 +60,20 @@ async function save(draft: boolean) {
     toast('The slug needs 1–80 lowercase letters, digits or dashes');
     return;
   }
-  doc.current.data.draft = draft;
   const path = `src/content/posts/${target}.md`;
   const result = await doc.save(
     (post, version) =>
       api<CommitResult>(`collections/posts/${target}`, {
         method: 'PUT',
-        body: { data: post.data, body: post.body, version },
+        body: { data: { ...post.data, draft }, body: post.body, version },
       }),
     path,
   );
-  if (result && isNew.value) {
+  if (!result || !doc.current) return;
+  doc.current.data.draft = draft; // only once saved: a failed save or a conflict leaves the flag as it was
+  await nextTick();
+  doc.discard(); // the flag change above is already committed, not an unsaved edit
+  if (isNew.value) {
     isNew.value = false;
     slug.value = target;
     doc.retarget(`posts/${target}`, loadPost(target));
@@ -134,7 +138,9 @@ function setSubtitle(e: Event) {
             <input v-model="slug" type="text" :readonly="!isNew" :placeholder="suggested" />
             <small>/blog/{{ slug || suggested }}</small>
           </label>
-          <FormFields :fields="sidebar" :model="doc.current.data" :errors="doc.errors" />
+          <fieldset class="adm-plain-fieldset" :disabled="readonly">
+            <FormFields :fields="sidebar" :model="doc.current.data" :errors="doc.errors" />
+          </fieldset>
         </aside>
       </div>
     </template>

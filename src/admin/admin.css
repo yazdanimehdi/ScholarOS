@@ -312,6 +312,12 @@
   flex: 1;
   min-width: 0;
 }
+.adm-plain-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
 .adm-color-row {
   align-items: flex-end;
 }

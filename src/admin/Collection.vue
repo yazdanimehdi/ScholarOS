@@ -61,7 +61,7 @@ async function select(slug: string) {
   creating.value = false;
   confirmDelete.value = false;
   selected.value = slug;
-  history.replaceState(null, '', `?slug=${slug}`);
+  history.replaceState(null, '', `?slug=${encodeURIComponent(slug)}`);
   await doc.open(`${props.name}/${slug}`, loadEntry(slug));
 }
 
@@ -102,7 +102,7 @@ async function save() {
     creating.value = false;
     selected.value = slug;
     doc.retarget(`${props.name}/${slug}`, loadEntry(slug));
-    history.replaceState(null, '', `?slug=${slug}`);
+    history.replaceState(null, '', `?slug=${encodeURIComponent(slug)}`);
   }
 }
 

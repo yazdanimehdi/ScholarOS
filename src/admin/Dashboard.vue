@@ -13,6 +13,7 @@ interface DashboardData {
   publications: number;
   cvUpdated: string | null;
   lastSync: string | null;
+  feedsError?: string;
 }
 interface Row {
   key: string;
@@ -178,6 +179,7 @@ onMounted(load);
             style="max-width: 260px"
           />
         </div>
+        <p v-if="d.feedsError" class="adm-banner adm-banner-error" role="alert">{{ d.feedsError }}</p>
         <table class="adm-table">
           <thead>
             <tr>
