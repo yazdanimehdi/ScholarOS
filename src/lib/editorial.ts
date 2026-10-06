@@ -118,7 +118,7 @@ export function normalizeAreas(areas: ResearchAreaInput[] = []): ResearchArea[] 
 /** Publication topic → research-area id, or 'other' when it matches none. */
 export function topicOf(topic: string | undefined, areaIds: ReadonlySet<string>): string {
   const id = slugify(topic ?? '');
-  return id && areaIds.has(id) ? id : 'other';;
+  return id && areaIds.has(id) ? id : 'other';
 }
 
 export interface TopicFilter {
