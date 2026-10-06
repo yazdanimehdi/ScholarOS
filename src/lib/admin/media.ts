@@ -23,6 +23,9 @@ const SIGNATURES: [ext: string, test: (b: Uint8Array) => boolean][] = [
 ];
 
 const SVG_DANGER: [RegExp, string][] = [
+  // Internal DTD entities expand into markup (e.g. a <script>) that the checks below never see.
+  [/<!ENTITY/i, 'DTD entities'],
+  [/<!DOCTYPE[^>[]*\[/i, 'DTD entities'],
   [/<([\w.-]+:)?script/i, 'scripts'],
   [/[\s"'/]on[a-z]+\s*=/i, 'event handler attributes'],
   [/javascript:/i, 'javascript: URLs'],
@@ -64,8 +67,11 @@ function isSvgRoot(text: string): boolean {
       if (i === -1) return false;
       i += 3;
     } else if (text.substr(i, 9) === '<!DOCTYPE') {
-      i = text.indexOf('>', i);
-      if (i === -1) return false;
+      const close = text.indexOf('>', i);
+      const subset = text.indexOf('[', i);
+      // An internal subset `[ … ]` can hold `>`; skip to its closing `]>`.
+      i = subset !== -1 && subset < close ? text.indexOf(']>', subset) + 1 : close;
+      if (i <= 0) return false;
       i++;
     } else {
       break;

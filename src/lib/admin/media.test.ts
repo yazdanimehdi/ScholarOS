@@ -76,3 +76,22 @@ test('sniffImage still recognizes SVG with comment prefix', () => {
   assert.equal(sniffImage(bytes('<!-- comment --><svg xmlns="http://www.w3.org/2000/svg"/>')), 'svg');
   assert.equal(sniffImage(bytes('<!-- comment 1 --><!-- comment 2 --><svg/>')), 'svg');
 });
+
+test('SVGs with DTD entities or an internal DOCTYPE subset are rejected', () => {
+  const entity = '<!ENTITY s "&#60;script&#62;alert(1)&#60;/script&#62;">';
+  const evil = [
+    `<!DOCTYPE svg [${entity}]><svg xmlns="http://www.w3.org/2000/svg">&s;</svg>`,
+    // the first `>` inside the subset is followed by `<svg`, which used to fool the root check
+    `<!DOCTYPE svg [<!--><svg>-->${entity}]><svg xmlns="http://www.w3.org/2000/svg">&s;</svg>`,
+    '<!DOCTYPE svg [<!ATTLIST svg x CDATA "1">]><svg/>',
+  ];
+  for (const svg of evil) {
+    assert.equal(sniffImage(bytes(svg)), 'svg', svg);
+    assert.throws(
+      () => prepareUpload('x.svg', bytes(svg)),
+      (e) => isMediaError(415)(e) && (e as Error).message === 'SVG files with DTD entities are not allowed',
+      svg,
+    );
+  }
+  assert.equal(sniffImage(bytes('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "x.dtd"><svg/>')), 'svg');
+});
