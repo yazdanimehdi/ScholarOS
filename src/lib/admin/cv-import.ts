@@ -45,7 +45,7 @@ const CV_OWNED = ['title', 'authors', 'venue', 'year', 'doi', 'url'];
 const titleKey = (title: unknown) =>
   String(title ?? '')
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
+    .replace(/[^\p{L}\p{N}]/gu, '');
 const doiKey = (doi: unknown) => (doi ? bareDoi(String(doi)).toLowerCase() : '');
 
 // ponytail: keyword heuristic for `type`; the owner fixes it in the Publications screen and re-imports keep the fix.
@@ -102,7 +102,7 @@ export function importRenderCv(text: string, existing: ExistingPublication[]): C
   }
 
   const byDoi = new Map(existing.filter((e) => e.data.doi).map((e) => [doiKey(e.data.doi), e]));
-  const byTitle = new Map(existing.map((e) => [titleKey(e.data.title), e]));
+  const byTitle = new Map(existing.filter((e) => titleKey(e.data.title)).map((e) => [titleKey(e.data.title), e]));
   const slugs = new Set(existing.map((e) => e.slug));
   const publications: ImportedPublication[] = [];
   let created = 0;
@@ -110,11 +110,19 @@ export function importRenderCv(text: string, existing: ExistingPublication[]): C
   let skipped = 0;
   for (const entry of found) {
     const mapped = toPublication(entry);
-    const match = (mapped.doi ? byDoi.get(doiKey(mapped.doi)) : undefined) ?? byTitle.get(titleKey(mapped.title));
+    const key = titleKey(mapped.title);
+    const match = (mapped.doi ? byDoi.get(doiKey(mapped.doi)) : undefined) ?? (key ? byTitle.get(key) : undefined);
     if (match?.readonly) {
       skipped++;
     } else if (match) {
-      const owned = Object.fromEntries(CV_OWNED.filter((k) => k in mapped).map((k) => [k, mapped[k]]));
+      // year and venue in `mapped` may be defaults; only a real date/journal overrides the curated value.
+      const fromSource = (k: string) =>
+        k === 'year'
+          ? !!Number(String(entry.date ?? '').slice(0, 4))
+          : k === 'venue'
+            ? !!String(entry.journal ?? '').trim()
+            : true;
+      const owned = Object.fromEntries(CV_OWNED.filter((k) => k in mapped && fromSource(k)).map((k) => [k, mapped[k]]));
       publications.push({ slug: match.slug, data: { ...match.data, ...owned }, version: match.version });
       updated++;
     } else {

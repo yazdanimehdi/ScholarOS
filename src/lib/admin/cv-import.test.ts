@@ -78,3 +78,39 @@ test('invalid YAML and non-RenderCV documents are import errors', () => {
   assert.throws(() => importRenderCv('name: no cv key', []), ImportError);
   assert.throws(() => importRenderCv('cv:\n  name: X\n  sections:\n    odd:\n      - foo: 1\n', []), ImportError);
 });
+
+const cvWith = (entries: string) => `cv:\n  name: X\n  sections:\n    publications:\n${entries}`;
+
+test('non-Latin titles only match the same title', () => {
+  const existing = [
+    {
+      slug: 'first',
+      version: 'v1',
+      data: { title: 'مقاله اول', authors: ['A'], venue: 'J', year: 2020, type: 'journal' },
+    },
+  ];
+  const { publications, summary } = importRenderCv(
+    cvWith('      - title: مقاله دوم\n        authors: [A]\n        date: 2021\n        journal: J\n'),
+    existing,
+  );
+  assert.equal(summary.updatedPublications, 0);
+  assert.equal(summary.newPublications, 1);
+  assert.ok(!publications.some((p) => p.slug === 'first'));
+  const same = importRenderCv(cvWith('      - title: مقاله اول\n        authors: [A]\n'), existing);
+  assert.equal(same.publications[0].slug, 'first');
+});
+
+test('a matched entry keeps year and venue when the CV entry has no date or journal', () => {
+  const existing = [
+    {
+      slug: 'kept',
+      version: 'v1',
+      data: { title: 'Paper', authors: ['A'], venue: 'NeurIPS', year: 2019, type: 'conference' },
+    },
+  ];
+  const { publications } = importRenderCv(cvWith('      - title: Paper\n        authors: [B]\n'), existing);
+  assert.deepEqual(
+    [publications[0].data.year, publications[0].data.venue, publications[0].data.authors],
+    [2019, 'NeurIPS', ['B']],
+  );
+});
