@@ -22,19 +22,63 @@ const SIGNATURES: [ext: string, test: (b: Uint8Array) => boolean][] = [
   ['avif', (b) => ascii(b, 4, 8) === 'ftyp' && ['avif', 'avis'].includes(ascii(b, 8, 12))],
 ];
 
-/** Root element is <svg>, after an optional BOM, XML declaration, comments and doctype. */
-const SVG_ROOT = /^﻿?\s*(<\?xml[\s\S]*?\?>\s*)?((<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)\s*)*<svg[\s>/]/i;
 const SVG_DANGER: [RegExp, string][] = [
-  [/<script/i, 'scripts'],
-  [/\son[a-z]+\s*=/i, 'event handler attributes'],
+  [/<([\w.-]+:)?script/i, 'scripts'],
+  [/[\s"'/]on[a-z]+\s*=/i, 'event handler attributes'],
   [/javascript:/i, 'javascript: URLs'],
-  [/<foreignObject/i, '<foreignObject>'],
+  [/<([\w.-]+:)?foreignObject/i, '<foreignObject>'],
 ];
+
+/** Decode numeric character references (&#123; or &#x1a;) and control characters. */
+function decodeCharRefs(text: string): string {
+  return text
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+/** Check if svg contains any javascript: URLs, accounting for entity encoding and embedded whitespace. */
+function hasJavaScriptUrl(text: string): boolean {
+  const decoded = decodeCharRefs(text);
+  return /javascript\s*:/i.test(decoded.replace(/[\x00-\x20]/g, ''));
+}
+
+/** Check if text is a valid SVG root element. Linear-time parse to avoid ReDoS. */
+function isSvgRoot(text: string): boolean {
+  let i = 0;
+  // Skip BOM
+  if (text.charCodeAt(i) === 0xfeff) i++;
+  // Skip whitespace
+  while (i < text.length && /\s/.test(text[i])) i++;
+  // Skip XML declaration
+  if (text.substr(i, 5) === '<?xml') {
+    i = text.indexOf('?>', i);
+    if (i === -1) return false;
+    i += 2;
+    while (i < text.length && /\s/.test(text[i])) i++;
+  }
+  // Skip comments and DOCTYPE in a linear loop
+  while (i < text.length) {
+    if (text.substr(i, 4) === '<!--') {
+      i = text.indexOf('-->', i + 4);
+      if (i === -1) return false;
+      i += 3;
+    } else if (text.substr(i, 9) === '<!DOCTYPE') {
+      i = text.indexOf('>', i);
+      if (i === -1) return false;
+      i++;
+    } else {
+      break;
+    }
+    while (i < text.length && /\s/.test(text[i])) i++;
+  }
+  // Check if the next thing is <svg
+  return text.substr(i, 4).toLowerCase() === '<svg' && /[\s>/]/.test(text[i + 4] || '');
+}
 
 function svgText(bytes: Uint8Array): string | null {
   try {
     const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-    return SVG_ROOT.test(text) ? text : null;
+    return isSvgRoot(text) ? text : null;
   } catch {
     return null;
   }
@@ -53,8 +97,11 @@ export function prepareUpload(name: string, bytes: Uint8Array): { filename: stri
   const ext = sniffImage(bytes);
   if (!ext) throw new MediaError('Only PNG, JPEG, WebP, GIF, AVIF and SVG images can be uploaded', 415);
   if (ext === 'svg') {
-    const danger = SVG_DANGER.find(([re]) => re.test(svgText(bytes)!));
-    if (danger) throw new MediaError(`SVG files with ${danger[1]} are not allowed`, 415);
+    const text = svgText(bytes)!;
+    const danger = SVG_DANGER.find(([re]) => re.test(text));
+    if (danger || hasJavaScriptUrl(text)) {
+      throw new MediaError(`SVG files with ${danger?.[1] || 'javascript: URLs'} are not allowed`, 415);
+    }
   }
   const base =
     slugify(name.replace(/\.[^.]*$/, ''))
