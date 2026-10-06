@@ -88,3 +88,35 @@ test('news: edit an item right after creating it', async ({ page }) => {
   await expect(page.getByText(COMMITTED)).toHaveCount(2);
   await expect(page.getByText(/changed|conflict/i)).toHaveCount(0);
 });
+
+test('cv: edit an entry, see the preview, publish', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/cv`);
+  await page.getByRole('region', { name: 'Sections' }).getByRole('button', { name: /^Experience/ }).click();
+  await page.getByRole('region', { name: 'Entries' }).getByRole('button').first().click();
+  await page.getByLabel('Position', { exact: true }).fill('Professor (e2e)');
+  await expect(page.getByLabel('Preview')).toContainText('Professor (e2e)');
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+});
+
+test('cv: a stale save shows the conflict dialog and keeps the edits', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/cv`);
+  await expect(page.getByRole('region', { name: 'Sections' }).getByRole('button').first()).toBeVisible();
+  // Someone else commits config/cv.yml after this page loaded it.
+  const current = await (await page.request.get('/api/admin/config/cv')).json();
+  const origin = new URL(page.url()).origin;
+  const res = await page.request.put('/api/admin/config/cv', {
+    headers: { Origin: origin },
+    data: { data: { ...current.data, cv: { ...current.data.cv, phone: '+1-555-0199' } }, version: current.version },
+  });
+  expect(res.ok()).toBeTruthy();
+  await page.getByRole('region', { name: 'Sections' }).getByRole('button', { name: /^Education/ }).click();
+  await page.getByRole('region', { name: 'Entries' }).getByRole('button').first().click();
+  await page.getByLabel('Institution', { exact: true }).fill('Changed University');
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'This file changed since you opened it' })).toBeVisible();
+  await page.getByRole('button', { name: 'Reload' }).click();
+  await expect(page.getByRole('button', { name: 'Restore edits' })).toBeVisible();
+});

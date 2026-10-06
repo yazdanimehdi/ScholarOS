@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getIn, replaceAt, resolveOptions, setIn, type FieldDef } from './fields';
+import { cvEntryKind, cvEntryPreview, getIn, replaceAt, resolveOptions, sectionKey, sectionLabel, setIn, type FieldDef } from './fields';
 
 test('getIn/setIn walk dotted paths; empty strings and undefined delete the key', () => {
   const model: Record<string, any> = {};
@@ -33,4 +33,37 @@ test('resolveOptions fills option lists, including nested object fields', () => 
   assert.deepEqual(out[0].options, [{ value: 'nlp', label: 'NLP' }]);
   assert.deepEqual(out[1].fields![0].options, [{ value: 'p1', label: 'Paper' }]);
   assert.equal(fields[0].options, undefined, 'inputs are not mutated');
+});
+
+test('cvEntryKind recognizes the RenderCV entry shapes', () => {
+  assert.equal(cvEntryKind('A text entry'), 'text');
+  assert.equal(cvEntryKind({ institution: 'U', area: 'CS' }), 'education');
+  assert.equal(cvEntryKind({ company: 'C' }), 'experience');
+  assert.equal(cvEntryKind({ position: 'P' }), 'experience');
+  assert.equal(cvEntryKind({ title: 'T', authors: [] }), 'publication');
+  assert.equal(cvEntryKind({ label: 'L', details: 'D' }), 'oneLine');
+  assert.equal(cvEntryKind({ bullet: 'B' }), 'bullet');
+  assert.equal(cvEntryKind({ name: 'N' }), 'normal');
+});
+
+test('cvEntryPreview mirrors the public CV layout (title / org / dates / points)', () => {
+  assert.deepEqual(
+    cvEntryPreview({ institution: 'MIT', area: 'CS', degree: 'PhD', location: 'Boston', startDate: '2020-09', endDate: 'present', highlights: ['Thesis'] }),
+    { title: 'PhD in CS', org: 'MIT, Boston', when: '2020-09 – Present', points: ['Thesis'] },
+  );
+  assert.deepEqual(cvEntryPreview({ label: 'Languages', details: 'Python' }), { title: 'Languages', org: 'Python', when: '', points: [] });
+  assert.deepEqual(cvEntryPreview({ title: 'Paper', authors: ['**Me**', 'You'], journal: 'NeurIPS', date: 2025 }), {
+    title: 'Paper',
+    org: 'Me, You · NeurIPS',
+    when: '2025',
+    points: [],
+  });
+  assert.equal(cvEntryPreview('Plain text').title, 'Plain text');
+});
+
+test('section names ↔ camelCase keys', () => {
+  assert.equal(sectionLabel('researchExperience'), 'Research Experience');
+  assert.equal(sectionKey('Teaching experience'), 'teachingExperience');
+  assert.equal(sectionKey('  Awards & Honors '), 'awardsHonors');
+  assert.equal(sectionKey('!!!'), '');
 });

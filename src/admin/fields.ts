@@ -205,3 +205,83 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     ],
   },
 };
+
+// ── CV (config/cv.yml stores RenderCV entries with camelCase keys) ──
+
+export type CvEntryKind = 'text' | 'education' | 'experience' | 'publication' | 'oneLine' | 'bullet' | 'normal';
+
+/** Same shape tests as src/lib/cv.ts (which can't be imported here: it reads files). */
+export function cvEntryKind(entry: unknown): CvEntryKind {
+  if (typeof entry !== 'object' || entry === null) return 'text';
+  const has = (key: string) => key in entry;
+  if (has('institution')) return 'education';
+  if (has('company') || has('position')) return 'experience';
+  if (has('title') && has('authors')) return 'publication';
+  if (has('label') && has('details')) return 'oneLine';
+  if (has('bullet')) return 'bullet';
+  return 'normal';
+}
+
+export const CV_BLANK: Record<CvEntryKind, () => unknown> = {
+  text: () => '',
+  education: () => ({ institution: '', area: '' }),
+  experience: () => ({ company: '', position: '' }),
+  publication: () => ({ title: '', authors: [] }),
+  oneLine: () => ({ label: '', details: '' }),
+  bullet: () => ({ bullet: '' }),
+  normal: () => ({ name: '' }),
+};
+
+const highlights: FieldDef = { key: 'highlights', label: 'Highlights', type: 'list' };
+const cvDates = [text('startDate', 'Start (YYYY-MM)'), text('endDate', "End (YYYY-MM or 'present')")];
+
+export const CV_FIELDS: Record<Exclude<CvEntryKind, 'text'>, FieldDef[]> = {
+  education: [text('institution', 'Institution'), text('area', 'Area'), text('degree', 'Degree'), text('location', 'Location'), ...cvDates, highlights],
+  experience: [text('company', 'Company'), text('position', 'Position'), text('location', 'Location'), ...cvDates, highlights],
+  publication: [
+    text('title', 'Title'),
+    { key: 'authors', label: 'Authors', type: 'authors' },
+    text('journal', 'Journal or venue'),
+    text('date', 'Date or year'),
+    text('doi', 'DOI'),
+    text('url', 'URL'),
+  ],
+  oneLine: [text('label', 'Label'), text('details', 'Details')],
+  bullet: [text('bullet', 'Text')],
+  normal: [text('name', 'Name'), text('location', 'Location'), text('date', 'Date'), ...cvDates, text('summary', 'Summary'), highlights],
+};
+
+const str = (v: unknown) => (typeof v === 'string' || typeof v === 'number' ? String(v).trim() : '');
+const joined = (parts: unknown[], sep: string) => parts.map(str).filter(Boolean).join(sep);
+
+/** The live preview: the same title / org / dates / highlights the public CV shows. */
+export function cvEntryPreview(entry: unknown): { title: string; org: string; when: string; points: string[] } {
+  if (typeof entry === 'string') return { title: entry, org: '', when: '', points: [] };
+  const e = (entry ?? {}) as Record<string, any>;
+  const when = e.startDate ? `${str(e.startDate)} – ${e.endDate === 'present' ? 'Present' : str(e.endDate)}` : str(e.date);
+  const points = Array.isArray(e.highlights) ? e.highlights.map(str).filter(Boolean) : [];
+  switch (cvEntryKind(entry)) {
+    case 'education':
+      return { title: joined([e.degree, e.area], ' in '), org: joined([e.institution, e.location], ', '), when, points };
+    case 'experience':
+      return { title: str(e.position), org: joined([e.company, e.location], ', '), when, points };
+    case 'publication': {
+      const authors = (Array.isArray(e.authors) ? e.authors : []).map((a: unknown) => str(a).replace(/\*+/g, ''));
+      return { title: str(e.title), org: joined([authors.join(', '), e.journal], ' · '), when: str(e.date), points };
+    }
+    case 'oneLine':
+      return { title: str(e.label), org: str(e.details), when: '', points: [] };
+    case 'bullet':
+      return { title: str(e.bullet), org: '', when: '', points: [] };
+    default:
+      return { title: str(e.name), org: str(e.location), when, points };
+  }
+}
+
+export const sectionLabel = (key: string) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+
+/** "Teaching experience" → "teachingExperience"; '' when nothing usable is left. */
+export function sectionKey(name: string): string {
+  const words = name.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  return words.map((w, i) => (i === 0 ? w : w[0].toUpperCase() + w.slice(1))).join('');
+}
