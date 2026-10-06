@@ -108,10 +108,19 @@ export function importRenderCv(text: string, existing: ExistingPublication[]): C
   let created = 0;
   let updated = 0;
   let skipped = 0;
+  // DOI and title keys of the entries handled so far: a second listing of the same paper in this CV is skipped.
+  const emitted = new Set<string>();
   for (const entry of found) {
     const mapped = toPublication(entry);
     const key = titleKey(mapped.title);
-    const match = (mapped.doi ? byDoi.get(doiKey(mapped.doi)) : undefined) ?? (key ? byTitle.get(key) : undefined);
+    const doi = doiKey(mapped.doi);
+    const match = (doi ? byDoi.get(doi) : undefined) ?? (key ? byTitle.get(key) : undefined);
+    if ((doi && emitted.has(`doi:${doi}`)) || (key && emitted.has(`title:${key}`))) {
+      skipped++;
+      continue;
+    }
+    if (doi) emitted.add(`doi:${doi}`);
+    if (key) emitted.add(`title:${key}`);
     if (match?.readonly) {
       skipped++;
     } else if (match) {

@@ -114,3 +114,23 @@ test('a matched entry keeps year and venue when the CV entry has no date or jour
     [2019, 'NeurIPS', ['B']],
   );
 });
+
+test('the same paper twice in one CV is emitted once', () => {
+  const twice =
+    '      - title: Same Paper\n        authors: [A]\n        doi: 10.1/x\n' +
+    '      - title: Other Title\n        authors: [A]\n        doi: https://doi.org/10.1/X\n' +
+    '      - title: Same  paper!\n        authors: [B]\n';
+  const fresh = importRenderCv(cvWith(twice), []);
+  assert.equal(fresh.publications.length, 1);
+  assert.deepEqual([fresh.summary.newPublications, fresh.summary.skipped], [1, 2]);
+
+  const existing = [
+    { slug: 'same', version: 'v1', data: { title: 'Same Paper', authors: ['A'], venue: 'J', year: 2020 } },
+  ];
+  const matched = importRenderCv(cvWith(twice), existing);
+  assert.deepEqual(
+    matched.publications.map((p) => p.slug),
+    ['same'],
+  );
+  assert.deepEqual([matched.summary.updatedPublications, matched.summary.skipped], [1, 2]);
+});

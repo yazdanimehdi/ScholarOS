@@ -189,3 +189,33 @@ test('githubConfig: explicit repo and branch win over Vercel metadata', () => {
   assert.throws(() => githubConfig({ GITHUB_REPO: 'me/site' }), /GITHUB_TOKEN/);
   assert.throws(() => githubConfig({ GITHUB_TOKEN: 't' }), /GITHUB_REPO/);
 });
+
+test('a missing branch is named as such, not as a token permission', async () => {
+  const { fetchFn } = fakeGitHub({});
+  await assert.rejects(
+    new GitHubStore(cfg, author, fetchFn).commit([{ path: 'config/cv.yml', content: 'x' }], 'm', {}),
+    (e) =>
+      e instanceof UpstreamError &&
+      e.status === 502 &&
+      e.message === 'Branch "main" was not found in o/r. Set GITHUB_BRANCH to an existing branch.',
+  );
+});
+
+test('commit: deleting a file that does not exist is a conflict', async () => {
+  const { fetchFn, calls } = fakeGitHub(commitRoutes());
+  await assert.rejects(
+    new GitHubStore(cfg, author, fetchFn).commit([{ path: 'config/gone.yml', content: null }], 'm', {
+      'config/gone.yml': null,
+    }),
+    (e) => e instanceof ConflictError && e.path === 'config/gone.yml',
+  );
+  assert.ok(!calls.some((c) => c.method !== 'GET'));
+});
+
+test('capabilities probes the repo root, so a repo without config/site.yml is readable', async () => {
+  const { fetchFn } = fakeGitHub({
+    'GET /contents?ref=main': () => ({ json: [] }),
+    'GET /actions/workflows?per_page=1': () => ({ json: { workflows: [] } }),
+  });
+  assert.deepEqual(await new GitHubStore(cfg, author, fetchFn).capabilities(), { contents: true, actions: true });
+});

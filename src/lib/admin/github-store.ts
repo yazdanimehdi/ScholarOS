@@ -144,7 +144,14 @@ export class GitHubStore implements ContentStore {
 
   private async tryCommit(changes: Change[], message: string, base: Record<string, string | null>) {
     const branch = encodePath(this.cfg.branch);
-    const head = (await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${branch}`))!.object.sha;
+    const ref = await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${branch}`, undefined, true);
+    if (!ref) {
+      const { owner, repo } = this.cfg;
+      throw new UpstreamError(
+        `Branch "${this.cfg.branch}" was not found in ${owner}/${repo}. Set GITHUB_BRANCH to an existing branch.`,
+      );
+    }
+    const head = ref.object.sha;
     const baseTree = (await this.gh<{ tree: { sha: string } }>('GET', `/git/commits/${head}`))!.tree.sha;
     const current = await Promise.all(
       changes.map((c) =>
@@ -155,6 +162,8 @@ export class GitHubStore implements ContentStore {
       const file = current[i];
       const sha = file && !Array.isArray(file) ? file.sha : null;
       if (sha !== (base[c.path] ?? null)) throw new ConflictError(c.path);
+      // Deleting a file that isn't there: GitHub would answer 422 on the tree.
+      if (c.content === null && sha === null) throw new ConflictError(c.path);
     });
     const tree = await Promise.all(
       changes.map(async (c) => ({
@@ -221,7 +230,7 @@ export class GitHubStore implements ContentStore {
         () => false,
       );
     const [contents, actions] = await Promise.all([
-      probe(`/contents/config/site.yml${this.ref()}`),
+      probe(`/contents${this.ref()}`),
       probe('/actions/workflows?per_page=1'),
     ]);
     const error = !contents
