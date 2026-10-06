@@ -83,6 +83,20 @@ for (const theme of THEMES) {
   assert.match(html, /Python · Transformers/, 'editorial /research: software tech line from tags');
 }
 
+{
+  const html = ed('publications/index.html');
+  assert.equal((html.match(/data-topic="/g) ?? []).length, 5, 'editorial /publications: one filterable row per paper');
+  assert.match(html, /<li id="smith2024adaptive"/, 'editorial /publications: row anchors for Cite links');
+  assert.match(html, /data-topic="other"/, 'editorial /publications: unmatched topic → Other');
+  assert.match(html, /data-filter="nlp"[^>]*>\s*NLP <span class="ed-tab-count num">1<\/span>/, 'editorial /publications: topic filter with count');
+  assert.match(html, /data-filter="other"/, 'editorial /publications: Other filter');
+  assert.match(html, /<details class="ed-bib">\s*<summary class="ul">Cite<\/summary>\s*<pre>@inproceedings\{smith2024adaptive,/, 'editorial /publications: BibTeX expander');
+  assert.match(html, /@article\{smith2023fairness,/, 'editorial /publications: bibtex field used as-is');
+  assert.match(html, /"@type":"ScholarlyArticle"/, 'editorial /publications: ScholarlyArticle JSON-LD');
+  assert.match(html, /https:\/\/arxiv\.org\/abs\/2024\.00003/, 'editorial /publications: arXiv prefix stripped in sameAs');
+  assert.match(html, /data-first-only/, 'editorial /publications: first-author toggle');
+}
+
 // --- classic regression ---
 const BASELINE = 'dist-baseline';
 

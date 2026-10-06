@@ -2,7 +2,9 @@
 import ClassicPublications from '../themes/classic/Publications.astro';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
-import { getSiteConfig, isPersonalMode } from '../lib/config';
+import EditorialPublications from '../themes/editorial/Publications.astro';
+import { loadPublications } from '../themes/editorial/data';
+import { getSiteConfig, getTheme, isPersonalMode } from '../lib/config';
 import { byId } from '../lib/utils';
 
 const config = getSiteConfig();
@@ -33,6 +35,14 @@ const pubData = await Promise.all(
     };
   }),
 );
+
+const editorialPublications = getTheme() === 'editorial' ? await loadPublications() : null;
 ---
 
-<ClassicPublications {config} {personal} {pubData} />
+{
+  editorialPublications ? (
+    <EditorialPublications {...editorialPublications} />
+  ) : (
+    <ClassicPublications {config} {personal} {pubData} />
+  )
+}

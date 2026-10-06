@@ -1,0 +1,156 @@
+---
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import PaperRow from './PaperRow.astro';
+import { bareArxiv, bareDoi, jsonLd } from '../../lib/editorial';
+import type { PublicationsData } from './data';
+
+type Props = PublicationsData;
+
+const { config, groups, filters, total, firstCount } = Astro.props;
+const personal = config.siteMode === 'personal';
+const scholar = config.socials?.scholar;
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: groups
+    .flatMap((g) => g.items)
+    .map(({ pub }, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'ScholarlyArticle',
+        headline: pub.data.title,
+        author: pub.data.authors.map((name) => ({ '@type': 'Person', name })),
+        datePublished: String(pub.data.year),
+        isPartOf: { '@type': 'Periodical', name: pub.data.venue },
+        sameAs: [
+          pub.data.doi && `https://doi.org/${bareDoi(pub.data.doi)}`,
+          pub.data.arxiv && `https://arxiv.org/abs/${bareArxiv(pub.data.arxiv)}`,
+        ].filter(Boolean),
+      },
+    })),
+};
+---
+
+<Layout
+  title="Publications"
+  description={personal ? 'My published research papers and articles.' : 'Our published research papers and articles.'}
+>
+  <script type="application/ld+json" set:html={jsonLd(ld)} />
+  <div class="ed-wrap ed-main">
+    <div class="ed-pubs-head">
+      <div class="ed-stack">
+        <Eyebrow>Publications</Eyebrow>
+        <h1 class="ed-h1">Papers</h1>
+        {
+          (personal || scholar) && (
+            <p class="ed-intro">
+              {personal && 'My name is shown in bold. '}
+              {scholar && (
+                <>
+                  See also{' '}
+                  <a href={scholar} class="ul">
+                    Google Scholar
+                  </a>
+                  .
+                </>
+              )}
+            </p>
+          )
+        }
+      </div>
+      <div class="ed-stats">
+        <div class="ed-stat">
+          <span class="ed-stat-num num">{total}</span><span class="ed-stat-label">publications</span>
+        </div>
+        {
+          personal && (
+            <div class="ed-stat">
+              <span class="ed-stat-num num">{firstCount}</span>
+              <span class="ed-stat-label">first-author</span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="ed-filterbar" data-pub-filters>
+      {
+        filters.length > 1 ? (
+          <div class="ed-tabs" role="group" aria-label="Filter by topic">
+            {filters.map((f) => (
+              <button type="button" class="ed-tab" data-filter={f.id} aria-pressed={f.id === 'all' ? 'true' : 'false'}>
+                {f.label} <span class="ed-tab-count num">{f.count}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <span />
+        )
+      }
+      {
+        personal && (
+          <label class="ed-toggle">
+            <input type="checkbox" data-first-only /> First-author only
+          </label>
+        )
+      }
+    </div>
+
+    <p class="ed-intro" data-pub-empty hidden>No papers match these filters.</p>
+
+    {
+      groups.map((g) => (
+        <section class="ed-year" data-year={g.year} aria-labelledby={`y${g.year}`}>
+          <h2 id={`y${g.year}`} class="num">
+            {g.year}
+          </h2>
+          <ol class="ed-papers">
+            {g.items.map((i) => (
+              <PaperRow pub={i.pub} owner={config.author} variant="list" topic={i.topic} first={i.first} />
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</Layout>
+
+<script>
+  function initPublicationFilters() {
+    const bar = document.querySelector<HTMLElement>('[data-pub-filters]');
+    if (!bar) return;
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const firstOnly = bar.querySelector<HTMLInputElement>('[data-first-only]');
+    const empty = document.querySelector<HTMLElement>('[data-pub-empty]');
+    let topic = 'all';
+
+    const apply = () => {
+      document.querySelectorAll<HTMLElement>('li[data-topic]').forEach((li) => {
+        const offTopic = topic !== 'all' && li.dataset.topic !== topic;
+        const notFirst = !!firstOnly?.checked && li.dataset.first !== 'true';
+        li.hidden = offTopic || notFirst;
+      });
+      let anyVisible = false;
+      document.querySelectorAll<HTMLElement>('section[data-year]').forEach((section) => {
+        section.hidden = !section.querySelector('li[data-topic]:not([hidden])');
+        anyVisible ||= !section.hidden;
+      });
+      if (empty) empty.hidden = anyVisible;
+    };
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        topic = button.dataset.filter ?? 'all';
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        apply();
+      }),
+    );
+    firstOnly?.addEventListener('change', apply);
+    apply(); // honours a checkbox state restored by the browser
+  }
+
+  document.addEventListener('astro:page-load', initPublicationFilters);
+</script>

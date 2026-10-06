@@ -2,9 +2,12 @@ import { getCollection } from 'astro:content';
 import { getHomepageSections, getSiteConfig, getSiteName, loadYamlConfig } from '../../lib/config';
 import {
   homeBlocks,
+  isOwner,
   mergeWriting,
   normalizeAreas,
   shortTitle,
+  topicFilters,
+  topicOf,
   type ResearchConfig,
   type WritingItem,
 } from '../../lib/editorial';
@@ -115,3 +118,29 @@ export async function loadResearch() {
 }
 
 export type ResearchData = Awaited<ReturnType<typeof loadResearch>>;
+
+export async function loadPublications() {
+  const config = getSiteConfig();
+  const areas = normalizeAreas(loadResearchConfig().areas);
+  const areaIds = new Set(areas.map((a) => a.id));
+  const items = (await getCollection('publications'))
+    .sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title))
+    .map((pub) => ({
+      pub,
+      topic: topicOf(pub.data.topic, areaIds),
+      first: isOwner(pub.data.authors[0] ?? '', config.author),
+    }));
+  const years = [...new Set(items.map((i) => i.pub.data.year))];
+  return {
+    config,
+    groups: years.map((year) => ({ year, items: items.filter((i) => i.pub.data.year === year) })),
+    filters: topicFilters(
+      items.map((i) => i.topic),
+      areas,
+    ),
+    total: items.length,
+    firstCount: items.filter((i) => i.first).length,
+  };
+}
+
+export type PublicationsData = Awaited<ReturnType<typeof loadPublications>>;

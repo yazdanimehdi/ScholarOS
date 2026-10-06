@@ -497,6 +497,7 @@
   }
   & .ed-paper--list {
     flex-direction: column;
+    align-items: stretch;
     flex-wrap: nowrap;
     gap: 6px;
     padding-block: 20px;
