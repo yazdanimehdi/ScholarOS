@@ -11,3 +11,6 @@ personal-site-handoff/
 HANDOFF.md
 docs/superpowers/
 .superpowers/
+
+# RenderCV import fixture, kept byte-for-byte
+tests/fixtures/

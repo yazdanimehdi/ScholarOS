@@ -1,0 +1,482 @@
+cv:
+  name: "Mehdi Yazdani-Jahromi"
+  location: "Orlando, FL"
+  email: "owner@example.com"
+  phone: "tel:+1-555-0100"
+  website: "http://yazdanimehdi.com"
+  social_networks:
+    - network: "LinkedIn"
+      username: "yazdanimehdi"
+    - network: "GitHub"
+      username: "yazdanimehdi"
+  sections:
+    summary:
+      - "AI research scientist and PhD in Computer Science specializing in representation learning, with primary applications in computational biology and drug discovery. Industry experience at Johnson and Johnson and Microsoft, where I developed language models for mRNA and machine learning systems for large scale biomedical data. Strong programming background in Python, and JavaScript, with deep experience in PyTorch, Transformers and graph neural networks. Published in NeurIPS, ICLR and Briefings in Bioinformatics, with work spanning mRNA modeling, drug target interaction prediction and algorithmic fairness."
+
+    skills:
+      - label: "Programming Languages"
+        details: "Python, Dart, JavaScript, C++, C#, SQL, Solidity, MATLAB"
+      - label: "Python Packages"
+        details: "Pytorch, Numpy, Pandas, Keras, TensorFlow, Scikit-learn, Scipy, Networkx, iGraph, dgl, matplotlib, seaborn"
+      - label: "JavaScript Frameworks"
+        details: "Vue.js, Electron, NativeScript"
+      - label: "Tools"
+        details: "Kubernetes, Docker, Git, HTML, CSS, LATEX, AWS, Azure, Slurm"
+      - label: "Quantitative Research"
+        details: "Machine Learning Methods, Artificial Intelligence, Large Language Models, Generative AI, Genomics Sequence Modeling, Drug Discovery, Graph Neural Networks, Transformers, Recurrent Neural Networks, LSTMs, Mathematical Optimization, Mathematical Modeling"
+      - label: "Soft Skills"
+        details: "Research team coordination, Student mentoring, Technical writing, Conference presentations, Resource allocation, Strategic planning, Analytical thinking, Complex problem resolution, International team collaboration, Multicultural communication, Self-directed learning, Professional networking"
+
+    education:
+      - institution: "University of Central Florida"
+        area: "Computer Science"
+        degree: "PhD"
+        start_date: 2021-01
+        end_date: 2025-10
+        highlights:
+          - "Thesis: Advancing Drug Discovery with Structural and Representation Learning of Biological Systems [Link](https://stars.library.ucf.edu/etd2024/515/)"
+          - "GPA: 3.91/4.0"
+      - institution: "University of Central Florida"
+        area: "Computer Science"
+        degree: "MS"
+        start_date: 2021-01
+        end_date: 2023-08
+        highlights:
+          - "GPA: 3.9/4.0"
+      - institution: "Sharif University of Technology"
+        area: "Industrial Engineering"
+        degree: "MS"
+        start_date: 2017-09
+        end_date: 2019-12
+        highlights:
+          - "GPA: 3.88/4.0"
+    
+    research_experience:
+      - company: "DeepBio Scientific"
+        position: "Senior Research Scientist"
+        location: "Orlando, FL"
+        start_date: "2026-01"
+        end_date: "present"
+        highlights:
+          - "Lead computational biology and drug discovery research, developing machine learning models and algorithms for analyzing complex biomedical data."
+          - "Collaborate with cross-functional teams to translate research findings into scalable bioinformatics and computational drug discovery workflows."
+          - "Design and implement a state-of-the-art agentic AI system for retrieval and multi-step reasoning across biomedical datasets, enabling faster and more accurate analysis."
+          - "Develop benchmark datasets, evaluation metrics, and testing frameworks to assess model retrieval, reasoning, and predictive performance."
+
+      - company: "Microsoft"
+        position: "Research Intern, Bio-LLMs"
+        location: "Redmond, WA"
+        start_date: "2025-06"
+        end_date: "2025-09"
+        highlights:
+          - "Built a novel agent orchestration system for planning, tool use, and judgment."
+          - "Explored agentic AI on deidentified clinical datasets with end to end experiments and evaluation."
+          - "Developed a RAG retrieval stack with hybrid dense and sparse search, reranking, and citation attribution."
+          - "Contributed to the development of evaluation metrics and benchmarks for agentic AI systems."
+
+      - company: "Johnson & Johnson (Janssen R&D)"
+        position: "Data Science Intern, AI/ML for Drug Discovery"
+        start_date: 2024-05
+        end_date: 2024-11
+        highlights:
+          - Developed and trained HELM (Hierarchical Encoding for mRNA Language Modeling), the first mRNA antibody language model, achieving up to 8% increase in prediction accuracy and enabling the generation of more diverse and biologically plausible sequences.
+          - Explored alternative attention architectures such as Mamba and Hyena, enhancing transformer model efficiency and effectiveness in processing mRNA sequences.
+          - Implemented large-scale distributed training on Kubernetes, resulting in significant reduction in training time for LLMs on extensive datasets, optimizing resource utilization and scalability.
+          - Collaborated with cross-functional teams to refine and deploy advanced LLM architectures, enhancing model accuracy and efficiency for large-scale data processing tasks.
+    
+    selected_publications:
+      - title: "Equi-mRNA: Protein Translation Equivariant Encoding for mRNA Language Models"
+        authors: ["**Mehdi Yazdani-Jahromi**", "Ali Khodabandeh Yalabadi", "Ozlem Ozmen Garibay"]
+        journal: "Neurips 2025"
+        date: 2025
+        doi: 10.48550/arXiv.2508.15103
+      
+      - title: "BoKDiff: Best-of-K Diffusion Alignment for Target-Specific 3D Molecule Generation"
+        authors: ["Ali Khodabandeh Yalabadi", "**Mehdi Yazdani-Jahromi**", "Ozlem Ozmen Garibay"]
+        journal: "Advances in Bioinformatics"
+        date: 2025
+        doi: 10.48550/arXiv.2501.15631
+      
+      - title: "HELM: Hierarchical Encoding for mRNA Language Modeling"
+        authors: ["**Mehdi Yazdani-Jahromi**", "Mangal Prakash", "Tommaso Mansi", "Artem Moskalev", "Rui Liao"]
+        journal: "ICLR 2025, Neurips 2024 Workshop on AI for New Drug Modalities"
+        date: 2024
+        doi: 10.48550/arXiv.2410.12459
+      
+      - title: "Fair Bilevel Neural Network (FairBiNN): On Balancing fairness and accuracy via Stackelberg Equilibrium"
+        authors: ["**Mehdi Yazdani-Jahromi**", "Ali Khodabandeh Yalabadi", "AmirArsalan Rajabi", "Aida Tayebi", "Ivan Garibay", "Ozlem Ozmen Garibay"]
+        journal: "Neurips 2024"
+        date: "2024"
+        doi: 10.48550/arXiv.2410.16432
+
+      - title: "Learning Fair Representations: Mitigating Statistical Dependencies"
+        authors: ["Aida Tayebi", "**Mehdi Yazdani-Jahromi**", "Ali Khodabandeh Yalabadi", "Niloofar Yousefi", "Ozlem Ozmen Garibay"]
+        journal: "HCII conference 2023 Oral Presentation"
+        date: "2024"
+        doi: 10.1007/978-3-031-60611-3_8
+
+      - title: "FragXsiteDTI: an interpretable transformer-based model for drug-target interaction prediction"
+        authors: ["Ali Khodabandeh Yalabadi", "**Mehdi Yazdani-Jahromi**", "Niloofar Yousefi", "Aida Tayebi", "Sina Abdidizaji", "Ozlem Ozmen Garibay"]
+        journal: "Recomb 2024 (Oral), Neurips 2023 Workshop on New Frontiers of AI for Drug Discovery and Development"
+        date: "2024"
+        doi: 10.1007/978-1-0716-3989-4_5
+
+      - title: "Controlling the misinformation diffusion in social media by the effect of different classes of agents"
+        authors: ["Ali Khodabandeh Yalabadi", "Mehdi Yazdani-Jahromi", "Sina Abdidizaji", "Ivan Garibay", "Ozlem Ozmen Garibay"]
+        journal: "The Computational Social Science Society of the Americas Annual Conference"
+        date: "2023"
+        doi: 10.48550/arXiv.2401.11524
+
+      - title: "Agent-Based Modeling of C. Difficile Spread in Hospitals: Assessing Contribution of High-Touch vs. Low-Touch Surfaces and Inoculations' Containment Impact"
+        authors: ["Sina Abdidizaji", "Ali Khodabandeh Yalabadi", "Mehdi Yazdani-Jahromi", "Ozlem Ozmen Garibay", "Ivan Garibay"]
+        journal: "The Computational Social Science Society of the Americas Annual Conference"
+        date: "2023"
+        doi: 10.48550/arXiv.2401.11656
+
+      - title: "Through a fair looking-glass: on mitigating bias in image datasets"
+        authors: ["Amirarsalan Rajabi", "**Mehdi Yazdani-Jahromi**", "Ozlem Ozmen Garibay", "Gita Sukthankar"]
+        journal: "HCII conference 2023 (Oral), AAAI 2023 Workshop on Representation Learning for Responsible Human-Centric AI"
+        date: "2023"
+        doi: 10.1007/978-3-031-35891-3_27
+
+      - title: "BindingSiteAugmented DTA to enable A Next-Generation Pipeline for Interpretable Prediction Models in Drug-Repurposing"
+        authors: ["Niloofar Yousefi", "**Mehdi Yazdani-Jahromi**", "Aida Tayebi", "Elayaraja Kolanthai", "Craig J Neal", "Tanumoy Banerjee", "Agnivo Gosai", "Ganesh Balasubramanian", "Sudipta Seal", "Ozlem Ozmen Garibay"]
+        journal: "Briefings in Bioinformatics"
+        date: "2023"
+        doi: 10.1093/bib/bbad136
+
+      - title: "AttentionSiteDTI: Attention Based Model for Predicting Drug-Target Interaction Using 3D Structure of Protein Binding Sites"
+        authors: ["**Mehdi Yazdani-Jahromi**", "Niloofar Yousefi", "Aida Tayebi", "Elayaraja Kolanthai", "Craig J Neal", "Sudipta Seal", "Ozlem Ozmen Garibay"]
+        journal: "Briefings in Bioinformatics"
+        date: "2022"
+        doi: 10.1093/bib/bbac272
+
+      - title: "UnbiasedDTI: Mitigating Real-World Bias of Drug-Target Interaction Prediction"
+        authors: ["Aida Tayebi", "Niloofar Yousefi", "**Mehdi Yazdani-Jahromi**", "Elayaraja Kolanthai", "Craig J Neal", "Sudipta Seal", "Ozlem Ozmen Garibay"]
+        journal: "MDPI Molecules"
+        date: "2022"
+        doi: 10.3390/molecules27092980
+    
+    academic_services:
+      - Reviewer of Journal Briefings in Bioinformatics 
+      - Reviewer of Computational and Structural Biotechnology Journal 
+      - Reviewer of IEEE Transactions on Neural Networks and Learning Systems Journal 
+      - Program Committee Member of AAAI Artificial Intelligence for Social Impact 2025 & 2026.
+      - Reviewer of Neurips 2025 (The Thirty-Ninth Annual Conference on Neural Information Processing Systems)
+
+
+    teaching_experience:
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - PHI 6679 - Digital Ethics"
+        location: "Orlando, FL"
+        start_date: 2025-08
+        end_date: 2025-12
+
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - STA 5206 - Statistical Analysis"
+        location: "Orlando, FL"
+        start_date: 2025-05
+        end_date: 2025-08
+
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - CAP 6737 - Interactive Data Visualization"
+        location: "Orlando, FL"
+        start_date: 2025-01
+        end_date: 2025-05
+
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - CAP 5610 - Machine Learning"
+        location: "Orlando, FL"
+        start_date: 2024-08
+        end_date: 2024-12
+
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - STA 6714 - Data Preparation"
+        location: "Orlando, FL"
+        start_date: 2023-08
+        end_date: 2023-12
+      
+      - company: "University of Central Florida"
+        position: "Teaching Assistant - STA 5206 - Statistical Analysis"
+        location: "Orlando, FL"
+        start_date: 2023-05
+        end_date: 2023-08
+      
+      - company: "University of Central Florida"
+        position: "Guest Lecturer (Project in Data Analytics)"
+        location: "Orlando, FL"
+        start_date: 2022-08
+        end_date: 2022-12
+      
+      - company: "Sharif University of Technology"
+        position: "Teaching Assistant - Data Mining"
+        location: "Tehran, Iran"
+        start_date: 2018-09
+        end_date: 2019-12
+
+    
+    developement_experience:
+      - company: "ZTech Team"
+        position: "Blockchain Developer"
+        start_date: 2020-06
+        end_date: 2020-12
+        highlights:
+          - "Developed blockchain applications on the Ethereum network using **Solidity**, including implementing ERC20 token standards and smart contracts for financial ICOs."
+
+      - company: "BerimCafe"
+        position: "Lead Software Developer"
+        start_date: 2019-01
+        end_date: 2020-12
+        highlights:
+          - "Developed software for cafe and restaurant management with **Django** and **Flutter**."
+      - company: "TAEPO"
+        position: "Lead Software Developer"
+        start_date: 2019-01
+        end_date: 2020-03
+        highlights:
+          - "Created TOEFL Online Practice and Exam Platform using **Django**, **Vue.js**, and **Electron.js**."
+      - company: "MrZoro.ir"
+        position: "Lead Software Developer"
+        start_date: 2018-02
+        end_date: 2019-12
+        highlights:
+          - "Developed an automated solution for reserving meals in university, a **Django** based project."
+    
+    awards:
+      - name: "Nominated for Best Dissertation Award at University of Central Florida"
+        date: "2025"
+      - name: "Top Reviewer Award from NeuRIPS 2025"
+        date: "2025"
+      - name: "Received 30000 dollar Amazon Research Credit Award"
+        date: "2023"
+      - name: "Nominated for Order of Pegasus award"
+        date: "2023"
+      - name: "Invited to Golden Key International Honor Society"
+        date: "2022"
+      - name: "Outstanding Graduate Fellowship University of Central Florida"
+        date: "2021"
+      - name: "Ranked **1st** among 25000 competitors in Iranian national entrance exam for M.Sc. of industrial engineering"
+        date: "2017"
+      # - name: "Ranked **6th** among 70 students of Industrial Engineering at Isfahan University of Technology"
+      #   date: "2017"
+      # - name: "Ranked 5th among 70 students of Industrial Engineering at Sharif University of Technology"
+      #   date: "2015"
+      - name: "Ranked **2nd** in “Kharazmi” national Prize for Programming"
+        date: "2012"
+
+    projects:
+      - name: "DeepDrugDomain: Easy-to-use drug-target affinity/interaction prediction package for architecture design"
+        highlights:
+          - "Developed an open source **Python package** for drug-target affinity/interaction prediction using deep learning models, including **transformers** and **graph neural networks**, for computational drug discovery."
+          - "Implemented a user-friendly API for easy-to-use drug-target affinity/interaction prediction."
+          - 'Published on [GitHub](https://github.com/yazdanimehdi/DeepDrugDomain)'
+      - name: "COVID-19 Data Collection and Screening Project"
+        highlights: 
+          - 'Initiated and led an open-source project for COVID-19 data collection and screening, utilizing technologies such as **Python**, **Django**, and **PostgreSQL** for *backend* development [link](https://gitlab.com/yazdanimehdi/covid-19-data-collector), and **JavaScript**, **Vue js** for *frontend* development [link](https://gitlab.com/yazdanimehdi/covid-19-front-end), to support public health efforts during the pandemic.'
+      - name: "Cache Simulator"
+        highlights:
+          - "Developed a cache simulator to evaluate the performance of different cache management strategies, including LRU, FIFO, and LFU. Implemented in **C++**."
+    certificates:
+      - name: "Machine Learning Specialization"
+        date: "2024"
+        highlights:
+          - Stanford University and DeepLearning.AI - [link](https://coursera.org/share/4b17de459f221accf5d775721e80a7dd)
+     
+      - name: "Python Fundamentals"
+        date: "2018"
+        highlights:
+          - Tehran University - [link](https://ut.ac.ir/en)
+       
+      - name: "Advanced Python"
+        date: "2018"
+        highlights:
+          - Maktabkhooneh - [link](https://maktabkhooneh.org/)
+
+    # languages:
+    #   - label: "English"
+    #     details: "Fluent"
+    #   - label: "Farsi"
+    #     details: "Native"
+    #   - label: "French"
+    #     details: "Elementary"
+
+    references:
+      # - "Available upon request"
+      - name: "Dr. Ozlem Ozmen (Advisor)"
+        highlights: 
+          - "Assistant Professor at University of Central Florida"
+      - name: "Dr. Mangal Prakash"
+        highlights:
+          - "Senior Scientist, AI/ML at Johnson & Johnson (Janssen R&D)"
+      - name: "Dr. Artem Moskalev"
+        highlights:
+          - "Research Scientist at Johnson & Johnson (Janssen R&D)"
+      - name: "Dr. Ivan Garibay"
+        highlights:
+          - "Associate Professor at University of Central Florida"
+
+# design:
+#   theme: "sb2nov"
+#   font: Latin Modern Serif
+#   font_size: "10pt"
+#   page_size: "letterpaper"
+#   color: "#004f90"
+#   disable_external_link_icons: false
+#   disable_page_numbering: false
+#   page_numbering_style: "NAME - Page PAGE_NUMBER of TOTAL_PAGES"
+#   disable_last_updated_date: true
+#   last_updated_date_style: "Last updated in TODAY"
+#   header_font_size: "30 pt"
+#   text_alignment: "justified"
+#   use_icons_for_connections: true
+#   margins:
+#     page:
+#       top: 2 cm
+#       bottom: 2 cm
+#       left: 2 cm
+#       right: 2 cm
+#     section_title:
+#       top: 0.3 cm
+#       bottom: 0.2 cm
+#     entry_area:
+#       left_and_right: 0.2 cm
+#       vertical_between: 0.2 cm
+#       date_and_location_width: 4.5 cm
+#     highlights_area:
+#       top: 0.10 cm
+#       left: 0.4 cm
+#       vertical_between_bullet_points: 0.10 cm
+#     header:
+#       vertical_between_name_and_connections: 0.3 cm
+#       bottom: 0.3 cm
+#       horizontal_between_connections: 0.5 cm
+
+design:
+  theme: sb2nov
+
+# design:
+#   theme: sb2nov
+#   page:
+#     size: us-letter
+#     top_margin: 2cm
+#     bottom_margin: 2cm
+#     left_margin: 2cm
+#     right_margin: 2cm
+#     show_page_numbering: true
+#     show_last_updated_date: false
+#   colors:
+#     text: black
+#     name: black
+#     connections: black
+#     section_titles: black
+#     links: '#004f90'
+#     last_updated_date_and_page_numbering: grey
+#   text:
+#     font_family: New Computer Modern
+#     font_size: 10pt
+#     leading: 0.6em
+#     alignment: justified
+#     date_and_location_column_alignment: right
+#   links:
+#     underline: true
+#     use_external_link_icon: true
+#   header:
+#     name_font_size: 30pt
+#     name_bold: true
+#     photo_width: 3.5cm
+#     vertical_space_between_name_and_connections: 0.7cm
+#     vertical_space_between_connections_and_first_section: 0.7cm
+#     horizontal_space_between_connections: 0.5cm
+#     separator_between_connections: ''
+#     use_icons_for_connections: true
+#     alignment: center
+#   section_titles:
+#     type: with-parial-line
+#     font_size: 1.4em
+#     bold: true
+#     small_caps: false
+#     line_thickness: 0.5pt
+#     vertical_space_above: 0.5cm
+#     vertical_space_below: 0.3cm
+#     line_type: with-full-line
+#   entries:
+#     date_and_location_width: 4.15cm
+#     left_and_right_margin: 0.2cm
+#     horizontal_space_between_columns: 0.1cm
+#     vertical_space_between_entries: 1.2em
+#     allow_page_break_in_entries: true
+#     short_second_row: false
+#     show_time_spans_in: []
+#   highlights:
+#     bullet: ◦
+#     top_margin: 0.25cm
+#     left_margin: 0.4cm
+#     vertical_space_between_highlights: 0.25cm
+#     horizontal_space_between_bullet_and_highlight: 0.5em
+#     summary_left_margin: 0cm
+#   entry_types:
+#     one_line_entry:
+#       template: '**LABEL:** DETAILS'
+#     education_entry:
+#       main_column_first_row_template: "**INSTITUTION**\n*DEGREE
+#         in AREA*"
+#       degree_column_width: 1cm
+#       main_column_second_row_template: "SUMMARY\nHIGHLIGHTS"
+#       date_and_location_column_template: "*LOCATION*\n*DATE*"
+#     normal_entry:
+#       main_column_first_row_template: '**NAME**'
+#       main_column_second_row_template: "SUMMARY\nHIGHLIGHTS"
+#       date_and_location_column_template: "*LOCATION*\n*DATE*"
+#     experience_entry:
+#       main_column_first_row_template: "**POSITION**\n*COMPANY*"
+#       main_column_second_row_template: "SUMMARY\nHIGHLIGHTS"
+#       date_and_location_column_template: "*LOCATION*\n*DATE*"
+#     publication_entry:
+#       main_column_first_row_template: '**TITLE**'
+#       main_column_second_row_template: "AUTHORS\nURL (JOURNAL)"
+#       main_column_second_row_without_journal_template: "AUTHORS\n\
+#         URL"
+#       main_column_second_row_without_url_template: "AUTHORS\n\
+#         JOURNAL"
+#       date_and_location_column_template: DATE
+# locale:
+#   language: en
+#   phone_number_format: national
+#   page_numbering_template: NAME - Page PAGE_NUMBER of TOTAL_PAGES
+#   last_updated_date_template: Last updated in TODAY
+#   date_template: MONTH_ABBREVIATION YEAR
+#   month: month
+#   months: months
+#   year: year
+#   years: years
+#   present: present
+#   to: –
+#   abbreviations_for_months:
+#     - Jan
+#     - Feb
+#     - Mar
+#     - Apr
+#     - May
+#     - June
+#     - July
+#     - Aug
+#     - Sept
+#     - Oct
+#     - Nov
+#     - Dec
+#   full_names_of_months:
+#     - January
+#     - February
+#     - March
+#     - April
+#     - May
+#     - June
+#     - July
+#     - August
+#     - September
+#     - October
+#     - November
+#     - December
+# rendercv_settings:
+#   date: '2025-01-07'
+#   bold_keywords: []
