@@ -49,7 +49,10 @@ const editor = useEditor({
 watch(
   () => props.modelValue,
   (markdown) => {
-    if (markdown === emitted) return; // our own edit coming back
+    // Our own edit coming back is skipped once; any other change (reload, restore, another entry) is applied.
+    const echo = markdown === emitted;
+    emitted = undefined;
+    if (echo) return;
     plain.value = !isLossless(markdown, headless);
     if (!plain.value && editor.value && markdown !== editor.value.getMarkdown()) {
       editor.value.commands.setContent(markdown, { contentType: 'markdown', emitUpdate: false });

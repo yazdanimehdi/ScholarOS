@@ -64,6 +64,12 @@ function copy(f: MediaFile) {
   );
 }
 
+async function pickFiles(e: Event) {
+  const input = e.target as HTMLInputElement;
+  await upload(input.files);
+  input.value = ''; // choosing the same file again fires `change` again
+}
+
 function drop(e: DragEvent) {
   over.value = false;
   upload(e.dataTransfer?.files);
@@ -86,7 +92,7 @@ function drop(e: DragEvent) {
         accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/svg+xml"
         class="adm-visually-hidden"
         aria-label="Upload images"
-        @change="upload(($event.target as HTMLInputElement).files)"
+        @change="pickFiles"
       />
     </label>
     <p v-if="loading" class="adm-muted">Loading…</p>

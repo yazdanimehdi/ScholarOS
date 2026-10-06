@@ -164,3 +164,41 @@ test('settings: change the site title and publish', async ({ page }) => {
   await page.getByRole('button', { name: 'Publish settings' }).click();
   await expect(page.getByText(COMMITTED)).toBeVisible();
 });
+
+test('posts: edits restored after a conflict survive the next keystroke', async ({ page, baseURL }) => {
+  await signIn(page);
+  const slug = `e2e-restore-${Date.now()}`;
+  const url = `/api/admin/collections/posts/${slug}`;
+  const created = await page.request.put(url, {
+    headers: { Origin: baseURL! },
+    data: { data: { title: 'Restore', date: '2024-06-01', draft: true }, body: 'First line.\n', version: null },
+  });
+  expect(created.ok()).toBe(true);
+  await page.goto(`${ADMIN}/posts/${slug}`);
+  const editor = page.locator('.tiptap');
+  await editor.click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.type(' Mine.');
+  await expect(editor).toContainText('First line. Mine.');
+  // Someone else commits the post after this page loaded it.
+  const current = await (await page.request.get(url)).json();
+  const other = await page.request.put(url, {
+    headers: { Origin: baseURL! },
+    data: { data: current.data, body: 'Their line.\n', version: current.version },
+  });
+  expect(other.ok()).toBe(true);
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'This file changed since you opened it' })).toBeVisible();
+  await page.getByRole('button', { name: 'Reload' }).click();
+  await expect(editor).toContainText('Their line.');
+  await page.getByRole('button', { name: 'Restore edits' }).click();
+  await expect(editor).toContainText('First line. Mine.');
+  await editor.click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.type('!');
+  await expect(editor).toContainText('First line. Mine.!');
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+  const saved = await (await page.request.get(url)).json();
+  expect(saved.body).toContain('First line. Mine.!');
+});
