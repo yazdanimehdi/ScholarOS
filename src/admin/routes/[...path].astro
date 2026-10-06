@@ -1,35 +1,56 @@
 ---
+import Media from '../Media.vue';
 import { adminSettings } from '../../lib/admin/settings';
+import '../../themes/editorial/editorial.css';
+import '../admin.css';
 
 export const prerender = false;
 
-const { siteName } = adminSettings();
-const screen = (Astro.params.path ?? '').split('/')[0];
+const { adminPath, siteName } = adminSettings();
+const [screen = '', arg = ''] = (Astro.params.path ?? '').split('/');
+const SCREENS = new Set(['login', 'media']);
+if (!SCREENS.has(screen)) return new Response('Not found', { status: 404 });
+
+const ctx = { adminPath, siteName, user: Astro.locals.user ?? null };
 const error = Astro.url.searchParams.get('error');
 if (screen === 'login' && error === 'denied') Astro.response.status = 403;
+const LOGIN_ERRORS: Record<string, string> = {
+  denied: "That GitHub account isn't on this site's admin list (adminUsers in config/site.yml).",
+  expired: 'Sign-in expired or was interrupted. Please try again.',
+};
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="editorial">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>Site admin · {siteName}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+    />
   </head>
-  <body>
+  <body class="adm">
     {
-      screen === 'login' ? (
-        <main>
+      screen === 'login' && (
+        <main class="adm-login">
           <h1>{siteName}</h1>
-          <a href="/api/admin/auth/login">Sign in with GitHub</a>
-          {error && <p role="alert">{error === 'denied' ? 'Not on the admin list.' : 'Sign-in expired. Try again.'}</p>}
-        </main>
-      ) : (
-        <main>
-          <p>Signed in as {Astro.locals.user?.login}</p>
+          <p class="adm-muted">Site admin</p>
+          <a class="adm-btn adm-btn-primary" href="/api/admin/auth/login">
+            Sign in with GitHub
+          </a>
+          {error && (
+            <p class="adm-error" role="alert">
+              {LOGIN_ERRORS[error] ?? LOGIN_ERRORS.expired}
+            </p>
+          )}
         </main>
       )
     }
+    {screen === 'media' && <Media client:only="vue" ctx={ctx} />}
   </body>
 </html>

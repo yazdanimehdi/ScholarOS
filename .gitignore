@@ -36,3 +36,7 @@ dist-*/
 
 # Vercel build output (VERCEL=1 pnpm build)
 .vercel/
+
+# Playwright
+test-results/
+playwright-report/
