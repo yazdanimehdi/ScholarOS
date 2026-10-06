@@ -2,11 +2,12 @@
 import ClassicResearch from '../themes/classic/Research.astro';
 import { getCollection } from 'astro:content';
 import { isPersonalMode, loadYamlConfig } from '../lib/config';
+import { byId } from '../lib/utils';
 
 const personal = isPersonalMode();
 
 const projects = (await getCollection('projects')).filter((p) => p.data.status === 'active');
-const publications = (await getCollection('publications')).sort((a, b) => a.id.localeCompare(b.id))
+const publications = (await getCollection('publications')).sort(byId)
   .filter((p) => p.data.featured)
   .sort((a, b) => b.data.year - a.data.year)
   .slice(0, 5);

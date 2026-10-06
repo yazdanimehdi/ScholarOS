@@ -7,7 +7,7 @@ import SEO from '../../components/astro/SEO.astro';
 import ObfuscatedEmail from '../../components/astro/ObfuscatedEmail.astro';
 import { Image, getImage } from 'astro:assets';
 import { getCollection, getEntry, render } from 'astro:content';
-import { getRoleName } from '../../lib/utils';
+import { byId, getRoleName } from '../../lib/utils';
 import { getImageShapeClass, isCircularShape } from '../../lib/imageShape';
 
 export async function getStaticPaths() {
@@ -21,7 +21,7 @@ export async function getStaticPaths() {
 const { person } = Astro.props;
 const { Content } = await render(person);
 
-const publications = (await getCollection('publications')).sort((a, b) => a.id.localeCompare(b.id))
+const publications = (await getCollection('publications')).sort(byId)
   .filter((p) =>
     p.data.authors.some((a) => a.toLowerCase().includes(person.data.name.split(' ')[1]?.toLowerCase() || '')),
   )

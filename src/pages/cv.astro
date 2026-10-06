@@ -3,11 +3,12 @@ import ClassicCv from '../themes/classic/Cv.astro';
 import { getCollection } from 'astro:content';
 import { getSiteConfig } from '../lib/config';
 import { cvSections, hasYamlPublications, loadCv, loadCvMeta } from '../lib/cv';
+import { byId } from '../lib/utils';
 
 const config = getSiteConfig();
 const cv = loadCv().cv;
 const allSections = cvSections(cv);
-const publications = (await getCollection('publications')).sort((a, b) => a.id.localeCompare(b.id)).sort((a, b) => b.data.year - a.data.year);
+const publications = (await getCollection('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
 const cvMeta = loadCvMeta();
 const hasPdf = cvMeta?.pdfPath != null;
 const pdfHref = cvMeta?.pdfPath ?? '#';

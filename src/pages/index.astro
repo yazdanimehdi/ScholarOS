@@ -3,6 +3,7 @@ import ClassicHome from '../themes/classic/Home.astro';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections } from '../lib/config';
+import { byId } from '../lib/utils';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
@@ -27,7 +28,7 @@ const announcements = sections.includes('news')
   : [];
 
 const publicationsRaw = sections.includes('publications')
-  ? (await getCollection('publications')).sort((a, b) => a.id.localeCompare(b.id))
+  ? (await getCollection('publications')).sort(byId)
       .sort((a, b) => {
         if (a.data.featured && !b.data.featured) return -1;
         if (!a.data.featured && b.data.featured) return 1;

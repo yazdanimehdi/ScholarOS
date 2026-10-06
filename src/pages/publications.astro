@@ -3,11 +3,12 @@ import ClassicPublications from '../themes/classic/Publications.astro';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
+import { byId } from '../lib/utils';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
 
-const publications = (await getCollection('publications')).sort((a, b) => a.id.localeCompare(b.id)).sort((a, b) => b.data.year - a.data.year);
+const publications = (await getCollection('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
 
 const pubData = await Promise.all(
   publications.map(async (p) => {

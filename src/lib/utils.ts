@@ -113,3 +113,6 @@ export function formatNewsDate(date: Date, precision: DatePrecision = 'month'): 
         : { year: 'numeric', month: 'short' };
   return date.toLocaleDateString('en-US', { ...parts, timeZone: 'UTC' });
 }
+
+/** The content layer's entry order is not stable, so lists get an id tie-break before their real sort. */
+export const byId = (a: { id: string }, b: { id: string }) => a.id.localeCompare(b.id);

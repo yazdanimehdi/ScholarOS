@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content';
+import { byId } from './utils';
 
 export interface SearchItem {
   title: string;
@@ -18,9 +19,9 @@ export async function getSearchItems(): Promise<SearchItem[]> {
     getCollection('talks'),
   ]);
 
-  // Sort by id: glob-loader order varies between builds, which would reshuffle the index.
+  // Id tie-break (see byId). Talks stay unsorted: their classic baseline order is not id order, so sorting would change classic output.
   for (const c of [posts, publications, people, projects, announcements, positions]) {
-    c.sort((a, b) => a.id.localeCompare(b.id));
+    c.sort(byId);
   }
 
   const items: SearchItem[] = [];
