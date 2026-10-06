@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@astrojs/markdown-remark':
-        specifier: 6.3.10
+        specifier: ^6.3.10
         version: 6.3.10
       '@astrojs/mdx':
         specifier: ^4.0.0
