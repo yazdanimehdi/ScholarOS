@@ -27,8 +27,15 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
-      - name: Build both themes
+      # Full demo assertions only in the template repo; forks edit content, so they get the structural check.
+      # The dist-baseline comparison is a local pre-merge gate (gitignored), so CI always skips it.
+      - name: Build both themes (template, full check)
+        if: ${{ github.event.repository.is_template }}
         run: pnpm check:themes
+
+      - name: Build both themes (fork, structural check)
+        if: ${{ !github.event.repository.is_template }}
+        run: node scripts/check-themes.mjs --structural
 
       - name: ESLint
         continue-on-error: true
