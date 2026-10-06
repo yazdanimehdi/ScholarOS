@@ -147,3 +147,13 @@ export function generateColorOverrides(config: SiteConfig): string {
 
   return parts.join('\n');
 }
+
+/**
+ * Editorial accent from colors.light.primary. When unset, editorial.css supplies #1F3C88 / #142A63.
+ * `html:root[…]` outranks the `:root[…]` defaults in editorial.css regardless of stylesheet order.
+ */
+export function editorialAccentCss(config: SiteConfig): string {
+  const accent = config.colors?.light?.primary?.trim();
+  if (!accent) return '';
+  return `\nhtml:root[data-theme='editorial'] {\n  --ed-accent: ${accent};\n  --ed-accent-hover: color-mix(in oklch, ${accent}, black 25%);\n}`;
+}
