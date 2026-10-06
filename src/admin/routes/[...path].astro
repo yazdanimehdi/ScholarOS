@@ -3,8 +3,10 @@ import Collection from '../Collection.vue';
 import Cv from '../Cv.vue';
 import Dashboard from '../Dashboard.vue';
 import Media from '../Media.vue';
+import Pages from '../Pages.vue';
 import PostEditor from '../PostEditor.vue';
 import Posts from '../Posts.vue';
+import Settings from '../Settings.vue';
 import { adminSettings } from '../../lib/admin/settings';
 import '../../themes/editorial/editorial.css';
 import '../admin.css';
@@ -13,7 +15,7 @@ export const prerender = false;
 
 const { adminPath, siteName } = adminSettings();
 const [screen = '', arg = ''] = (Astro.params.path ?? '').split('/');
-const SCREENS = new Set(['', 'login', 'media', 'posts', 'publications', 'content', 'cv']);
+const SCREENS = new Set(['', 'login', 'media', 'posts', 'publications', 'content', 'cv', 'pages', 'settings']);
 const CONTENT = ['announcements', 'people', 'projects', 'talks', 'positions'];
 if (!SCREENS.has(screen)) return new Response('Not found', { status: 404 });
 if (screen === 'content' && !CONTENT.includes(arg)) return new Response('Not found', { status: 404 });
@@ -59,6 +61,8 @@ const LOGIN_ERRORS: Record<string, string> = {
       )
     }
     {screen === 'media' && <Media client:only="vue" ctx={ctx} />}
+    {screen === 'pages' && <Pages client:only="vue" ctx={ctx} />}
+    {screen === 'settings' && <Settings client:only="vue" ctx={ctx} />}
     {screen === 'cv' && <Cv client:only="vue" ctx={ctx} />}
     {screen === '' && <Dashboard client:only="vue" ctx={ctx} />}
     {screen === 'posts' && !arg && <Posts client:only="vue" ctx={ctx} />}

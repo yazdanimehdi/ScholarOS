@@ -120,3 +120,20 @@ test('cv: a stale save shows the conflict dialog and keeps the edits', async ({ 
   await page.getByRole('button', { name: 'Reload' }).click();
   await expect(page.getByRole('button', { name: 'Restore edits' })).toBeVisible();
 });
+
+test('pages: reorder home sections and publish', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/pages`);
+  const sections = page.getByRole('group', { name: 'Home page sections' });
+  await sections.getByRole('button', { name: 'Move down' }).first().click();
+  await page.getByRole('button', { name: 'Publish home page' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+});
+
+test('settings: change the site title and publish', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/settings`);
+  await page.getByLabel('Site title', { exact: true }).fill('E2E Lab');
+  await page.getByRole('button', { name: 'Publish settings' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+});
