@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import MediaGrid from './MediaGrid.vue';
+import { vDialog } from './dialog';
 
 defineProps<{ modelValue?: string; folder: 'content' | 'site'; label: string }>();
 const emit = defineEmits<{ 'update:modelValue': [value: string | undefined] }>();
 const open = ref(false);
-const vFocus = { mounted: (el: HTMLElement) => el.focus() };
 
 function pick(url: string) {
   emit('update:modelValue', url);
@@ -25,6 +25,7 @@ function pick(url: string) {
   </div>
   <div
     v-if="open"
+    v-dialog
     class="adm-modal"
     role="dialog"
     aria-modal="true"
@@ -34,7 +35,7 @@ function pick(url: string) {
     <div>
       <div class="adm-head">
         <h2 class="adm-h2">Choose an image</h2>
-        <button v-focus type="button" class="adm-btn adm-btn-small" @click="open = false">Close</button>
+        <button type="button" class="adm-btn adm-btn-small" @click="open = false">Close</button>
       </div>
       <MediaGrid :folder="folder" pickable @pick="pick" />
     </div>

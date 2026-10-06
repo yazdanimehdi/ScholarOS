@@ -76,6 +76,15 @@
 .adm-side nav .adm-sub {
   padding-left: 24px;
 }
+.adm-side-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.adm-side .adm-menu-btn {
+  display: none;
+}
 .adm-side-foot {
   margin-top: auto;
   display: flex;
@@ -302,6 +311,9 @@
 .adm-list-row > :first-child {
   flex: 1;
   min-width: 0;
+}
+.adm-color-row {
+  align-items: flex-end;
 }
 .adm-group {
   border: 1px solid var(--adm-rule);
@@ -569,9 +581,11 @@
     border-right: 0;
     border-bottom: 1px solid var(--adm-rule);
   }
-  .adm-side nav {
-    flex-direction: row;
-    flex-wrap: wrap;
+  .adm-side .adm-menu-btn {
+    display: inline-flex;
+  }
+  .adm-side nav:not(.is-open) {
+    display: none;
   }
   .adm-side-foot {
     flex-direction: row;

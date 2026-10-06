@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import AdminShell from './AdminShell.vue';
 import DocBanners from './DocBanners.vue';
 import FormFields from './FormFields.vue';
+import { vDialog } from './dialog';
 import { api, report, toast } from './api';
 import {
   CV_BLANK,
@@ -440,6 +441,7 @@ async function generatePdf() {
 
     <div
       v-if="importing"
+      v-dialog
       class="adm-modal"
       role="dialog"
       aria-modal="true"

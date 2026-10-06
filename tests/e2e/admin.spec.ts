@@ -202,3 +202,34 @@ test('posts: edits restored after a conflict survive the next keystroke', async 
   const saved = await (await page.request.get(url)).json();
   expect(saved.body).toContain('First line. Mine.!');
 });
+
+test('phone layout: the nav collapses behind a Menu button', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await signIn(page);
+  await page.goto(`${ADMIN}/cv`);
+  const nav = page.getByRole('navigation', { name: 'Admin' });
+  const menu = page.locator('.adm-side').getByRole('button', { name: 'Menu' });
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+  await expect(nav.getByRole('link', { name: 'Posts' })).toBeHidden();
+  await menu.click();
+  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  await expect(nav.getByRole('link', { name: 'Posts' })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('cv: Tab stays inside the import dialog', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/cv`);
+  const open = page.getByRole('button', { name: 'Import YAML' });
+  await open.click();
+  const dialog = page.getByRole('dialog', { name: 'Import a RenderCV YAML file' });
+  await expect(dialog).toBeVisible();
+  const inside = () => dialog.evaluate((el) => el.contains(document.activeElement));
+  for (const key of ['Tab', 'Tab', 'Tab', 'Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab']) {
+    await page.keyboard.press(key);
+    expect(await inside()).toBe(true);
+  }
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(open).toBeFocused();
+});

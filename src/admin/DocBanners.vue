@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { vDialog } from './dialog';
+
 /** `stale`: the draft predates the loaded version; lists the top-level keys that differ (null when not stale). */
 defineProps<{ draft: boolean; conflict: boolean; stale?: string[] | null }>();
 defineEmits<{ restore: []; discard: []; reload: [] }>();
-const vFocus = { mounted: (el: HTMLElement) => el.focus() };
 </script>
 
 <template>
-  <div v-if="conflict" class="adm-modal" role="dialog" aria-modal="true" aria-labelledby="adm-conflict-title">
+  <div v-if="conflict" v-dialog class="adm-modal" role="dialog" aria-modal="true" aria-labelledby="adm-conflict-title">
     <div>
       <h2 id="adm-conflict-title" class="adm-h2">This file changed since you opened it</h2>
       <p>
@@ -14,7 +15,7 @@ const vFocus = { mounted: (el: HTMLElement) => el.focus() };
         can re-apply them after reloading.
       </p>
       <div class="adm-actions">
-        <button v-focus type="button" class="adm-btn adm-btn-primary" @click="$emit('reload')">Reload</button>
+        <button type="button" class="adm-btn adm-btn-primary" @click="$emit('reload')">Reload</button>
       </div>
     </div>
   </div>

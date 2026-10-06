@@ -7,6 +7,8 @@ const props = defineProps<{ ctx: AdminCtx; active: string; title: string }>();
 const base = `/${props.ctx.adminPath}`;
 const banner = ref('');
 const contentOpen = ref(props.active.startsWith('content/'));
+// Phones (under 860px): the nav is a menu, closed until opened. Links reload the page, which closes it again.
+const menuOpen = ref(false);
 const TOP = [
   ['', 'Dashboard'],
   ['posts', 'Posts'],
@@ -45,11 +47,22 @@ async function signOut() {
 <template>
   <div class="adm-layout">
     <aside class="adm-side">
-      <div>
-        <strong>{{ ctx.siteName }}</strong>
-        <div class="adm-muted">Site admin</div>
+      <div class="adm-side-top">
+        <div>
+          <strong>{{ ctx.siteName }}</strong>
+          <div class="adm-muted">Site admin</div>
+        </div>
+        <button
+          type="button"
+          class="adm-btn adm-btn-small adm-menu-btn"
+          aria-controls="adm-nav"
+          :aria-expanded="menuOpen"
+          @click="menuOpen = !menuOpen"
+        >
+          Menu
+        </button>
       </div>
-      <nav aria-label="Admin">
+      <nav id="adm-nav" aria-label="Admin" :class="{ 'is-open': menuOpen }">
         <a
           v-for="[path, label] in TOP"
           :key="path"

@@ -5,6 +5,7 @@ import { EditorContent, useEditor } from '@tiptap/vue-3';
 import 'katex/dist/katex.min.css';
 import { ref, watch } from 'vue';
 import MediaGrid from './MediaGrid.vue';
+import { vDialog } from './dialog';
 import { editorExtensions, isLossless } from './editor/extensions';
 
 const props = defineProps<{ modelValue: string; compact?: boolean; preview?: boolean }>();
@@ -12,7 +13,6 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 const host = ref<HTMLElement>();
 const picking = ref(false);
 const slash = ref<{ top: number; left: number } | null>(null);
-const vFocus = { mounted: (el: HTMLElement) => el.focus() };
 // In preview the content takes the public post styles (.ed-prose from editorial.css).
 const contentClass = (preview?: boolean) => (preview ? 'tiptap ed-prose' : 'tiptap');
 
@@ -187,6 +187,7 @@ function choose(action: () => void) {
     </div>
     <div
       v-if="picking"
+      v-dialog
       class="adm-modal"
       role="dialog"
       aria-modal="true"
@@ -196,7 +197,7 @@ function choose(action: () => void) {
       <div>
         <div class="adm-head">
           <h2 class="adm-h2">Insert an image</h2>
-          <button v-focus type="button" class="adm-btn adm-btn-small" @click="picking = false">Close</button>
+          <button type="button" class="adm-btn adm-btn-small" @click="picking = false">Close</button>
         </div>
         <MediaGrid folder="site" pickable @pick="insertImage" />
       </div>
