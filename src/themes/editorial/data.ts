@@ -22,7 +22,7 @@ import {
   type WritingItem,
 } from '../../lib/editorial';
 import { renderMarkdown } from '../../lib/markdown';
-import { readingTime } from '../../lib/utils';
+import { byId as idOrder, readingTime } from '../../lib/utils';
 
 export function loadResearchConfig(): ResearchConfig {
   try {
@@ -92,11 +92,13 @@ export async function loadHome() {
       papers: pick(a.publications, byId, `research.yml area "${a.id}"`).map((p) => shortTitle(p.data.title)),
     })),
     selected: [...pubs]
+      .sort(idOrder)
       .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.year - a.data.year)
       .slice(0, 4),
     pubCount: pubs.length,
     news: (await getCollection('announcements'))
-      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+      .sort(idOrder)
+      .sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned) || b.data.date.getTime() - a.data.date.getTime())
       .slice(0, 5),
     writing: (await writingItems()).slice(0, 3),
   };
@@ -134,6 +136,7 @@ export async function loadPublications() {
   const areas = normalizeAreas(loadResearchConfig().areas);
   const areaIds = new Set(areas.map((a) => a.id));
   const items = (await getCollection('publications'))
+    .sort(idOrder)
     .sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title))
     .map((pub) => ({
       pub,
@@ -168,7 +171,10 @@ export async function loadCvPage() {
     }))
     .filter((s) => s.entries.length > 0);
   if (!hasYamlPublications(sections)) {
-    const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year).slice(0, 5);
+    const pubs = (await getCollection('publications'))
+      .sort(idOrder)
+      .sort((a, b) => b.data.year - a.data.year)
+      .slice(0, 5);
     if (pubs.length > 0) {
       shown.push({
         key: 'selectedPublications',
@@ -202,6 +208,7 @@ export async function loadPost(post: CollectionEntry<'posts'>) {
   const config = getSiteConfig();
   const posts = (await getCollection('posts'))
     .filter((p) => !p.data.draft)
+    .sort(idOrder)
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
   const i = posts.findIndex((p) => p.id === post.id);
   const relatedId = post.data.relatedPublication;

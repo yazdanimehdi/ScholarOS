@@ -80,7 +80,7 @@ const ld = {
 
     <div class="ed-filterbar" data-pub-filters>
       {
-        filters.length > 1 ? (
+        filters.length > 2 ? (
           <div class="ed-tabs" role="group" aria-label="Filter by topic">
             {filters.map((f) => (
               <button type="button" class="ed-tab" data-filter={f.id} aria-pressed={f.id === 'all' ? 'true' : 'false'}>

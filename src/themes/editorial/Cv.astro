@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Eyebrow from './Eyebrow.astro';
 import type { CvPageData } from './data';
+import { slugify } from '../../lib/utils';
 
 type Props = CvPageData;
 
@@ -33,8 +34,8 @@ const { name, sections, pdfHref, updated } = Astro.props;
 
     {
       sections.map((s) => (
-        <section class="ed-cv-section" aria-labelledby={`cv-${s.key}`}>
-          <h2 id={`cv-${s.key}`}>{s.title}</h2>
+        <section class="ed-cv-section" aria-labelledby={`cv-${slugify(s.key)}`}>
+          <h2 id={`cv-${slugify(s.key)}`}>{s.title}</h2>
           <div class="ed-cv-entries">
             {s.entries.map((e) => (
               <div class="ed-cv-entry">

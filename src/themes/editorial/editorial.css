@@ -37,6 +37,7 @@
   --color-surface-50: var(--ed-hover);
   --color-surface-100: var(--ed-tint);
   --color-surface-200: var(--ed-rule);
+  --color-surface-300: var(--ed-caption); /* text-surface-300 is used as text: keep >= 4.5:1 */
   --color-surface-400: var(--ed-caption);
   --color-surface-500: var(--ed-caption);
   --color-surface-600: var(--ed-muted);
@@ -525,6 +526,17 @@
     font-weight: 600;
     line-height: 1.1;
     color: var(--ed-accent);
+  }
+  /* No venueShort: the full venue, clamped so it never leaves the tile. */
+  & .ed-venue-tile-short--long {
+    font-size: 13px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
   }
   & .ed-venue-tile-year {
     font-size: 12px;

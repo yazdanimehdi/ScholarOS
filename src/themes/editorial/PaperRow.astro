@@ -28,7 +28,9 @@ const list = variant === 'list';
   {
     !list && (
       <div class="ed-venue-tile" aria-hidden="true">
-        <span class="ed-venue-tile-short">{p.venueShort ?? p.venue}</span>
+        <span class:list={['ed-venue-tile-short', { 'ed-venue-tile-short--long': !p.venueShort }]}>
+          {p.venueShort ?? p.venue}
+        </span>
         <span class="ed-venue-tile-year num">{p.year}</span>
       </div>
     )
@@ -53,7 +55,7 @@ const list = variant === 'list';
         ))
       }
     </span>
-    <span class="ed-paper-meta">
+    <div class="ed-paper-meta">
       <span class="ed-venue">{list && !p.venue.includes(String(p.year)) ? `${p.venue}, ${p.year}` : p.venue}</span>
       {p.note && <span class="ed-note">{p.note}</span>}
       {
@@ -82,6 +84,6 @@ const list = variant === 'list';
           </a>
         )
       }
-    </span>
+    </div>
   </div>
 </li>
