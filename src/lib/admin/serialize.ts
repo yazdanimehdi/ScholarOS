@@ -42,8 +42,8 @@ function apply(doc: Document, path: (string | number)[], prev: unknown, next: un
 
 /** Rewrites a YAML file to hold `next`, keeping comments, key order and the quoting of untouched values. */
 export function updateYaml(source: string, next: unknown): string {
-  const doc = parseDocument(source);
-  if (doc.contents === null) doc.contents = doc.createNode(next) as typeof doc.contents;
+  const doc: Document = parseDocument(source);
+  if (doc.contents === null) doc.contents = doc.createNode(next);
   else apply(doc, [], doc.toJS(), next);
   return doc.toString(YAML_OUT);
 }
