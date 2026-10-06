@@ -77,3 +77,36 @@ export function isPublicationEntry(e: unknown): e is CvGenericEntry {
 export function isNormalEntry(e: unknown): e is CvGenericEntry {
   return typeof e === 'object' && e !== null && ('name' in e || 'startDate' in e || 'highlights' in e);
 }
+
+export interface CvEntryView {
+  title: string;
+  org?: string;
+  when?: string;
+  points: string[];
+}
+
+const str = (v: unknown): string => (typeof v === 'string' || typeof v === 'number' ? String(v).trim() : '');
+const joined = (parts: unknown[], sep: string) => parts.map(str).filter(Boolean).join(sep);
+
+function view(title: string, org: string, when: string, points: string[]): CvEntryView {
+  return { title, ...(org ? { org } : {}), ...(when ? { when } : {}), points };
+}
+
+/** Any RenderCV entry in the editorial "title / org / dates / highlights" shape; null when unrecognized. */
+export function cvEntryView(entry: unknown): CvEntryView | null {
+  if (typeof entry === 'string') return { title: entry, points: [] };
+  if (typeof entry !== 'object' || entry === null) return null;
+  const e = entry as CvGenericEntry;
+  const points = Array.isArray(e.highlights) ? e.highlights.filter((h): h is string => typeof h === 'string') : [];
+  const range = e.startDate ? formatDateRange(e.startDate, e.endDate) : str(e.date);
+
+  if (isEducationEntry(e)) return view(joined([e.degree, e.area], ' in '), joined([e.institution, e.location], ', '), range, points);
+  if (isOneLineEntry(e)) return view(str(e.label), str(e.details), '', []);
+  if (isExperienceEntry(e)) return view(str(e.position), joined([e.company, e.location], ', '), range, points);
+  if (isPublicationEntry(e)) {
+    const authors = (Array.isArray(e.authors) ? e.authors : []).map((a) => str(a).replace(/\*+/g, ''));
+    return view(str(e.title), joined([authors.join(', '), e.journal], ' · '), str(e.date), points);
+  }
+  if (isNormalEntry(e)) return view(str(e.name), str(e.location), range, points);
+  return null;
+}

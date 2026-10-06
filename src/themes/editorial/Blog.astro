@@ -1,0 +1,97 @@
+---
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import { formatNewsDate } from '../../lib/utils';
+import type { BlogData } from './data';
+
+type Props = BlogData;
+
+const { config, items, elsewhere } = Astro.props;
+const label = config.nav.find((n) => n.href === '/blog')?.label ?? 'Writing';
+const personal = config.siteMode === 'personal';
+const description = personal
+  ? 'Posts, articles, and technical writing.'
+  : 'Lab blog posts and external articles from our team.';
+const hasBoth = items.some((i) => i.kind === 'site') && items.some((i) => i.kind === 'external');
+const tabs = [
+  { id: 'all', label: 'All' },
+  { id: 'site', label: 'On this site' },
+  { id: 'external', label: elsewhere },
+];
+---
+
+<Layout title={label} description={description}>
+  <div class="ed-wrap ed-main ed-main--narrow">
+    <div class="ed-stack">
+      <Eyebrow>{label}</Eyebrow>
+      <h1 class="ed-h1">Essays &amp; notes</h1>
+      <p class="ed-intro">{description}</p>
+    </div>
+
+    <div class="ed-filterbar" data-blog-filters>
+      {
+        hasBoth ? (
+          <div class="ed-tabs" role="group" aria-label="Filter by source">
+            {tabs.map((t) => (
+              <button type="button" class="ed-tab" data-filter={t.id} aria-pressed={t.id === 'all' ? 'true' : 'false'}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <span />
+        )
+      }
+      <a href="/feed.xml" class="ul ed-feedlink">RSS</a>
+    </div>
+
+    {items.length === 0 && <p class="ed-intro">No posts yet.</p>}
+
+    <ol class="ed-entries">
+      {
+        items.map((item) => {
+          const external = item.kind === 'external';
+          const date = formatNewsDate(item.date, 'month');
+          return (
+            <li class="ed-entry" data-kind={item.kind}>
+              <div class="ed-entry-tile" aria-hidden="true">
+                <span class="ed-entry-tag">{external ? item.source : (item.tag ?? 'Post')}</span>
+                <span class="ed-entry-date num">{date}</span>
+              </div>
+              <div class="ed-entry-body">
+                <a href={item.href} class="ed-entry-title" rel={external ? 'noopener' : undefined}>
+                  {item.title}
+                </a>
+                {item.excerpt && <p class="ed-entry-excerpt">{item.excerpt}</p>}
+                <span class="ed-entry-meta">
+                  {external
+                    ? `${date} · Published on ${item.source} ↗`
+                    : [date, `${item.minutes} min read`, item.tag].filter(Boolean).join(' · ')}
+                </span>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+</Layout>
+
+<script>
+  function initBlogFilters() {
+    const bar = document.querySelector<HTMLElement>('[data-blog-filters]');
+    if (!bar) return;
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const kind = button.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        document.querySelectorAll<HTMLElement>('li[data-kind]').forEach((li) => {
+          li.hidden = kind !== 'all' && li.dataset.kind !== kind;
+        });
+      }),
+    );
+  }
+
+  document.addEventListener('astro:page-load', initBlogFilters);
+</script>

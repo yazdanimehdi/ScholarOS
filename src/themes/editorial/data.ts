@@ -1,6 +1,8 @@
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { cvEntryView, cvSections, hasYamlPublications, loadCv, loadCvMeta, sectionTitle, type CvEntryView } from '../../lib/cv';
 import { getHomepageSections, getSiteConfig, getSiteName, loadYamlConfig } from '../../lib/config';
 import {
+  elsewhereLabel,
   homeBlocks,
   isOwner,
   mergeWriting,
@@ -144,3 +146,70 @@ export async function loadPublications() {
 }
 
 export type PublicationsData = Awaited<ReturnType<typeof loadPublications>>;
+
+export async function loadCvPage() {
+  const config = getSiteConfig();
+  const cv = loadCv().cv;
+  const sections = cvSections(cv);
+  const meta = loadCvMeta();
+  const shown = sections
+    .map(([key, entries]) => ({
+      key,
+      title: sectionTitle(key),
+      entries: entries.map(cvEntryView).filter((e): e is CvEntryView => e !== null),
+    }))
+    .filter((s) => s.entries.length > 0);
+  if (!hasYamlPublications(sections)) {
+    const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year).slice(0, 5);
+    if (pubs.length > 0) {
+      shown.push({
+        key: 'selectedPublications',
+        title: 'Selected Publications',
+        entries: pubs.map((p) => ({ title: p.data.title, org: `${p.data.venue} · ${p.data.year}`, points: [] })),
+      });
+    }
+  }
+  return {
+    name: cv.name || config.author,
+    sections: shown,
+    pdfHref: meta?.pdfPath ?? undefined,
+    updated: meta?.lastGenerated ? new Date(meta.lastGenerated) : undefined,
+  };
+}
+
+export type CvPageData = Awaited<ReturnType<typeof loadCvPage>>;
+
+export async function loadBlog() {
+  const items = await writingItems();
+  return {
+    config: getSiteConfig(),
+    items,
+    elsewhere: elsewhereLabel(items.filter((i) => i.kind === 'external').map((i) => i.source ?? '')),
+  };
+}
+
+export type BlogData = Awaited<ReturnType<typeof loadBlog>>;
+
+export async function loadPost(post: CollectionEntry<'posts'>) {
+  const config = getSiteConfig();
+  const posts = (await getCollection('posts'))
+    .filter((p) => !p.data.draft)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const i = posts.findIndex((p) => p.id === post.id);
+  const relatedId = post.data.relatedPublication;
+  const related = relatedId ? await getEntry('publications', relatedId) : undefined;
+  // eslint-disable-next-line no-console
+  if (relatedId && !related) console.warn(`[editorial] post "${post.id}": unknown relatedPublication "${relatedId}"`);
+  const people = await getCollection('people');
+  return {
+    config,
+    post,
+    author: people.find((p) => p.id === post.data.author)?.data.name ?? post.data.author ?? config.author,
+    minutes: readingTime(post.body ?? ''),
+    related,
+    newer: i > 0 ? posts[i - 1] : undefined,
+    older: posts[i + 1],
+  };
+}
+
+export type PostData = Awaited<ReturnType<typeof loadPost>>;

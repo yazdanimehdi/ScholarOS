@@ -1,7 +1,9 @@
 ---
 import ClassicCv from '../themes/classic/Cv.astro';
+import EditorialCv from '../themes/editorial/Cv.astro';
+import { loadCvPage } from '../themes/editorial/data';
 import { getCollection } from 'astro:content';
-import { getSiteConfig } from '../lib/config';
+import { getSiteConfig, getTheme } from '../lib/config';
 import { cvSections, hasYamlPublications, loadCv, loadCvMeta } from '../lib/cv';
 import { byId } from '../lib/utils';
 
@@ -12,9 +14,14 @@ const publications = (await getCollection('publications')).sort(byId).sort((a, b
 const cvMeta = loadCvMeta();
 const hasPdf = cvMeta?.pdfPath != null;
 const pdfHref = cvMeta?.pdfPath ?? '#';
+const editorialCv = getTheme() === 'editorial' ? await loadCvPage() : null;
 ---
 
-<ClassicCv
+{
+  editorialCv ? (
+    <EditorialCv {...editorialCv} />
+  ) : (
+    <ClassicCv
   {config}
   {cv}
   {cvMeta}
@@ -24,3 +31,5 @@ const pdfHref = cvMeta?.pdfPath ?? '#';
   hasYamlPublications={hasYamlPublications(allSections)}
   {publications}
 />
+  )
+}

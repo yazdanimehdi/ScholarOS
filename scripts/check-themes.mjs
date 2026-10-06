@@ -97,6 +97,29 @@ for (const theme of THEMES) {
   assert.match(html, /data-first-only/, 'editorial /publications: first-author toggle');
 }
 
+{
+  const html = ed('cv/index.html');
+  assert.match(html, /<h1 class="ed-cv-title">Curriculum Vitae<\/h1>/, 'editorial /cv: title');
+  assert.match(html, /<h2 id="cv-education">Education<\/h2>/, 'editorial /cv: section label');
+  assert.match(html, /Ph\.D\. in Computer Science/, 'editorial /cv: education entry');
+  assert.match(html, /2020-01 – Present/, 'editorial /cv: date range');
+  assert.doesNotMatch(html, /Download PDF/, 'editorial /cv: no PDF button without cv.json pdfPath');
+}
+{
+  const html = ed('blog/index.html');
+  assert.match(html, /<li class="ed-entry" data-kind="site">/, 'editorial /blog: site rows');
+  assert.match(html, /<li class="ed-entry" data-kind="external">/, 'editorial /blog: external rows');
+  assert.match(html, /data-filter="external"[^>]*>\s*Elsewhere\s*</, 'editorial /blog: mixed feed sources → "Elsewhere"');
+  assert.match(html, /Published on Medium ↗/, 'editorial /blog: external rows link out');
+  assert.match(html, /href="\/feed\.xml"/, 'editorial /blog: RSS link');
+  const post = ed('blog/research-update-summer-2024/index.html');
+  assert.match(post, /<p class="ed-subtitle">Three papers, a toolkit release and two new lab members\.<\/p>/, 'editorial post: subtitle');
+  assert.match(post, /<span class="ed-aside-label">Related paper<\/span>/, 'editorial post: related paper');
+  assert.match(post, /\d+ min read/, 'editorial post: reading time');
+  assert.match(post, /<div class="ed-prose">/, 'editorial post: prose wrapper');
+  assert.match(post, /href="\/blog\/welcome-to-our-lab"/, 'editorial post: previous post link');
+}
+
 // --- classic regression ---
 const BASELINE = 'dist-baseline';
 

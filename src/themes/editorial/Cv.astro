@@ -1,0 +1,60 @@
+---
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import type { CvPageData } from './data';
+
+type Props = CvPageData;
+
+const { name, sections, pdfHref, updated } = Astro.props;
+---
+
+<Layout title="CV" description={`Curriculum Vitae of ${name}`}>
+  <div class="ed-wrap ed-main ed-main--narrow ed-main--flush">
+    <div class="ed-cv-head">
+      <div class="ed-stack">
+        <Eyebrow>{name}</Eyebrow>
+        <h1 class="ed-cv-title">Curriculum Vitae</h1>
+        {
+          updated && (
+            <span class="ed-cv-updated">
+              Updated {updated.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}
+            </span>
+          )
+        }
+      </div>
+      {
+        pdfHref && (
+          <a href={pdfHref} class="ed-btn-outline" download="cv.pdf">
+            Download PDF
+          </a>
+        )
+      }
+    </div>
+
+    {
+      sections.map((s) => (
+        <section class="ed-cv-section" aria-labelledby={`cv-${s.key}`}>
+          <h2 id={`cv-${s.key}`}>{s.title}</h2>
+          <div class="ed-cv-entries">
+            {s.entries.map((e) => (
+              <div class="ed-cv-entry">
+                <div class="ed-cv-entry-top">
+                  <span class="ed-cv-entry-title">{e.title}</span>
+                  {e.when && <span class="ed-cv-when num">{e.when}</span>}
+                </div>
+                {e.org && <span class="ed-cv-org">{e.org}</span>}
+                {e.points.length > 0 && (
+                  <ul class="ed-cv-points">
+                    {e.points.map((p) => (
+                      <li>{p}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Layout>

@@ -1,0 +1,63 @@
+---
+import { render } from 'astro:content';
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import SEO from '../../components/astro/SEO.astro';
+import ProseEnhancements from '../../components/astro/ProseEnhancements.astro';
+import { paperLink } from '../../lib/editorial';
+import { formatNewsDate } from '../../lib/utils';
+import type { PostData } from './data';
+
+type Props = PostData & { ogImage?: string };
+
+const { config, post, author, minutes, related, newer, older, ogImage } = Astro.props;
+const { Content } = await render(post);
+const label = config.nav.find((n) => n.href === '/blog')?.label ?? 'Writing';
+const tags = post.data.tags ?? [];
+---
+
+<Layout title={post.data.title} description={post.data.excerpt} ogImage={ogImage} keywords={post.data.keywords}>
+  <SEO
+    type="blogPost"
+    title={post.data.title}
+    description={post.data.excerpt}
+    datePublished={post.data.date}
+    author={post.data.author}
+    keywords={post.data.keywords}
+  />
+  <article class="ed-article">
+    <a href="/blog" class="ed-back">← {label}</a>
+    <header class="ed-article-head">
+      {tags.length > 0 && <Eyebrow>{tags.join(' · ')}</Eyebrow>}
+      <h1 class="ed-article-title">{post.data.title}</h1>
+      {post.data.subtitle && <p class="ed-subtitle">{post.data.subtitle}</p>}
+      <span class="ed-byline">
+        {author} · <time datetime={post.data.date.toISOString()}>{formatNewsDate(post.data.date, 'day')}</time> · {
+          minutes
+        } min read
+      </span>
+    </header>
+
+    <div class="ed-prose"><Content /></div>
+    <ProseEnhancements />
+
+    {
+      related && (
+        <aside class="ed-aside" aria-label="Related paper">
+          <span class="ed-aside-label">Related paper</span>
+          <a href={paperLink(related.data) ?? `/publications#${related.id}`}>{related.data.title}</a>
+          <span class="ed-aside-venue">{related.data.venue}</span>
+        </aside>
+      )
+    }
+
+    {
+      (older || newer) && (
+        <nav class="ed-pager" aria-label="More posts">
+          {older ? <a href={`/blog/${older.id}`}>← {older.data.title}</a> : <span />}
+          {newer && <a href={`/blog/${newer.id}`}>{newer.data.title} →</a>}
+        </nav>
+      )
+    }
+  </article>
+</Layout>

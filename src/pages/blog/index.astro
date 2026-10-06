@@ -1,7 +1,9 @@
 ---
 import ClassicBlog from '../../themes/classic/Blog.astro';
+import EditorialBlog from '../../themes/editorial/Blog.astro';
+import { loadBlog } from '../../themes/editorial/data';
 import { getCollection } from 'astro:content';
-import { isPersonalMode } from '../../lib/config';
+import { getTheme, isPersonalMode } from '../../lib/config';
 
 const personal = isPersonalMode();
 
@@ -24,6 +26,7 @@ const timeline: TimelineItem[] = [
   ...posts.map((p) => ({ type: 'post' as const, date: p.data.date, data: p })),
   ...feeds.map((f) => ({ type: 'feed' as const, date: new Date(f.data.date), data: f })),
 ].sort((a, b) => b.date.getTime() - a.date.getTime());
+const editorialBlog = getTheme() === 'editorial' ? await loadBlog() : null;
 ---
 
-<ClassicBlog {personal} {posts} {feeds} {timeline} />
+{editorialBlog ? <EditorialBlog {...editorialBlog} /> : <ClassicBlog {personal} {posts} {feeds} {timeline} />}

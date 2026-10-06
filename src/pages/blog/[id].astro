@@ -1,5 +1,8 @@
 ---
 import ClassicPost from '../../themes/classic/Post.astro';
+import EditorialPost from '../../themes/editorial/Post.astro';
+import { loadPost } from '../../themes/editorial/data';
+import { getTheme } from '../../lib/config';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 
@@ -20,6 +23,7 @@ if (post.data.coverImage) {
   const resolved = await getImage({ src: post.data.coverImage, width: 1200 });
   ogImage = resolved.src;
 }
+const editorialPost = getTheme() === 'editorial' ? await loadPost(post) : null;
 ---
 
-<ClassicPost {post} {ogImage} />
+{editorialPost ? <EditorialPost {...editorialPost} {ogImage} /> : <ClassicPost {post} {ogImage} />}
