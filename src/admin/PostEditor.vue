@@ -16,7 +16,6 @@ type Post = { data: Record<string, any>; body: string };
 const props = defineProps<{ ctx: AdminCtx; slug: string }>();
 const isNew = ref(props.slug === 'new');
 const slug = ref(isNew.value ? '' : props.slug);
-const readonly = ref(false);
 const preview = ref(false);
 const publications = ref<Option[]>([]);
 const doc = useDocument<Post>();
@@ -33,9 +32,7 @@ const suggested = computed(() => slugify(String(doc.current?.data.title ?? '')))
 
 const loadPost = (target: string) => async () => {
   const entry = await api<Post & { version: string; readonly: boolean }>(`collections/posts/${target}`);
-  readonly.value = entry.readonly;
-  if (entry.readonly) doc.key = ''; // MDX can't be saved here: no draft key, so no drafts are offered or recorded
-  return { value: { data: entry.data, body: entry.body }, version: entry.version };
+  return { value: { data: entry.data, body: entry.body }, version: entry.version, readonly: entry.readonly };
 };
 
 onMounted(async () => {
@@ -92,8 +89,10 @@ function setSubtitle(e: Event) {
       <button type="button" class="adm-btn" :aria-pressed="preview" @click="preview = !preview">
         {{ preview ? 'Edit' : 'Preview' }}
       </button>
-      <button type="button" class="adm-btn" :disabled="doc.saving || readonly" @click="save(true)">Save draft</button>
-      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || readonly" @click="save(false)">
+      <button type="button" class="adm-btn" :disabled="doc.saving || doc.readonly" @click="save(true)">
+        Save draft
+      </button>
+      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || doc.readonly" @click="save(false)">
         Publish
       </button>
     </template>
@@ -106,7 +105,7 @@ function setSubtitle(e: Event) {
         @discard="doc.discard()"
         @reload="doc.reload()"
       />
-      <p v-if="readonly" class="adm-banner">
+      <p v-if="doc.readonly" class="adm-banner">
         This post is MDX. The admin shows it read-only; edit it in the repository.
       </p>
       <div class="adm-split adm-split-wide">
@@ -117,7 +116,7 @@ function setSubtitle(e: Event) {
             type="text"
             placeholder="Title"
             aria-label="Title"
-            :readonly="readonly"
+            :readonly="doc.readonly"
           />
           <span v-if="doc.errors.title" class="adm-err">{{ doc.errors.title }}</span>
           <input
@@ -126,10 +125,10 @@ function setSubtitle(e: Event) {
             type="text"
             placeholder="Subtitle"
             aria-label="Subtitle"
-            :readonly="readonly"
+            :readonly="doc.readonly"
             @input="setSubtitle"
           />
-          <pre v-if="readonly" class="adm-card adm-pre">{{ doc.current.body }}</pre>
+          <pre v-if="doc.readonly" class="adm-card adm-pre">{{ doc.current.body }}</pre>
           <MarkdownEditor v-else v-model="doc.current.body" :preview="preview" />
         </div>
         <aside class="adm-form" aria-label="Post settings">
@@ -138,7 +137,7 @@ function setSubtitle(e: Event) {
             <input v-model="slug" type="text" :readonly="!isNew" :placeholder="suggested" />
             <small>/blog/{{ slug || suggested }}</small>
           </label>
-          <fieldset class="adm-plain-fieldset" :disabled="readonly">
+          <fieldset class="adm-plain-fieldset" :disabled="doc.readonly">
             <FormFields :fields="sidebar" :model="doc.current.data" :errors="doc.errors" />
           </fieldset>
         </aside>

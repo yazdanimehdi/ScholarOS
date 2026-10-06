@@ -40,7 +40,8 @@ function changedKeys(a: object, b: object): string[] {
   );
 }
 
-type Loader<T> = () => Promise<{ value: T; version: string | null }>;
+/** `readonly`: the document can't be saved here (e.g. MDX), so no drafts are offered or recorded. */
+type Loader<T> = () => Promise<{ value: T; version: string | null; readonly?: boolean }>;
 
 /**
  * One editable document: load it, keep every edit as a localStorage draft (cleared only after a successful
@@ -54,6 +55,7 @@ export function useDocument<T extends object>() {
     key: '',
     current: null as T | null,
     version: null as string | null,
+    readonly: false,
     draft: null as T | null,
     /** The draft was edited from an older version than the one loaded: restoring it overwrites newer changes. */
     draftStale: false,
@@ -76,14 +78,15 @@ export function useDocument<T extends object>() {
       if (!loader) return;
       tracking = false;
       try {
-        const { value, version } = await loader();
-        const saved = readDraft(doc.key);
+        const { value, version, readonly = false } = await loader();
+        const saved = readonly ? null : readDraft(doc.key);
         const offered = saved && JSON.stringify(saved.value) !== JSON.stringify(value) ? (saved.value as T) : null;
         doc.draft = offered as typeof doc.draft;
         doc.draftStale = !!offered && saved!.base !== undefined && saved!.base !== version;
         doc.draftChanges = offered ? changedKeys(offered, value) : [];
         doc.current = value as typeof doc.current;
         doc.version = version;
+        doc.readonly = readonly;
         doc.conflict = false;
         doc.errors = {};
       } catch (e) {
@@ -137,7 +140,8 @@ export function useDocument<T extends object>() {
   watch(
     () => doc.current,
     (value) => {
-      if (tracking && !doc.draft && value && doc.key) writeDraft(doc.key, { base: doc.version, value });
+      if (tracking && !doc.readonly && !doc.draft && value && doc.key)
+        writeDraft(doc.key, { base: doc.version, value });
     },
     { deep: true },
   );

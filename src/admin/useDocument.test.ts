@@ -120,3 +120,16 @@ test('a 409 for a slug that already exists is a toast, not the conflict dialog',
   }, 'p');
   assert.equal(doc.conflict, false);
 });
+
+test('a read-only document never offers or writes drafts', async () => {
+  localStorage.clear();
+  localStorage.setItem(KEY, JSON.stringify(draftOf({ title: 'old draft' })));
+  const doc = useDocument<Doc>();
+  await doc.open('k', async () => ({ value: { title: 'server' }, version: 'v1', readonly: true }));
+  assert.equal(doc.readonly, true);
+  assert.equal(doc.draft, null);
+  localStorage.clear();
+  doc.current!.title = 'edited';
+  await flush();
+  assert.equal(localStorage.length, 0);
+});

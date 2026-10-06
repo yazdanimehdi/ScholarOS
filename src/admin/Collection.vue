@@ -20,7 +20,6 @@ const entries = ref<Entry[]>([]);
 const selected = ref<string | null>(null);
 const creating = ref(false);
 const newSlug = ref('');
-const readonly = ref(false);
 const confirmDelete = ref(false);
 const filters = ref<Record<string, string>>({});
 const topics = ref<Option[]>([]);
@@ -67,15 +66,13 @@ async function select(slug: string) {
 
 const loadEntry = (slug: string) => async () => {
   const entry = await api<Doc & { version: string; readonly: boolean }>(`collections/${props.name}/${slug}`);
-  readonly.value = entry.readonly;
-  return { value: { data: entry.data, body: entry.body }, version: entry.version };
+  return { value: { data: entry.data, body: entry.body }, version: entry.version, readonly: entry.readonly };
 };
 
 function startNew() {
   creating.value = true;
   selected.value = null;
   newSlug.value = '';
-  readonly.value = false;
   history.replaceState(null, '', location.pathname);
   doc.open(`${props.name}/new`, async () => ({ value: { data: structuredClone(cfg.blank), body: '' }, version: null }));
 }
@@ -165,21 +162,29 @@ async function remove() {
           @discard="doc.discard()"
           @reload="doc.reload()"
         />
-        <p v-if="readonly" class="adm-banner">This entry is MDX: read-only here, edit it in the repository.</p>
+        <p v-if="doc.readonly" class="adm-banner">This entry is MDX: read-only here, edit it in the repository.</p>
         <label v-if="creating" class="adm-field">
           <span>Slug (file name)</span>
           <input v-model="newSlug" type="text" :placeholder="suggested" />
         </label>
-        <FormFields :fields="fields" :model="doc.current.data" :errors="doc.errors" :owner="ctx.siteName" />
-        <div class="adm-field" role="group" aria-labelledby="adm-body-label">
-          <span id="adm-body-label">Body</span>
-          <MarkdownEditor v-model="doc.current.body" compact />
-        </div>
+        <fieldset class="adm-plain-fieldset adm-form" :disabled="doc.readonly">
+          <FormFields :fields="fields" :model="doc.current.data" :errors="doc.errors" :owner="ctx.siteName" />
+          <div class="adm-field" role="group" aria-labelledby="adm-body-label">
+            <span id="adm-body-label">Body</span>
+            <MarkdownEditor v-model="doc.current.body" compact :preview="doc.readonly" />
+          </div>
+        </fieldset>
         <div class="adm-actions">
-          <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || readonly" @click="save">
+          <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || doc.readonly" @click="save">
             {{ creating ? 'Create' : 'Publish' }}
           </button>
-          <button v-if="!creating" type="button" class="adm-btn adm-btn-danger" :disabled="readonly" @click="remove">
+          <button
+            v-if="!creating"
+            type="button"
+            class="adm-btn adm-btn-danger"
+            :disabled="doc.readonly"
+            @click="remove"
+          >
             {{ confirmDelete ? 'Click again to delete' : 'Delete' }}
           </button>
         </div>
