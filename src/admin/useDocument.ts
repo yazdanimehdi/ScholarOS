@@ -95,7 +95,13 @@ export function useDocument<T extends object>() {
           doc.conflict = true;
           return undefined;
         }
-        if (e instanceof ApiError && e.status === 400 && e.details && typeof e.details === 'object' && !Array.isArray(e.details)) {
+        if (
+          e instanceof ApiError &&
+          e.status === 400 &&
+          e.details &&
+          typeof e.details === 'object' &&
+          !Array.isArray(e.details)
+        ) {
           doc.errors = e.details as Record<string, string>;
         }
         report(e);

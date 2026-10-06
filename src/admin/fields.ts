@@ -80,7 +80,12 @@ export interface CollectionConfig {
 const today = () => new Date().toISOString().slice(0, 10);
 export const text = (key: string, label: string): FieldDef => ({ key, label, type: 'text' });
 export const date = (key: string, label: string): FieldDef => ({ key, label, type: 'date' });
-export const select = (key: string, label: string, options: string[]): FieldDef => ({ key, label, type: 'select', options });
+export const select = (key: string, label: string, options: string[]): FieldDef => ({
+  key,
+  label,
+  type: 'select',
+  options,
+});
 export const SOCIALS = ['github', 'scholar', 'twitter', 'linkedin', 'orcid', 'mastodon', 'bluesky', 'website'];
 
 export const COLLECTIONS: Record<string, CollectionConfig> = {
@@ -137,7 +142,16 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     blank: { name: '', role: 'phd' },
     fields: [
       text('name', 'Name'),
-      select('role', 'Role', ['pi', 'postdoc', 'phd', 'masters', 'undergrad', 'research-assistant', 'visiting', 'alumni']),
+      select('role', 'Role', [
+        'pi',
+        'postdoc',
+        'phd',
+        'masters',
+        'undergrad',
+        'research-assistant',
+        'visiting',
+        'alumni',
+      ]),
       text('title', 'Title'),
       { key: 'photo', label: 'Photo', type: 'image', folder: 'content' },
       text('email', 'Email'),
@@ -182,7 +196,15 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'date', label: 'Date (as shown)', type: 'text', hint: 'Free text, e.g. "March 2025".' },
       date('sortDate', 'Date (for sorting)'),
       text('location', 'Location'),
-      select('type', 'Type', ['Conference Talk', 'Invited Talk', 'Seminar', 'Tutorial', 'Workshop', 'Keynote', 'Panel']),
+      select('type', 'Type', [
+        'Conference Talk',
+        'Invited Talk',
+        'Seminar',
+        'Tutorial',
+        'Workshop',
+        'Keynote',
+        'Panel',
+      ]),
       text('slidesUrl', 'Slides URL'),
       text('videoUrl', 'Video URL'),
     ],
@@ -236,8 +258,21 @@ const highlights: FieldDef = { key: 'highlights', label: 'Highlights', type: 'li
 const cvDates = [text('startDate', 'Start (YYYY-MM)'), text('endDate', "End (YYYY-MM or 'present')")];
 
 export const CV_FIELDS: Record<Exclude<CvEntryKind, 'text'>, FieldDef[]> = {
-  education: [text('institution', 'Institution'), text('area', 'Area'), text('degree', 'Degree'), text('location', 'Location'), ...cvDates, highlights],
-  experience: [text('company', 'Company'), text('position', 'Position'), text('location', 'Location'), ...cvDates, highlights],
+  education: [
+    text('institution', 'Institution'),
+    text('area', 'Area'),
+    text('degree', 'Degree'),
+    text('location', 'Location'),
+    ...cvDates,
+    highlights,
+  ],
+  experience: [
+    text('company', 'Company'),
+    text('position', 'Position'),
+    text('location', 'Location'),
+    ...cvDates,
+    highlights,
+  ],
   publication: [
     text('title', 'Title'),
     { key: 'authors', label: 'Authors', type: 'authors' },
@@ -248,7 +283,14 @@ export const CV_FIELDS: Record<Exclude<CvEntryKind, 'text'>, FieldDef[]> = {
   ],
   oneLine: [text('label', 'Label'), text('details', 'Details')],
   bullet: [text('bullet', 'Text')],
-  normal: [text('name', 'Name'), text('location', 'Location'), text('date', 'Date'), ...cvDates, text('summary', 'Summary'), highlights],
+  normal: [
+    text('name', 'Name'),
+    text('location', 'Location'),
+    text('date', 'Date'),
+    ...cvDates,
+    text('summary', 'Summary'),
+    highlights,
+  ],
 };
 
 const str = (v: unknown) => (typeof v === 'string' || typeof v === 'number' ? String(v).trim() : '');
@@ -258,11 +300,18 @@ const joined = (parts: unknown[], sep: string) => parts.map(str).filter(Boolean)
 export function cvEntryPreview(entry: unknown): { title: string; org: string; when: string; points: string[] } {
   if (typeof entry === 'string') return { title: entry, org: '', when: '', points: [] };
   const e = (entry ?? {}) as Record<string, any>;
-  const when = e.startDate ? `${str(e.startDate)} – ${e.endDate === 'present' ? 'Present' : str(e.endDate)}` : str(e.date);
+  const when = e.startDate
+    ? `${str(e.startDate)} – ${e.endDate === 'present' ? 'Present' : str(e.endDate)}`
+    : str(e.date);
   const points = Array.isArray(e.highlights) ? e.highlights.map(str).filter(Boolean) : [];
   switch (cvEntryKind(entry)) {
     case 'education':
-      return { title: joined([e.degree, e.area], ' in '), org: joined([e.institution, e.location], ', '), when, points };
+      return {
+        title: joined([e.degree, e.area], ' in '),
+        org: joined([e.institution, e.location], ', '),
+        when,
+        points,
+      };
     case 'experience':
       return { title: str(e.position), org: joined([e.company, e.location], ', '), when, points };
     case 'publication': {
@@ -278,10 +327,14 @@ export function cvEntryPreview(entry: unknown): { title: string; org: string; wh
   }
 }
 
-export const sectionLabel = (key: string) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+export const sectionLabel = (key: string) =>
+  key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
 
 /** "Teaching experience" → "teachingExperience"; '' when nothing usable is left. */
 export function sectionKey(name: string): string {
-  const words = name.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const words = name
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
   return words.map((w, i) => (i === 0 ? w : w[0].toUpperCase() + w.slice(1))).join('');
 }

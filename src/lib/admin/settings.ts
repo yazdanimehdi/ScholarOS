@@ -45,10 +45,6 @@ export function isAdminUser(login: string, adminUsers: string[]): boolean {
   const wanted = login.trim().toLowerCase();
   if (!wanted) return false;
   return adminUsers.some(
-    (entry) =>
-      (extractGitHubUsername(entry) ?? entry)
-        .trim()
-        .replace(/^@/, '')
-        .toLowerCase() === wanted,
+    (entry) => (extractGitHubUsername(entry) ?? entry).trim().replace(/^@/, '').toLowerCase() === wanted,
   );
 }

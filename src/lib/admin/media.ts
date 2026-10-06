@@ -39,6 +39,7 @@ function decodeCharRefs(text: string): string {
 /** Check if svg contains any javascript: URLs, accounting for entity encoding and embedded whitespace. */
 function hasJavaScriptUrl(text: string): boolean {
   const decoded = decodeCharRefs(text);
+  // eslint-disable-next-line no-control-regex -- control characters are stripped on purpose
   return /javascript\s*:/i.test(decoded.replace(/[\x00-\x20]/g, ''));
 }
 

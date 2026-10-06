@@ -140,9 +140,7 @@ export async function syncFeeds(
     }
   }
   if (failed.length === sources.length) {
-    throw new Error(
-      `All ${sources.length} feed(s) failed: ${failed.map((f) => `${f.source}: ${f.error}`).join('; ')}`,
-    );
+    throw new Error(`All ${sources.length} feed(s) failed: ${failed.map((f) => `${f.source}: ${f.error}`).join('; ')}`);
   }
   const items = mergeWithExisting(deduplicateByLink(fresh), existing).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),

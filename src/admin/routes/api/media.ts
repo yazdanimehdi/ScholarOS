@@ -17,7 +17,9 @@ const IMAGE = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 export const GET = route(async ({ url }, store) => {
   const folder = folderOf(url.searchParams.get('folder') ?? 'content');
   const files = (await store.list(folder.dir)).filter((f) => IMAGE.test(f.path));
-  return json(files.map((f) => ({ path: f.path, version: f.version, url: folder.url + f.path.slice(folder.dir.length) })));
+  return json(
+    files.map((f) => ({ path: f.path, version: f.version, url: folder.url + f.path.slice(folder.dir.length) })),
+  );
 });
 
 export const POST = route(async ({ request }, store) => {
@@ -36,7 +38,9 @@ export const POST = route(async ({ request }, store) => {
   // The name carries a content hash: the same image is already there, nothing to commit.
   const existing = (await store.list(folder.dir)).find((f) => f.path === path);
   if (existing) return json({ path, url, version: existing.version, commit: null });
-  const result = await commitChanges(store, [{ path, content: base64, encoding: 'base64' }], `Upload ${path}`, { [path]: null });
+  const result = await commitChanges(store, [{ path, content: base64, encoding: 'base64' }], `Upload ${path}`, {
+    [path]: null,
+  });
   return json({ path, url, version: result.versions[path], commit: { id: result.id, url: result.url } });
 });
 

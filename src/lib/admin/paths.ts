@@ -1,6 +1,14 @@
 import { adminSettings } from './settings';
 
-export const COLLECTIONS = ['posts', 'publications', 'announcements', 'people', 'projects', 'talks', 'positions'] as const;
+export const COLLECTIONS = [
+  'posts',
+  'publications',
+  'announcements',
+  'people',
+  'projects',
+  'talks',
+  'positions',
+] as const;
 export type CollectionName = (typeof COLLECTIONS)[number];
 export const CONFIG_FILES = ['site', 'research', 'feeds', 'cv', 'cv-upload'] as const;
 export type ConfigFile = (typeof CONFIG_FILES)[number];

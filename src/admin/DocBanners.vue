@@ -8,7 +8,10 @@ const vFocus = { mounted: (el: HTMLElement) => el.focus() };
   <div v-if="conflict" class="adm-modal" role="dialog" aria-modal="true" aria-labelledby="adm-conflict-title">
     <div>
       <h2 id="adm-conflict-title" class="adm-h2">This file changed since you opened it</h2>
-      <p>Someone, or an automated job, saved a newer version. Reload to get it. Your edits stay in this browser, and you can re-apply them after reloading.</p>
+      <p>
+        Someone, or an automated job, saved a newer version. Reload to get it. Your edits stay in this browser, and you
+        can re-apply them after reloading.
+      </p>
       <div class="adm-actions">
         <button v-focus type="button" class="adm-btn adm-btn-primary" @click="$emit('reload')">Reload</button>
       </div>

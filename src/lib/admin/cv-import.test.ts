@@ -17,15 +17,15 @@ test('maps the fixture into cv.yml shape and moves publications into the collect
   assert.ok('researchExperience' in sections, 'snake_case keys become camelCase');
   assert.equal(sections.education[0].startDate, '2021-01');
   assert.equal(publications.length, FIXTURE_PUBS);
-  assert.deepEqual(
-    { n: summary.newPublications, u: summary.updatedPublications },
-    { n: FIXTURE_PUBS, u: 0 },
-  );
+  assert.deepEqual({ n: summary.newPublications, u: summary.updatedPublications }, { n: FIXTURE_PUBS, u: 0 });
   assert.ok(summary.sections.some((s) => s.key === 'education' && s.count === 3));
   for (const p of publications) {
     assert.equal(p.version, null);
     assert.match(p.slug, /^[a-z0-9-]{1,80}$/);
-    assert.ok((p.data.authors as string[]).every((a) => !a.includes('*')), 'bold markers stripped');
+    assert.ok(
+      (p.data.authors as string[]).every((a) => !a.includes('*')),
+      'bold markers stripped',
+    );
     assert.equal(typeof p.data.year, 'number');
     assert.ok(['journal', 'conference', 'preprint', 'workshop'].includes(p.data.type as string));
   }
@@ -39,9 +39,20 @@ test('re-import updates matching entries in place and keeps curated fields', () 
     {
       slug: 'curated',
       version: 'v1',
-      data: { ...a.data, doi: `https://doi.org/${a.data.doi}`, title: 'Old title', topic: 'nlp', type: 'journal', abstract: 'Kept' },
+      data: {
+        ...a.data,
+        doi: `https://doi.org/${a.data.doi}`,
+        title: 'Old title',
+        topic: 'nlp',
+        type: 'journal',
+        abstract: 'Kept',
+      },
     },
-    { slug: 'by-title', version: 'v2', data: { title: `${String(b.data.title).toUpperCase()}!`, authors: [], venue: 'x', year: 2000, type: 'preprint' } },
+    {
+      slug: 'by-title',
+      version: 'v2',
+      data: { title: `${String(b.data.title).toUpperCase()}!`, authors: [], venue: 'x', year: 2000, type: 'preprint' },
+    },
   ];
   const { publications, summary } = importRenderCv(FIXTURE, existing);
   const curated = publications.find((p) => p.slug === 'curated')!;

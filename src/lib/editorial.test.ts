@@ -171,7 +171,13 @@ test('jsonLd: escapes "<" so content cannot close the script tag', () => {
 });
 
 test('featuredFirst: featured site posts lead, each group keeps its order', () => {
-  const item = (href: string, featured?: boolean) => ({ kind: 'site' as const, title: href, href, date: new Date(0), featured });
+  const item = (href: string, featured?: boolean) => ({
+    kind: 'site' as const,
+    title: href,
+    href,
+    date: new Date(0),
+    featured,
+  });
   const out = featuredFirst([item('/a'), item('/b', true), item('/c'), item('/d', true)]);
   assert.deepEqual(
     out.map((i) => i.href),

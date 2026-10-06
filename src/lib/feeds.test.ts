@@ -34,7 +34,9 @@ test('syncFeeds: parses items, normalizes links, keeps ids stable', async () => 
 });
 
 test('syncFeeds: merges with existing items and injects the Medium feed', async () => {
-  const existing: FeedItem[] = [{ id: 'old', title: 'Old', link: 'https://ex.com/old', date: '2023-01-01', source: 'X' }];
+  const existing: FeedItem[] = [
+    { id: 'old', title: 'Old', link: 'https://ex.com/old', date: '2023-01-01', source: 'X' },
+  ];
   const config = { mediumUrl: 'https://medium.com/feed/@me', feeds: [] };
   const { items } = await syncFeeds(config, existing, fetcher({ 'https://medium.com/feed/@me': BLOG }));
   assert.deepEqual(

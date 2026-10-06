@@ -4,7 +4,14 @@ import EditorialHome from '../themes/editorial/Home.astro';
 import { loadHome } from '../themes/editorial/data';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
-import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections, getTheme, hiddenFeedIds } from '../lib/config';
+import {
+  getSiteConfig,
+  getSiteName,
+  isPersonalMode,
+  getHomepageSections,
+  getTheme,
+  hiddenFeedIds,
+} from '../lib/config';
 import { byId, withoutHidden } from '../lib/utils';
 
 const config = getSiteConfig();

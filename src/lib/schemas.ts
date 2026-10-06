@@ -160,7 +160,8 @@ export const adminCollections = {
 // ── Config files the admin edits. Permissive: unknown keys pass through untouched. ──
 
 const cvDetails = z.union([z.string(), z.number()]);
-const cvEntry = <T extends z.ZodRawShape>(shape: T) => z.object({ visible: z.boolean().optional(), ...shape }).passthrough();
+const cvEntry = <T extends z.ZodRawShape>(shape: T) =>
+  z.object({ visible: z.boolean().optional(), ...shape }).passthrough();
 
 /** RenderCV entry types (camelCase keys, as cv.yml stores them); a plain string is a TextEntry. */
 const cvEntrySchema = z.union([
@@ -193,7 +194,10 @@ export const siteSchema = z
     title: z.string().min(1),
     author: z.string(),
     theme: z.enum(['classic', 'editorial', '']).optional(),
-    adminPath: z.string().regex(/^[a-z0-9-]*$/, 'Use lowercase letters, digits and dashes').optional(),
+    adminPath: z
+      .string()
+      .regex(/^[a-z0-9-]*$/, 'Use lowercase letters, digits and dashes')
+      .optional(),
     adminUsers: z.array(z.string()).optional(),
     nav: z.array(z.object({ label: z.string(), href: z.string() }).passthrough()).optional(),
     homepageSections: z

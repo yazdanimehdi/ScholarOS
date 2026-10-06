@@ -11,7 +11,9 @@ const loading = ref(true);
 
 onMounted(async () => {
   try {
-    posts.value = (await api<Entry[]>('collections/posts')).sort((a, b) => String(b.data.date).localeCompare(String(a.data.date)));
+    posts.value = (await api<Entry[]>('collections/posts')).sort((a, b) =>
+      String(b.data.date).localeCompare(String(a.data.date)),
+    );
   } catch (e) {
     report(e);
   } finally {
@@ -39,7 +41,9 @@ onMounted(async () => {
             <a :href="`${base}/posts/${p.slug}`">{{ p.data.title || p.slug }}</a>
           </td>
           <td>
-            <span class="adm-status" :class="{ 'adm-status-draft': p.data.draft }">{{ p.data.draft ? 'Draft' : 'Published' }}</span>
+            <span class="adm-status" :class="{ 'adm-status-draft': p.data.draft }">{{
+              p.data.draft ? 'Draft' : 'Published'
+            }}</span>
           </td>
           <td>{{ String(p.data.date ?? '').slice(0, 10) }}</td>
         </tr>

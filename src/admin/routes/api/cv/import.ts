@@ -7,7 +7,8 @@ export const prerender = false;
 /** RenderCV YAML → a preview for the CV screen. Nothing is committed until Publish. */
 export const POST = route(async (ctx, store) => {
   const { yaml } = await readBody<{ yaml?: unknown }>(ctx);
-  if (typeof yaml !== 'string' || !yaml.trim()) throw new ImportError('Paste a RenderCV YAML document or choose a file');
+  if (typeof yaml !== 'string' || !yaml.trim())
+    throw new ImportError('Paste a RenderCV YAML document or choose a file');
   const result = importRenderCv(yaml, await listEntries(store, 'publications'));
   const publications = await Promise.all(
     result.publications.map(async (p) => ({

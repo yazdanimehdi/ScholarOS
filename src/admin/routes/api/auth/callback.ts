@@ -37,13 +37,20 @@ export const GET: APIRoute = async ({ cookies, redirect, url }) => {
   if (!token.access_token) return fail('expired');
 
   const res = await fetch('https://api.github.com/user', {
-    headers: { Authorization: `Bearer ${token.access_token}`, Accept: 'application/vnd.github+json', 'User-Agent': 'ScholarOS-admin' },
+    headers: {
+      Authorization: `Bearer ${token.access_token}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'ScholarOS-admin',
+    },
   });
   if (!res.ok) return fail('expired');
   const gh = (await res.json()) as { login: string; name?: string | null; avatar_url?: string };
   if (!isAdminUser(gh.login, adminUsers)) return fail('denied');
 
-  const session = await sealSession({ login: gh.login, name: gh.name || gh.login, avatar: gh.avatar_url ?? '' }, sessionSecret());
+  const session = await sealSession(
+    { login: gh.login, name: gh.name || gh.login, avatar: gh.avatar_url ?? '' },
+    sessionSecret(),
+  );
   cookies.set(SESSION_COOKIE, session, SESSION_COOKIE_OPTIONS);
   return redirect(`/${adminPath}`);
 };

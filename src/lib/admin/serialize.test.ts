@@ -62,7 +62,9 @@ test('updateYaml: edits touch only the changed lines and keep comments and quoti
   assert.deepEqual(comments(out), comments(src));
   assert.ok(out.includes("  name: 'Dr. Changed'"), 'existing single-quote style kept');
   assert.ok(!out.includes('phone:'));
-  const unchanged = src.split('\n').filter((l) => !/name:|phone:|Another University|Mathematics|B\.S\.|2004-09|2008-05/.test(l));
+  const unchanged = src
+    .split('\n')
+    .filter((l) => !/name:|phone:|Another University|Mathematics|B\.S\.|2004-09|2008-05/.test(l));
   for (const line of unchanged) assert.ok(out.includes(line), `kept: ${line}`);
 });
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any -- cv.yml is user data */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import AdminShell from './AdminShell.vue';
 import DocBanners from './DocBanners.vue';
@@ -22,7 +21,12 @@ interface PendingPublication {
 interface ImportPreview {
   cv: CvDoc;
   publications: PendingPublication[];
-  summary: { sections: { key: string; count: number }[]; newPublications: number; updatedPublications: number; skipped: number };
+  summary: {
+    sections: { key: string; count: number }[];
+    newPublications: number;
+    updatedPublications: number;
+    skipped: number;
+  };
 }
 interface Run {
   status: string;
@@ -186,7 +190,12 @@ async function publish() {
     (cv, cvVersion) =>
       api<CommitResult>('cv/publish', {
         method: 'POST',
-        body: { cv, cvVersion, publications: pending.value, ...(turnOffUpload.value ? { uploadVersion: upload.value.version } : {}) },
+        body: {
+          cv,
+          cvVersion,
+          publications: pending.value,
+          ...(turnOffUpload.value ? { uploadVersion: upload.value.version } : {}),
+        },
       }),
     'config/cv.yml',
   );
@@ -255,35 +264,55 @@ async function generatePdf() {
 <template>
   <AdminShell :ctx="ctx" active="cv" title="CV">
     <template #actions>
-      <span v-if="pdf" class="adm-muted">{{ pdfLabel }} · <a :href="pdf.url" target="_blank" rel="noopener">run</a></span>
+      <span v-if="pdf" class="adm-muted"
+        >{{ pdfLabel }} · <a :href="pdf.url" target="_blank" rel="noopener">run</a></span
+      >
       <button type="button" class="adm-btn" @click="importing = true">Import YAML</button>
       <button type="button" class="adm-btn" @click="generatePdf">Generate PDF</button>
-      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || !doc.current" @click="publish">Publish</button>
+      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || !doc.current" @click="publish">
+        Publish
+      </button>
     </template>
 
     <p v-if="upload.enabled && !turnOffUpload" class="adm-banner">
-      A raw RenderCV upload (config/cv-upload.yml) is turned on and replaces this CV on the site. Importing YAML here turns the upload off.
+      A raw RenderCV upload (config/cv-upload.yml) is turned on and replaces this CV on the site. Importing YAML here
+      turns the upload off.
     </p>
     <p v-if="turnOffUpload" class="adm-banner">Publishing will turn off the raw RenderCV upload.</p>
     <p v-if="pending.length" class="adm-banner">
       {{ pending.length }} publication(s) from the import will be saved to Publications when you publish.
     </p>
-    <DocBanners :draft="!!doc.draft" :conflict="doc.conflict" @restore="doc.restore()" @discard="doc.discard()" @reload="doc.reload()" />
+    <DocBanners
+      :draft="!!doc.draft"
+      :conflict="doc.conflict"
+      @restore="doc.restore()"
+      @discard="doc.discard()"
+      @reload="doc.reload()"
+    />
 
     <div v-if="doc.current" class="adm-cols3">
       <section aria-label="Sections" class="adm-form">
         <ul class="adm-pick">
           <li v-for="key in keys" :key="key">
             <button type="button" :aria-current="section === key" @click="selectSection(key)">
-              <span>{{ sectionLabel(key) }}</span><span class="adm-muted">{{ sections[key].length }}</span>
+              <span>{{ sectionLabel(key) }}</span
+              ><span class="adm-muted">{{ sections[key].length }}</span>
             </button>
           </li>
           <li v-if="!hasPublicationSection">
-            <a :href="`/${ctx.adminPath}/publications`"><span>Publications</span><span class="adm-muted">{{ publicationCount }} ↗</span></a>
+            <a :href="`/${ctx.adminPath}/publications`"
+              ><span>Publications</span><span class="adm-muted">{{ publicationCount }} ↗</span></a
+            >
           </li>
         </ul>
         <div class="adm-list-row">
-          <input v-model="newSection" type="text" placeholder="New section" aria-label="New section name" @keydown.enter="addSection" />
+          <input
+            v-model="newSection"
+            type="text"
+            placeholder="New section"
+            aria-label="New section name"
+            @keydown.enter="addSection"
+          />
           <button type="button" class="adm-btn adm-btn-small" @click="addSection">Add</button>
         </div>
         <div v-if="section" class="adm-actions">
@@ -310,8 +339,12 @@ async function generatePdf() {
           </select>
           <button type="button" class="adm-btn adm-btn-small" @click="addEntry">+ Entry</button>
           <template v-if="index !== null">
-            <button type="button" class="adm-btn adm-btn-small" aria-label="Move entry up" @click="moveEntry(-1)">↑</button>
-            <button type="button" class="adm-btn adm-btn-small" aria-label="Move entry down" @click="moveEntry(1)">↓</button>
+            <button type="button" class="adm-btn adm-btn-small" aria-label="Move entry up" @click="moveEntry(-1)">
+              ↑
+            </button>
+            <button type="button" class="adm-btn adm-btn-small" aria-label="Move entry down" @click="moveEntry(1)">
+              ↓
+            </button>
             <button type="button" class="adm-btn adm-btn-small adm-btn-danger" @click="deleteEntry">
               {{ confirmEntry ? 'Click again to delete' : 'Delete' }}
             </button>
@@ -327,7 +360,11 @@ async function generatePdf() {
           </label>
           <template v-else>
             <label class="adm-check">
-              <input type="checkbox" :checked="(entry as any).visible !== false" @change="setVisible(($event.target as HTMLInputElement).checked)" />
+              <input
+                type="checkbox"
+                :checked="(entry as any).visible !== false"
+                @change="setVisible(($event.target as HTMLInputElement).checked)"
+              />
               Visible
             </label>
             <FormFields
@@ -351,12 +388,19 @@ async function generatePdf() {
       </section>
     </div>
 
-    <div v-if="importing" class="adm-modal" role="dialog" aria-modal="true" aria-labelledby="adm-import-title" @keydown.esc="closeImport">
+    <div
+      v-if="importing"
+      class="adm-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="adm-import-title"
+      @keydown.esc="closeImport"
+    >
       <div>
         <h2 id="adm-import-title" class="adm-h2">Import a RenderCV YAML file</h2>
         <p class="adm-muted">
-          The import replaces the CV in this editor and moves publication sections into Publications. Papers that already exist
-          are updated, not duplicated. Nothing is saved until you click Publish.
+          The import replaces the CV in this editor and moves publication sections into Publications. Papers that
+          already exist are updated, not duplicated. Nothing is saved until you click Publish.
         </p>
         <input type="file" accept=".yaml,.yml,text/yaml" aria-label="RenderCV file" @change="readFile" />
         <label class="adm-field">
@@ -364,19 +408,27 @@ async function generatePdf() {
           <textarea v-model="importText" rows="10" />
         </label>
         <div v-if="preview" class="adm-card">
-          <p><strong>{{ preview.cv.cv.name }}</strong></p>
+          <p>
+            <strong>{{ preview.cv.cv.name }}</strong>
+          </p>
           <ul>
             <li v-for="s in preview.summary.sections" :key="s.key">{{ sectionLabel(s.key) }}: {{ s.count }}</li>
           </ul>
           <p>
-            Publications: {{ preview.summary.newPublications }} new, {{ preview.summary.updatedPublications }} updated<span
-              v-if="preview.summary.skipped"
+            Publications: {{ preview.summary.newPublications }} new,
+            {{ preview.summary.updatedPublications }} updated<span v-if="preview.summary.skipped"
               >, {{ preview.summary.skipped }} skipped (MDX)</span
             >.
           </p>
         </div>
         <div class="adm-actions">
-          <button v-if="!preview" type="button" class="adm-btn adm-btn-primary" :disabled="!importText.trim()" @click="previewImport">
+          <button
+            v-if="!preview"
+            type="button"
+            class="adm-btn adm-btn-primary"
+            :disabled="!importText.trim()"
+            @click="previewImport"
+          >
             Preview
           </button>
           <button v-else type="button" class="adm-btn adm-btn-primary" @click="applyImport">Apply to editor</button>

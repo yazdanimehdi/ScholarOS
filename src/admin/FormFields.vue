@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props -- `model` is the screen's reactive document; fields edit it in place. */
 /* eslint-disable @typescript-eslint/no-explicit-any -- form models are user data of any shape */
 import ImagePicker from './ImagePicker.vue';
 import ListInput from './ListInput.vue';
@@ -40,7 +39,13 @@ const regenerate = (key: string) => set(key, bibtexFor({ ...(props.model as BibS
 
       <fieldset v-else-if="f.type === 'objects'" class="adm-group">
         <legend>{{ f.label }}</legend>
-        <ListInput :items="value(f.key) ?? []" :blank="() => ({})" :fixed="f.fixed" add-label="Add item" @update="set(f.key, $event)">
+        <ListInput
+          :items="value(f.key) ?? []"
+          :blank="() => ({})"
+          :fixed="f.fixed"
+          add-label="Add item"
+          @update="set(f.key, $event)"
+        >
           <template #default="{ item, index }">
             <FormFields
               :fields="f.fields ?? []"
@@ -53,7 +58,12 @@ const regenerate = (key: string) => set(key, bibtexFor({ ...(props.model as BibS
         </ListInput>
       </fieldset>
 
-      <div v-else-if="['list', 'authors', 'image', 'markdown'].includes(f.type)" class="adm-field" role="group" :aria-labelledby="labelId(f.key)">
+      <div
+        v-else-if="['list', 'authors', 'image', 'markdown'].includes(f.type)"
+        class="adm-field"
+        role="group"
+        :aria-labelledby="labelId(f.key)"
+      >
         <span :id="labelId(f.key)">{{ f.label }}</span>
         <ListInput
           v-if="f.type === 'list' || f.type === 'authors'"
@@ -97,23 +107,45 @@ const regenerate = (key: string) => set(key, bibtexFor({ ...(props.model as BibS
           :value="value(f.key) ?? ''"
           @input="set(f.key, text($event) === '' ? undefined : Number(text($event)))"
         />
-        <input v-else-if="f.type === 'date'" type="date" :value="String(value(f.key) ?? '').slice(0, 10)" @input="set(f.key, text($event))" />
+        <input
+          v-else-if="f.type === 'date'"
+          type="date"
+          :value="String(value(f.key) ?? '').slice(0, 10)"
+          @input="set(f.key, text($event))"
+        />
         <select v-else-if="f.type === 'select'" :value="value(f.key) ?? ''" @change="set(f.key, text($event))">
           <option value="">—</option>
           <option v-for="o in (f.options ?? []).map(optionOf)" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
         <select v-else-if="f.type === 'pubs'" multiple size="6" @change="set(f.key, chosen($event))">
-          <option v-for="o in (f.options ?? []).map(optionOf)" :key="o.value" :value="o.value" :selected="strings(f.key).includes(o.value)">
+          <option
+            v-for="o in (f.options ?? []).map(optionOf)"
+            :key="o.value"
+            :value="o.value"
+            :selected="strings(f.key).includes(o.value)"
+          >
             {{ o.label }}
           </option>
         </select>
         <span v-else-if="f.type === 'color'" class="adm-list-row">
           <input type="text" :value="value(f.key) ?? ''" @input="set(f.key, text($event))" />
-          <input type="color" :value="value(f.key) || '#1f3c88'" :aria-label="`${f.label} picker`" @input="set(f.key, text($event))" />
+          <input
+            type="color"
+            :value="value(f.key) || '#1f3c88'"
+            :aria-label="`${f.label} picker`"
+            @input="set(f.key, text($event))"
+          />
         </span>
         <output v-else-if="f.type === 'readonly'">{{ value(f.key) }}</output>
         <input v-else type="text" :value="value(f.key) ?? ''" @input="set(f.key, text($event))" />
-        <button v-if="f.type === 'bibtex'" type="button" class="adm-btn adm-btn-small adm-add" @click="regenerate(f.key)">Regenerate</button>
+        <button
+          v-if="f.type === 'bibtex'"
+          type="button"
+          class="adm-btn adm-btn-small adm-add"
+          @click="regenerate(f.key)"
+        >
+          Regenerate
+        </button>
         <small v-if="f.hint">{{ f.hint }}</small>
         <span v-if="error(f.key)" class="adm-err">{{ error(f.key) }}</span>
       </label>

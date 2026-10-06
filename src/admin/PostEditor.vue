@@ -41,7 +41,10 @@ onMounted(async () => {
   await doc.open(
     `posts/${props.slug}`,
     isNew.value
-      ? async () => ({ value: { data: { title: '', date: new Date().toISOString().slice(0, 10), draft: true }, body: '' }, version: null })
+      ? async () => ({
+          value: { data: { title: '', date: new Date().toISOString().slice(0, 10), draft: true }, body: '' },
+          version: null,
+        })
       : loadPost(props.slug),
   );
   api<Entry[]>('collections/publications').then((list) => {
@@ -59,7 +62,11 @@ async function save(draft: boolean) {
   doc.current.data.draft = draft;
   const path = `src/content/posts/${target}.md`;
   const result = await doc.save(
-    (post, version) => api<CommitResult>(`collections/posts/${target}`, { method: 'PUT', body: { data: post.data, body: post.body, version } }),
+    (post, version) =>
+      api<CommitResult>(`collections/posts/${target}`, {
+        method: 'PUT',
+        body: { data: post.data, body: post.body, version },
+      }),
     path,
   );
   if (result && isNew.value) {
@@ -78,16 +85,35 @@ function setSubtitle(e: Event) {
 <template>
   <AdminShell :ctx="ctx" active="posts" :title="isNew ? 'New post' : 'Edit post'">
     <template #actions>
-      <button type="button" class="adm-btn" :aria-pressed="preview" @click="preview = !preview">{{ preview ? 'Edit' : 'Preview' }}</button>
+      <button type="button" class="adm-btn" :aria-pressed="preview" @click="preview = !preview">
+        {{ preview ? 'Edit' : 'Preview' }}
+      </button>
       <button type="button" class="adm-btn" :disabled="doc.saving || readonly" @click="save(true)">Save draft</button>
-      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || readonly" @click="save(false)">Publish</button>
+      <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || readonly" @click="save(false)">
+        Publish
+      </button>
     </template>
     <template v-if="doc.current">
-      <DocBanners :draft="!!doc.draft" :conflict="doc.conflict" @restore="doc.restore()" @discard="doc.discard()" @reload="doc.reload()" />
-      <p v-if="readonly" class="adm-banner">This post is MDX. The admin shows it read-only; edit it in the repository.</p>
+      <DocBanners
+        :draft="!!doc.draft"
+        :conflict="doc.conflict"
+        @restore="doc.restore()"
+        @discard="doc.discard()"
+        @reload="doc.reload()"
+      />
+      <p v-if="readonly" class="adm-banner">
+        This post is MDX. The admin shows it read-only; edit it in the repository.
+      </p>
       <div class="adm-split adm-split-wide">
         <div class="adm-form">
-          <input v-model="doc.current.data.title" class="adm-title-input" type="text" placeholder="Title" aria-label="Title" :readonly="readonly" />
+          <input
+            v-model="doc.current.data.title"
+            class="adm-title-input"
+            type="text"
+            placeholder="Title"
+            aria-label="Title"
+            :readonly="readonly"
+          />
           <span v-if="doc.errors.title" class="adm-err">{{ doc.errors.title }}</span>
           <input
             :value="doc.current.data.subtitle ?? ''"

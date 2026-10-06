@@ -30,7 +30,8 @@ const path = (slug: string) => `src/content/${props.name}/${slug}.md`;
 const fields = computed(() => resolveOptions(cfg.fields, { topics: topics.value }));
 const title = (e: Entry) => String(e.data[cfg.titleKey] || e.slug);
 const when = (e: Entry) => (cfg.dateKey ? String(e.data[cfg.dateKey] ?? '').slice(0, 10) : '');
-const filterOptions = (key: string) => [...new Set(entries.value.map((e) => String(e.data[key] ?? '')).filter(Boolean))].sort().reverse();
+const filterOptions = (key: string) =>
+  [...new Set(entries.value.map((e) => String(e.data[key] ?? '')).filter(Boolean))].sort().reverse();
 const visible = computed(() =>
   entries.value
     .filter((e) => Object.entries(filters.value).every(([k, v]) => !v || String(e.data[k] ?? '') === v))
@@ -46,7 +47,10 @@ onMounted(async () => {
   }
   if (props.name === 'publications') {
     api<{ data: { areas?: ResearchAreaInput[] } }>('config/research').then(({ data }) => {
-      topics.value = [...normalizeAreas(data.areas).map((a) => ({ value: a.id, label: a.title })), { value: 'other', label: 'Other' }];
+      topics.value = [
+        ...normalizeAreas(data.areas).map((a) => ({ value: a.id, label: a.title })),
+        { value: 'other', label: 'Other' },
+      ];
     }, report);
   }
   const wanted = new URLSearchParams(location.search).get('slug');
@@ -84,7 +88,11 @@ async function save() {
     return;
   }
   const result = await doc.save(
-    (v, version) => api<CommitResult>(`collections/${props.name}/${slug}`, { method: 'PUT', body: { data: v.data, body: v.body, version } }),
+    (v, version) =>
+      api<CommitResult>(`collections/${props.name}/${slug}`, {
+        method: 'PUT',
+        body: { data: v.data, body: v.body, version },
+      }),
     path(slug),
   );
   if (!result) return;
@@ -106,7 +114,12 @@ async function remove() {
   }
   confirmDelete.value = false;
   try {
-    committed(await api<CommitResult>(`collections/${props.name}/${selected.value}`, { method: 'DELETE', body: { version: doc.version } }));
+    committed(
+      await api<CommitResult>(`collections/${props.name}/${selected.value}`, {
+        method: 'DELETE',
+        body: { version: doc.version },
+      }),
+    );
     entries.value = entries.value.filter((e) => e.slug !== selected.value);
     selected.value = null;
     doc.current = null;
@@ -136,14 +149,21 @@ async function remove() {
         <ul class="adm-pick">
           <li v-for="e in visible" :key="e.slug">
             <button type="button" :aria-current="selected === e.slug" @click="select(e.slug)">
-              <span>{{ title(e) }}</span><span class="adm-muted">{{ when(e) }}</span>
+              <span>{{ title(e) }}</span
+              ><span class="adm-muted">{{ when(e) }}</span>
             </button>
           </li>
         </ul>
         <p v-if="!visible.length" class="adm-muted">Nothing here yet.</p>
       </section>
       <section v-if="doc.current" aria-label="Editor" class="adm-form">
-        <DocBanners :draft="!!doc.draft" :conflict="doc.conflict" @restore="doc.restore()" @discard="doc.discard()" @reload="doc.reload()" />
+        <DocBanners
+          :draft="!!doc.draft"
+          :conflict="doc.conflict"
+          @restore="doc.restore()"
+          @discard="doc.discard()"
+          @reload="doc.reload()"
+        />
         <p v-if="readonly" class="adm-banner">This entry is MDX: read-only here, edit it in the repository.</p>
         <label v-if="creating" class="adm-field">
           <span>Slug (file name)</span>

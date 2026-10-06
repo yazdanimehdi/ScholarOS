@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cvEntryKind, cvEntryPreview, getIn, replaceAt, resolveOptions, sectionKey, sectionLabel, setIn, type FieldDef } from './fields';
+import {
+  cvEntryKind,
+  cvEntryPreview,
+  getIn,
+  replaceAt,
+  resolveOptions,
+  sectionKey,
+  sectionLabel,
+  setIn,
+  type FieldDef,
+} from './fields';
 
 test('getIn/setIn walk dotted paths; empty strings and undefined delete the key', () => {
   const model: Record<string, any> = {};
@@ -27,9 +37,17 @@ test('replaceAt returns a new list', () => {
 test('resolveOptions fills option lists, including nested object fields', () => {
   const fields: FieldDef[] = [
     { key: 'topic', label: 'Topic', type: 'select', optionsFrom: 'topics' },
-    { key: 'areas', label: 'Areas', type: 'objects', fields: [{ key: 'publications', label: 'P', type: 'pubs', optionsFrom: 'publications' }] },
+    {
+      key: 'areas',
+      label: 'Areas',
+      type: 'objects',
+      fields: [{ key: 'publications', label: 'P', type: 'pubs', optionsFrom: 'publications' }],
+    },
   ];
-  const out = resolveOptions(fields, { topics: [{ value: 'nlp', label: 'NLP' }], publications: [{ value: 'p1', label: 'Paper' }] });
+  const out = resolveOptions(fields, {
+    topics: [{ value: 'nlp', label: 'NLP' }],
+    publications: [{ value: 'p1', label: 'Paper' }],
+  });
   assert.deepEqual(out[0].options, [{ value: 'nlp', label: 'NLP' }]);
   assert.deepEqual(out[1].fields![0].options, [{ value: 'p1', label: 'Paper' }]);
   assert.equal(fields[0].options, undefined, 'inputs are not mutated');
@@ -48,10 +66,23 @@ test('cvEntryKind recognizes the RenderCV entry shapes', () => {
 
 test('cvEntryPreview mirrors the public CV layout (title / org / dates / points)', () => {
   assert.deepEqual(
-    cvEntryPreview({ institution: 'MIT', area: 'CS', degree: 'PhD', location: 'Boston', startDate: '2020-09', endDate: 'present', highlights: ['Thesis'] }),
+    cvEntryPreview({
+      institution: 'MIT',
+      area: 'CS',
+      degree: 'PhD',
+      location: 'Boston',
+      startDate: '2020-09',
+      endDate: 'present',
+      highlights: ['Thesis'],
+    }),
     { title: 'PhD in CS', org: 'MIT, Boston', when: '2020-09 – Present', points: ['Thesis'] },
   );
-  assert.deepEqual(cvEntryPreview({ label: 'Languages', details: 'Python' }), { title: 'Languages', org: 'Python', when: '', points: [] });
+  assert.deepEqual(cvEntryPreview({ label: 'Languages', details: 'Python' }), {
+    title: 'Languages',
+    org: 'Python',
+    when: '',
+    points: [],
+  });
   assert.deepEqual(cvEntryPreview({ title: 'Paper', authors: ['**Me**', 'You'], journal: 'NeurIPS', date: 2025 }), {
     title: 'Paper',
     org: 'Me, You · NeurIPS',

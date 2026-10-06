@@ -78,7 +78,10 @@ async function setHidden(row: Row, hidden: boolean) {
     const ids = new Set<string>(d.value.feeds.data.hidden ?? []);
     if (hidden) ids.add(row.id);
     else ids.delete(row.id);
-    d.value.feeds = { data: { ...d.value.feeds.data, hidden: [...ids] }, version: result.versions['config/feeds.yml'] ?? null };
+    d.value.feeds = {
+      data: { ...d.value.feeds.data, hidden: [...ids] },
+      version: result.versions['config/feeds.yml'] ?? null,
+    };
   } catch (e) {
     report(e);
   }
@@ -88,7 +91,10 @@ async function saveMedium() {
   if (!d.value) return;
   const data = { ...d.value.feeds.data, mediumUrl: medium.value.trim() };
   try {
-    const result = await api<CommitResult>('config/feeds', { method: 'PUT', body: { data, version: d.value.feeds.version } });
+    const result = await api<CommitResult>('config/feeds', {
+      method: 'PUT',
+      body: { data, version: d.value.feeds.version },
+    });
     committed(result);
     d.value.feeds = { data, version: result.versions['config/feeds.yml'] ?? null };
   } catch (e) {
@@ -99,10 +105,12 @@ async function saveMedium() {
 async function checkNow() {
   syncing.value = true;
   try {
-    const result = await api<{ changed: boolean; count: number; failed: { source: string; error: string }[]; url?: string }>(
-      'feeds/sync',
-      { method: 'POST' },
-    );
+    const result = await api<{
+      changed: boolean;
+      count: number;
+      failed: { source: string; error: string }[];
+      url?: string;
+    }>('feeds/sync', { method: 'POST' });
     if (result.changed) committed(result);
     else toast(`No new items (${result.count} in total)`);
     for (const f of result.failed) toast(`${f.source}: ${f.error}`);
@@ -126,11 +134,21 @@ onMounted(load);
     <p v-if="!d" class="adm-muted">Loading…</p>
     <template v-else>
       <div class="adm-tiles">
-        <div class="adm-card adm-tile"><b>{{ d.posts.length }}</b><span>Site posts</span></div>
-        <div class="adm-card adm-tile"><b>{{ d.feedItems.length }}</b><span>Imported posts</span></div>
-        <div class="adm-card adm-tile"><b>{{ d.publications }}</b><span>Publications</span></div>
         <div class="adm-card adm-tile">
-          <b>{{ d.cvUpdated ? new Date(d.cvUpdated).toLocaleDateString() : '—' }}</b><span>CV last updated</span>
+          <b>{{ d.posts.length }}</b
+          ><span>Site posts</span>
+        </div>
+        <div class="adm-card adm-tile">
+          <b>{{ d.feedItems.length }}</b
+          ><span>Imported posts</span>
+        </div>
+        <div class="adm-card adm-tile">
+          <b>{{ d.publications }}</b
+          ><span>Publications</span>
+        </div>
+        <div class="adm-card adm-tile">
+          <b>{{ d.cvUpdated ? new Date(d.cvUpdated).toLocaleDateString() : '—' }}</b
+          ><span>CV last updated</span>
         </div>
       </div>
 
@@ -142,7 +160,9 @@ onMounted(load);
         </label>
         <div class="adm-actions">
           <button type="button" class="adm-btn" @click="saveMedium">Save</button>
-          <button type="button" class="adm-btn" :disabled="syncing" @click="checkNow">{{ syncing ? 'Checking…' : 'Check now' }}</button>
+          <button type="button" class="adm-btn" :disabled="syncing" @click="checkNow">
+            {{ syncing ? 'Checking…' : 'Check now' }}
+          </button>
           <span class="adm-muted">Last sync: {{ d.lastSync ? new Date(d.lastSync).toLocaleString() : '—' }}</span>
         </div>
       </section>
@@ -150,7 +170,13 @@ onMounted(load);
       <section class="adm-form" aria-labelledby="adm-posts">
         <div class="adm-head">
           <h2 id="adm-posts" class="adm-h2">Posts</h2>
-          <input v-model="query" type="search" placeholder="Search posts" aria-label="Search posts" style="max-width: 260px" />
+          <input
+            v-model="query"
+            type="search"
+            placeholder="Search posts"
+            aria-label="Search posts"
+            style="max-width: 260px"
+          />
         </div>
         <table class="adm-table">
           <thead>
@@ -167,14 +193,23 @@ onMounted(load);
               <td>{{ r.title }}</td>
               <td>{{ r.source }}</td>
               <td>
-                <span class="adm-status" :class="{ 'adm-status-draft': r.status === 'Draft', 'adm-status-hidden': r.status === 'Hidden' }">{{
-                  r.status
-                }}</span>
+                <span
+                  class="adm-status"
+                  :class="{ 'adm-status-draft': r.status === 'Draft', 'adm-status-hidden': r.status === 'Hidden' }"
+                  >{{ r.status }}</span
+                >
               </td>
               <td>{{ r.date }}</td>
               <td>
                 <a v-if="r.slug" class="adm-btn adm-btn-small" :href="`${base}/posts/${r.slug}`">Edit</a>
-                <button v-else-if="r.status === 'Hidden'" type="button" class="adm-btn adm-btn-small" @click="setHidden(r, false)">Unhide</button>
+                <button
+                  v-else-if="r.status === 'Hidden'"
+                  type="button"
+                  class="adm-btn adm-btn-small"
+                  @click="setHidden(r, false)"
+                >
+                  Unhide
+                </button>
                 <button v-else type="button" class="adm-btn adm-btn-small" @click="setHidden(r, true)">Hide</button>
               </td>
             </tr>

@@ -138,7 +138,11 @@ test('read decodes base64 and returns the blob sha; missing files are null', asy
     }),
   });
   const store = new GitHubStore(cfg, author, fetchFn);
-  assert.deepEqual(await store.read('config/site.yml'), { path: 'config/site.yml', content: 'title: Hi\n', version: 's1' });
+  assert.deepEqual(await store.read('config/site.yml'), {
+    path: 'config/site.yml',
+    content: 'title: Hi\n',
+    version: 's1',
+  });
   assert.equal(await store.read('config/nope.yml'), null);
 });
 
@@ -150,7 +154,9 @@ test('list recurses into folders', async () => {
         { type: 'dir', path: 'public/images/sub', sha: 'd' },
       ],
     }),
-    'GET /contents/public/images/sub?ref=main': () => ({ json: [{ type: 'file', path: 'public/images/sub/b.png', sha: 'b' }] }),
+    'GET /contents/public/images/sub?ref=main': () => ({
+      json: [{ type: 'file', path: 'public/images/sub/b.png', sha: 'b' }],
+    }),
   });
   assert.deepEqual(await new GitHubStore(cfg, author, fetchFn).list('public/images'), [
     { path: 'public/images/a.png', version: 'a' },
@@ -159,7 +165,12 @@ test('list recurses into folders', async () => {
 });
 
 test('githubConfig: explicit repo and branch win over Vercel metadata', () => {
-  const vercel = { GITHUB_TOKEN: 't', VERCEL_GIT_REPO_OWNER: 'vo', VERCEL_GIT_REPO_SLUG: 'vr', VERCEL_GIT_COMMIT_REF: 'preview' };
+  const vercel = {
+    GITHUB_TOKEN: 't',
+    VERCEL_GIT_REPO_OWNER: 'vo',
+    VERCEL_GIT_REPO_SLUG: 'vr',
+    VERCEL_GIT_COMMIT_REF: 'preview',
+  };
   assert.deepEqual(githubConfig(vercel), { token: 't', owner: 'vo', repo: 'vr', branch: 'preview' });
   assert.deepEqual(githubConfig({ ...vercel, GITHUB_REPO: 'me/site', GITHUB_BRANCH: 'main' }), {
     token: 't',

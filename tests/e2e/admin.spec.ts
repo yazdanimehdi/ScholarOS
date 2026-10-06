@@ -92,7 +92,10 @@ test('news: edit an item right after creating it', async ({ page }) => {
 test('cv: edit an entry, see the preview, publish', async ({ page }) => {
   await signIn(page);
   await page.goto(`${ADMIN}/cv`);
-  await page.getByRole('region', { name: 'Sections' }).getByRole('button', { name: /^Experience/ }).click();
+  await page
+    .getByRole('region', { name: 'Sections' })
+    .getByRole('button', { name: /^Experience/ })
+    .click();
   await page.getByRole('region', { name: 'Entries' }).getByRole('button').first().click();
   await page.getByLabel('Position', { exact: true }).fill('Professor (e2e)');
   await expect(page.getByLabel('Preview')).toContainText('Professor (e2e)');
@@ -112,7 +115,10 @@ test('cv: a stale save shows the conflict dialog and keeps the edits', async ({ 
     data: { data: { ...current.data, cv: { ...current.data.cv, phone: '+1-555-0199' } }, version: current.version },
   });
   expect(res.ok()).toBeTruthy();
-  await page.getByRole('region', { name: 'Sections' }).getByRole('button', { name: /^Education/ }).click();
+  await page
+    .getByRole('region', { name: 'Sections' })
+    .getByRole('button', { name: /^Education/ })
+    .click();
   await page.getByRole('region', { name: 'Entries' }).getByRole('button').first().click();
   await page.getByLabel('Institution', { exact: true }).fill('Changed University');
   await page.getByRole('button', { name: 'Publish', exact: true }).click();

@@ -71,7 +71,10 @@ const loader = (file: string) => async () => {
   return { value: data, version };
 };
 const publish = (doc: typeof home, file: string) =>
-  doc.save((data, version) => api<CommitResult>(`config/${file}`, { method: 'PUT', body: { data, version } }), `config/${file}.yml`);
+  doc.save(
+    (data, version) => api<CommitResult>(`config/${file}`, { method: 'PUT', body: { data, version } }),
+    `config/${file}.yml`,
+  );
 
 onMounted(() => {
   home.open('config/site#pages', loader('site'));
@@ -85,7 +88,14 @@ onMounted(() => {
 <template>
   <AdminShell :ctx="ctx" active="pages" title="Pages">
     <div role="tablist" aria-label="Pages" class="adm-actions">
-      <button type="button" role="tab" class="adm-btn" :class="{ 'adm-btn-primary': tab === 'home' }" :aria-selected="tab === 'home'" @click="tab = 'home'">
+      <button
+        type="button"
+        role="tab"
+        class="adm-btn"
+        :class="{ 'adm-btn-primary': tab === 'home' }"
+        :aria-selected="tab === 'home'"
+        @click="tab = 'home'"
+      >
         Home
       </button>
       <button
@@ -101,11 +111,19 @@ onMounted(() => {
     </div>
 
     <section v-show="tab === 'home'" class="adm-form" aria-label="Home page">
-      <DocBanners :draft="!!home.draft" :conflict="home.conflict" @restore="home.restore()" @discard="home.discard()" @reload="home.reload()" />
+      <DocBanners
+        :draft="!!home.draft"
+        :conflict="home.conflict"
+        @restore="home.restore()"
+        @discard="home.discard()"
+        @reload="home.reload()"
+      />
       <p class="adm-muted">Saved to config/site.yml.</p>
       <FormFields v-if="home.current" :fields="HOME" :model="home.current" :errors="home.errors" />
       <div class="adm-actions">
-        <button type="button" class="adm-btn adm-btn-primary" :disabled="home.saving" @click="publish(home, 'site')">Publish home page</button>
+        <button type="button" class="adm-btn adm-btn-primary" :disabled="home.saving" @click="publish(home, 'site')">
+          Publish home page
+        </button>
       </div>
     </section>
 
@@ -118,9 +136,19 @@ onMounted(() => {
         @reload="research.reload()"
       />
       <p class="adm-muted">Saved to config/research.yml.</p>
-      <FormFields v-if="research.current" :fields="researchFields" :model="research.current" :errors="research.errors" />
+      <FormFields
+        v-if="research.current"
+        :fields="researchFields"
+        :model="research.current"
+        :errors="research.errors"
+      />
       <div class="adm-actions">
-        <button type="button" class="adm-btn adm-btn-primary" :disabled="research.saving" @click="publish(research, 'research')">
+        <button
+          type="button"
+          class="adm-btn adm-btn-primary"
+          :disabled="research.saving"
+          @click="publish(research, 'research')"
+        >
           Publish research page
         </button>
       </div>

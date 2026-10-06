@@ -15,7 +15,10 @@ test('posts: featured is optional and defaults to false', () => {
 test('admin collection schemas take image paths as plain strings', () => {
   const person = adminCollections.people.parse({ name: 'A', role: 'phd', photo: '/src/assets/images/a.png' });
   assert.equal(person.photo, '/src/assets/images/a.png');
-  assert.equal(adminCollections.publications.safeParse({ title: 'T', authors: [], venue: 'V', year: 2024 }).success, false);
+  assert.equal(
+    adminCollections.publications.safeParse({ title: 'T', authors: [], venue: 'V', year: 2024 }).success,
+    false,
+  );
 });
 
 test('every config file in the repo passes its admin schema', () => {
@@ -54,9 +57,7 @@ test('Sveltia config exposes the new fields (featured, visible, hidden)', () => 
   assert.ok(names(posts.fields).includes('featured'));
   const files = cms.collections.find((c) => c.name === 'settings')!.files!;
   assert.ok(names(files.find((f) => f.name === 'feeds')!.fields).includes('hidden'));
-  const sections = files
-    .find((f) => f.name === 'cv')!
-    .fields[0].fields!.find((f) => f.name === 'sections')!.fields!;
+  const sections = files.find((f) => f.name === 'cv')!.fields[0].fields!.find((f) => f.name === 'sections')!.fields!;
   for (const s of ['education', 'experience', 'publications', 'awards', 'skills']) {
     assert.ok(names(sections.find((f) => f.name === s)!.fields).includes('visible'), `cv ${s} has visible`);
   }

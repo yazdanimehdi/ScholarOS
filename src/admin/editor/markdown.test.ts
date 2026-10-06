@@ -7,14 +7,23 @@ const window = new Window();
 window.document.write('<!DOCTYPE html><html><body></body></html>');
 Object.defineProperty(window.document, 'compatMode', { value: 'CSS1Compat' });
 Object.assign(globalThis, { window, document: window.document });
-for (const key of ['navigator', 'Node', 'HTMLElement', 'Element', 'getComputedStyle', 'DOMParser', 'MutationObserver']) {
+for (const key of [
+  'navigator',
+  'Node',
+  'HTMLElement',
+  'Element',
+  'getComputedStyle',
+  'DOMParser',
+  'MutationObserver',
+]) {
   (globalThis as Record<string, unknown>)[key] ??= (window as unknown as Record<string, unknown>)[key];
 }
 
 const { Editor } = await import('@tiptap/core');
 const { editorExtensions } = await import('./extensions');
 
-const editor = (markdown: string) => new Editor({ extensions: editorExtensions(), content: markdown, contentType: 'markdown' });
+const editor = (markdown: string) =>
+  new Editor({ extensions: editorExtensions(), content: markdown, contentType: 'markdown' });
 const roundTrip = (markdown: string) => editor(markdown).getMarkdown();
 const tidy = (s: string) => s.replace(/\n{3,}/g, '\n\n').trim();
 

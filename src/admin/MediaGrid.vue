@@ -72,7 +72,13 @@ function drop(e: DragEvent) {
 
 <template>
   <div class="adm-form">
-    <label class="adm-drop" :class="{ 'is-over': over }" @dragover.prevent="over = true" @dragleave="over = false" @drop.prevent="drop">
+    <label
+      class="adm-drop"
+      :class="{ 'is-over': over }"
+      @dragover.prevent="over = true"
+      @dragleave="over = false"
+      @drop.prevent="drop"
+    >
       {{ busy ? 'Uploading…' : 'Drop images here or click to choose (PNG, JPEG, WebP, GIF, AVIF, SVG; up to 4 MB)' }}
       <input
         type="file"
@@ -91,7 +97,14 @@ function drop(e: DragEvent) {
         <div v-else class="adm-thumb" aria-hidden="true">{{ fileName(f).split('.').pop()?.toUpperCase() }}</div>
         <figcaption>{{ fileName(f) }}</figcaption>
         <div class="adm-actions">
-          <button v-if="pickable" type="button" class="adm-btn adm-btn-small adm-btn-primary" @click="emit('pick', f.url)">Use</button>
+          <button
+            v-if="pickable"
+            type="button"
+            class="adm-btn adm-btn-small adm-btn-primary"
+            @click="emit('pick', f.url)"
+          >
+            Use
+          </button>
           <button type="button" class="adm-btn adm-btn-small" @click="copy(f)">Copy path</button>
           <button type="button" class="adm-btn adm-btn-small adm-btn-danger" @click="remove(f)">
             {{ confirming === f.path ? 'Confirm delete' : 'Delete' }}

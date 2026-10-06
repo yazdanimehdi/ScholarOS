@@ -31,7 +31,9 @@ export function editorExtensions(onMathClick?: MathClick): AnyExtension[] {
   return [
     StarterKit.configure({ link: { openOnClick: false } }),
     Markdown,
-    StrictInlineMath.configure({ onClick: onMathClick && ((node: PMNode, pos: number) => onMathClick('inline', node, pos)) }),
+    StrictInlineMath.configure({
+      onClick: onMathClick && ((node: PMNode, pos: number) => onMathClick('inline', node, pos)),
+    }),
     BlockMath.configure({ onClick: onMathClick && ((node: PMNode, pos: number) => onMathClick('block', node, pos)) }),
     Image,
     TableKit,

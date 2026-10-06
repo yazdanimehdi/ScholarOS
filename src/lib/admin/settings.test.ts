@@ -28,7 +28,9 @@ test('loadAdminSettings reads site.yml and cms.yml', () => {
 });
 
 test('loadAdminSettings defaults: admin path, empty users, lab name in lab mode', () => {
-  const s = loadAdminSettings(fixture('siteMode: lab\nauthor: A\nlabName: The Lab\n', 'media_folder: public/uploads\n'));
+  const s = loadAdminSettings(
+    fixture('siteMode: lab\nauthor: A\nlabName: The Lab\n', 'media_folder: public/uploads\n'),
+  );
   assert.equal(s.adminPath, 'admin');
   assert.deepEqual(s.adminUsers, []);
   assert.equal(s.siteName, 'The Lab');

@@ -78,7 +78,12 @@ type Active = string | [string, Record<string, unknown>];
 const TOOLBAR: { label: string; title: string; active?: Active; action: () => void }[] = [
   { label: 'B', title: 'Bold', active: 'bold', action: () => run((c) => c.toggleBold()) },
   { label: 'I', title: 'Italic', active: 'italic', action: () => run((c) => c.toggleItalic()) },
-  { label: 'H', title: 'Heading', active: ['heading', { level: 2 }], action: () => run((c) => c.toggleHeading({ level: 2 })) },
+  {
+    label: 'H',
+    title: 'Heading',
+    active: ['heading', { level: 2 }],
+    action: () => run((c) => c.toggleHeading({ level: 2 })),
+  },
   { label: '❝', title: 'Quote', active: 'blockquote', action: () => run((c) => c.toggleBlockquote()) },
   { label: 'Link', title: 'Link', active: 'link', action: link },
   { label: '•', title: 'List', active: 'bulletList', action: () => run((c) => c.toggleBulletList()) },
@@ -116,7 +121,10 @@ function choose(action: () => void) {
   const ed = editor.value;
   if (!ed) return;
   const { $from } = ed.state.selection;
-  ed.chain().focus().deleteRange({ from: $from.pos - 1, to: $from.pos }).run();
+  ed.chain()
+    .focus()
+    .deleteRange({ from: $from.pos - 1, to: $from.pos })
+    .run();
   slash.value = null;
   action();
 }
@@ -139,11 +147,24 @@ function choose(action: () => void) {
     </div>
     <EditorContent :editor="editor" />
     <div v-if="slash" class="adm-slash" role="menu" :style="{ top: `${slash.top}px`, left: `${slash.left}px` }">
-      <button v-for="[label, action] in SLASH" :key="label" type="button" role="menuitem" @mousedown.prevent="choose(action)">
+      <button
+        v-for="[label, action] in SLASH"
+        :key="label"
+        type="button"
+        role="menuitem"
+        @mousedown.prevent="choose(action)"
+      >
         {{ label }}
       </button>
     </div>
-    <div v-if="picking" class="adm-modal" role="dialog" aria-modal="true" aria-label="Insert an image" @keydown.esc="picking = false">
+    <div
+      v-if="picking"
+      class="adm-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Insert an image"
+      @keydown.esc="picking = false"
+    >
       <div>
         <div class="adm-head">
           <h2 class="adm-h2">Insert an image</h2>

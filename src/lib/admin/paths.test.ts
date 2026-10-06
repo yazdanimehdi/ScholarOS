@@ -7,7 +7,21 @@ const media = adminSettings().mediaFolder;
 
 test('slugs: lowercase ascii letters, digits and dashes, 1–80 chars', () => {
   for (const ok of ['a', 'my-post-2', 'x'.repeat(80)]) assert.equal(assertSlug(ok), ok);
-  const bad = ['', 'x'.repeat(81), 'Upper', 'with space', '../etc', 'a/b', 'café', 'ünï', '.hidden', 'a.md', '/abs', null, 42];
+  const bad = [
+    '',
+    'x'.repeat(81),
+    'Upper',
+    'with space',
+    '../etc',
+    'a/b',
+    'café',
+    'ünï',
+    '.hidden',
+    'a.md',
+    '/abs',
+    null,
+    42,
+  ];
   for (const b of bad) assert.throws(() => assertSlug(b), PathError, String(b));
 });
 

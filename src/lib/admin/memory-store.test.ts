@@ -52,7 +52,13 @@ test('commit: create, update and delete in one commit; disk untouched', async ()
     { 'config/feeds.yml': feeds.version, 'src/content/posts/new.md': null, 'src/content/posts/old.md': old.version },
   );
   assert.equal(result.id, 'memory-1');
-  assert.deepEqual(store.log, [{ id: 'memory-1', message: 'Edit', paths: ['config/feeds.yml', 'src/content/posts/new.md', 'src/content/posts/old.md'] }]);
+  assert.deepEqual(store.log, [
+    {
+      id: 'memory-1',
+      message: 'Edit',
+      paths: ['config/feeds.yml', 'src/content/posts/new.md', 'src/content/posts/old.md'],
+    },
+  ]);
   assert.equal((await store.read('config/feeds.yml'))?.version, gitBlobSha('hidden: []\n'));
   assert.deepEqual(
     (await store.list('src/content/posts')).map((f) => f.path),

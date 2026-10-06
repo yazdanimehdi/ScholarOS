@@ -23,7 +23,14 @@ function pick(url: string) {
     />
     <button type="button" class="adm-btn adm-btn-small" @click="open = true">Choose…</button>
   </div>
-  <div v-if="open" class="adm-modal" role="dialog" aria-modal="true" :aria-label="`Choose ${label}`" @keydown.esc="open = false">
+  <div
+    v-if="open"
+    class="adm-modal"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="`Choose ${label}`"
+    @keydown.esc="open = false"
+  >
     <div>
       <div class="adm-head">
         <h2 class="adm-h2">Choose an image</h2>

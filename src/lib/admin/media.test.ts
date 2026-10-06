@@ -13,7 +13,10 @@ test('sniffImage recognizes each allowed type by its bytes, not its name', () =>
   assert.equal(sniffImage(bytes('GIF89a')), 'gif');
   assert.equal(sniffImage(bytes('RIFF', 0, 0, 0, 0, 'WEBPVP8 ')), 'webp');
   assert.equal(sniffImage(bytes(0, 0, 0, 0x1c, 'ftypavif')), 'avif');
-  assert.equal(sniffImage(bytes('<?xml version="1.0"?>\n<!-- c -->\n<svg xmlns="http://www.w3.org/2000/svg"/>')), 'svg');
+  assert.equal(
+    sniffImage(bytes('<?xml version="1.0"?>\n<!-- c -->\n<svg xmlns="http://www.w3.org/2000/svg"/>')),
+    'svg',
+  );
   assert.equal(sniffImage(bytes('<html><svg></svg></html>')), null);
   assert.equal(sniffImage(bytes('%PDF-1.7')), null);
   assert.equal(sniffImage(new Uint8Array([0xc3, 0x28])), null, 'invalid UTF-8 is not an SVG');
@@ -42,7 +45,7 @@ test('prepareUpload rejects big, unknown and scripted files', () => {
     // Event handler without space before 'on'
     '<svg/onload="alert(1)"></svg>',
     '<svg"onload="alert(1)"></svg>',
-    "<svg'onload=\"alert(1)\"></svg>",
+    '<svg\'onload="alert(1)"></svg>',
     // Entity-encoded javascript:
     '<svg><a href="&#106;avascript:alert(1)">x</a></svg>',
     '<svg><a href="jav&#x61;script:alert(1)">x</a></svg>',
@@ -50,8 +53,14 @@ test('prepareUpload rejects big, unknown and scripted files', () => {
   ];
   for (const svg of evil) assert.throws(() => prepareUpload('x.svg', bytes(svg)), isMediaError(415), svg);
   // Clean SVG with harmless entity is accepted
-  assert.match(prepareUpload('Logo.svg', bytes('<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>')).filename, /^logo-[0-9a-f]{6}\.svg$/);
-  assert.match(prepareUpload('Safe.svg', bytes('<svg><text>A&#160;B</text></svg>')).filename, /^safe-[0-9a-f]{6}\.svg$/);
+  assert.match(
+    prepareUpload('Logo.svg', bytes('<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>')).filename,
+    /^logo-[0-9a-f]{6}\.svg$/,
+  );
+  assert.match(
+    prepareUpload('Safe.svg', bytes('<svg><text>A&#160;B</text></svg>')).filename,
+    /^safe-[0-9a-f]{6}\.svg$/,
+  );
 });
 
 test('sniffImage handles ReDoS on many comments', () => {

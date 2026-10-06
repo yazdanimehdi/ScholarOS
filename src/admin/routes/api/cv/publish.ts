@@ -20,7 +20,12 @@ export const POST = route(async (ctx, store) => {
     cvVersion = null,
     publications = [],
     uploadVersion,
-  } = await readBody<{ cv?: unknown; cvVersion?: string | null; publications?: PublicationIn[]; uploadVersion?: string | null }>(ctx);
+  } = await readBody<{
+    cv?: unknown;
+    cvVersion?: string | null;
+    publications?: PublicationIn[];
+    uploadVersion?: string | null;
+  }>(ctx);
   if (!Array.isArray(publications)) throw new HttpError(400, '`publications` must be a list');
 
   const current = await readConfig(store, 'cv');

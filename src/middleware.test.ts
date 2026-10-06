@@ -57,5 +57,8 @@ test('writes need a same-origin Origin header', async () => {
   assert.equal((await put('https://evil.test')).status, 403);
   assert.equal((await put()).status, 403, 'missing Origin');
   assert.equal((await put(ORIGIN)).status, 200);
-  assert.equal((await run(context('/api/admin/auth/logout', { method: 'POST', origin: 'https://evil.test' }))).status, 403);
+  assert.equal(
+    (await run(context('/api/admin/auth/logout', { method: 'POST', origin: 'https://evil.test' }))).status,
+    403,
+  );
 });

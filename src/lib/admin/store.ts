@@ -27,7 +27,11 @@ export interface ContentStore {
    * One atomic commit. `base[path]` is the version the caller started from (null or missing: the file must not
    * exist yet). Any mismatch throws ConflictError and writes nothing.
    */
-  commit(changes: Change[], message: string, base: Record<string, string | null>): Promise<{ id: string; url?: string }>;
+  commit(
+    changes: Change[],
+    message: string,
+    base: Record<string, string | null>,
+  ): Promise<{ id: string; url?: string }>;
   /** ISO time of the last change to `path`, or null when unknown. */
   lastModified(path: string): Promise<string | null>;
 }
@@ -51,6 +55,8 @@ export class UpstreamError extends Error {
 /** The sha git assigns to a blob with these bytes: the version of a file the admin just wrote. */
 export function gitBlobSha(content: string | Uint8Array, encoding: 'utf-8' | 'base64' = 'utf-8'): string {
   const bytes =
-    typeof content === 'string' ? Buffer.from(content, encoding === 'base64' ? 'base64' : 'utf8') : Buffer.from(content);
+    typeof content === 'string'
+      ? Buffer.from(content, encoding === 'base64' ? 'base64' : 'utf8')
+      : Buffer.from(content);
   return createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
 }

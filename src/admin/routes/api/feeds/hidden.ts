@@ -15,6 +15,8 @@ export const PUT = route(async (ctx, store) => {
   else ids.delete(id);
   const change = configChange('feeds', current.source, { ...current.data, hidden: [...ids] });
   return json(
-    await commitChanges(store, [change], `${hidden ? 'Hide' : 'Unhide'} feed item ${id}`, { [change.path]: current.version }),
+    await commitChanges(store, [change], `${hidden ? 'Hide' : 'Unhide'} feed item ${id}`, {
+      [change.path]: current.version,
+    }),
   );
 });

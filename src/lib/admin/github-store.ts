@@ -22,7 +22,8 @@ export function githubConfig(env: Record<string, string | undefined>): GitHubCon
   if (!env.GITHUB_TOKEN) {
     throw new UpstreamError('GITHUB_TOKEN is not set. Add a fine-grained token in the Vercel project settings.', 500);
   }
-  if (!owner || !repo) throw new UpstreamError('Set GITHUB_REPO to "owner/name" (Vercel git metadata is missing).', 500);
+  if (!owner || !repo)
+    throw new UpstreamError('Set GITHUB_REPO to "owner/name" (Vercel git metadata is missing).', 500);
   return { token: env.GITHUB_TOKEN, owner, repo, branch: env.GITHUB_BRANCH || env.VERCEL_GIT_COMMIT_REF || 'main' };
 }
 
@@ -73,9 +74,11 @@ export class GitHubStore implements ContentStore {
     } catch {
       // not JSON: keep the text
     }
-    if (res.status === 401) return new GitHubError(`GitHub rejected GITHUB_TOKEN (expired or revoked): ${message}`, 401);
+    if (res.status === 401)
+      return new GitHubError(`GitHub rejected GITHUB_TOKEN (expired or revoked): ${message}`, 401);
     if (res.status === 403 || res.status === 404) {
-      const needed = res.headers.get('x-accepted-github-permissions') || 'Contents: read and write, Actions: read and write';
+      const needed =
+        res.headers.get('x-accepted-github-permissions') || 'Contents: read and write, Actions: read and write';
       return new GitHubError(
         `GitHub refused the request (${res.status}: ${message}). The token needs ${needed} on ${this.cfg.owner}/${this.cfg.repo}.`,
         res.status,
@@ -96,7 +99,8 @@ export class GitHubStore implements ContentStore {
       true,
     );
     if (!file || Array.isArray(file) || file.type !== 'file') return null;
-    if (file.encoding !== 'base64') throw new UpstreamError(`${path} is larger than 1 MB and can't be edited here.`, 413);
+    if (file.encoding !== 'base64')
+      throw new UpstreamError(`${path} is larger than 1 MB and can't be edited here.`, 413);
     return { path, content: Buffer.from(file.content ?? '', 'base64').toString('utf8'), version: file.sha };
   }
 
@@ -135,7 +139,9 @@ export class GitHubStore implements ContentStore {
     const head = (await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${branch}`))!.object.sha;
     const baseTree = (await this.gh<{ tree: { sha: string } }>('GET', `/git/commits/${head}`))!.tree.sha;
     const current = await Promise.all(
-      changes.map((c) => this.gh<{ sha: string }>('GET', `/contents/${encodePath(c.path)}${this.ref(head)}`, undefined, true)),
+      changes.map((c) =>
+        this.gh<{ sha: string }>('GET', `/contents/${encodePath(c.path)}${this.ref(head)}`, undefined, true),
+      ),
     );
     changes.forEach((c, i) => {
       const file = current[i];
@@ -150,8 +156,10 @@ export class GitHubStore implements ContentStore {
         sha:
           c.content === null
             ? null
-            : (await this.gh<{ sha: string }>('POST', '/git/blobs', { content: c.content, encoding: c.encoding ?? 'utf-8' }))!
-                .sha,
+            : (await this.gh<{ sha: string }>('POST', '/git/blobs', {
+                content: c.content,
+                encoding: c.encoding ?? 'utf-8',
+              }))!.sha,
       })),
     );
     const newTree = (await this.gh<{ sha: string }>('POST', '/git/trees', { base_tree: baseTree, tree }))!.sha;
@@ -187,17 +195,23 @@ export class GitHubStore implements ContentStore {
   async latestRun(file: string): Promise<WorkflowRun | null> {
     const runs = await this.gh<{
       workflow_runs: { status: string; conclusion: string | null; html_url: string; created_at: string }[];
-    }>('GET', `/actions/workflows/${encodeURIComponent(file)}/runs?per_page=1&branch=${encodeURIComponent(this.cfg.branch)}`);
+    }>(
+      'GET',
+      `/actions/workflows/${encodeURIComponent(file)}/runs?per_page=1&branch=${encodeURIComponent(this.cfg.branch)}`,
+    );
     const run = runs?.workflow_runs[0];
-    return run ? { status: run.status, conclusion: run.conclusion, url: run.html_url, createdAt: run.created_at } : null;
+    return run
+      ? { status: run.status, conclusion: run.conclusion, url: run.html_url, createdAt: run.created_at }
+      : null;
   }
 
   /** Read probes for the admin's permission banner; missing write access shows up as a 502 on the first save. */
   async capabilities(): Promise<{ contents: boolean; actions: boolean; error?: string }> {
-    const probe = (route: string) => this.gh('GET', route).then(
-      () => true,
-      () => false,
-    );
+    const probe = (route: string) =>
+      this.gh('GET', route).then(
+        () => true,
+        () => false,
+      );
     const [contents, actions] = await Promise.all([
       probe(`/contents/config/site.yml${this.ref()}`),
       probe('/actions/workflows?per_page=1'),

@@ -50,8 +50,16 @@ async function signOut() {
         <div class="adm-muted">Site admin</div>
       </div>
       <nav aria-label="Admin">
-        <a v-for="[path, label] in TOP" :key="path" :href="href(path)" :aria-current="active === path ? 'page' : undefined">{{ label }}</a>
-        <button type="button" :aria-expanded="contentOpen" @click="contentOpen = !contentOpen">Content {{ contentOpen ? '▾' : '▸' }}</button>
+        <a
+          v-for="[path, label] in TOP"
+          :key="path"
+          :href="href(path)"
+          :aria-current="active === path ? 'page' : undefined"
+          >{{ label }}</a
+        >
+        <button type="button" :aria-expanded="contentOpen" @click="contentOpen = !contentOpen">
+          Content {{ contentOpen ? '▾' : '▸' }}
+        </button>
         <template v-if="contentOpen">
           <a
             v-for="[name, label] in CONTENT"
@@ -62,7 +70,13 @@ async function signOut() {
             >{{ label }}</a
           >
         </template>
-        <a v-for="[path, label] in BOTTOM" :key="path" :href="href(path)" :aria-current="active === path ? 'page' : undefined">{{ label }}</a>
+        <a
+          v-for="[path, label] in BOTTOM"
+          :key="path"
+          :href="href(path)"
+          :aria-current="active === path ? 'page' : undefined"
+          >{{ label }}</a
+        >
       </nav>
       <div class="adm-side-foot">
         <a href="/" target="_blank" rel="noopener">View site ↗</a>

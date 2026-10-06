@@ -22,7 +22,12 @@ export const PUT = route(async (ctx, store) => {
   const name = assertCollection(ctx.params.name);
   const slug = assertSlug(ctx.params.slug);
   await refuseMdx(store, name, slug);
-  const { data, body, version = null, message } = await readBody<{
+  const {
+    data,
+    body,
+    version = null,
+    message,
+  } = await readBody<{
     data?: unknown;
     body?: unknown;
     version?: string | null;
@@ -30,7 +35,9 @@ export const PUT = route(async (ctx, store) => {
   }>(ctx);
   const change = entryChange(name, slug, data, body);
   const summary =
-    typeof message === 'string' && message.trim() ? message.trim().slice(0, 200) : `${version ? 'Update' : 'Create'} ${name}/${slug}`;
+    typeof message === 'string' && message.trim()
+      ? message.trim().slice(0, 200)
+      : `${version ? 'Update' : 'Create'} ${name}/${slug}`;
   return json(await commitChanges(store, [change], summary, { [change.path]: version }));
 });
 
