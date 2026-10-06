@@ -50,6 +50,11 @@ export function useDocument<T extends object>() {
       loader = load;
       await doc.reload();
     },
+    /** Point the document at a new key and loader without reloading (a read right after a commit can be stale). */
+    retarget(key: string, load: Loader<T>) {
+      doc.key = key;
+      loader = load;
+    },
     async reload() {
       if (!loader) return;
       tracking = false;

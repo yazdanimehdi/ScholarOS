@@ -31,15 +31,19 @@ const SIDEBAR: FieldDef[] = [
 const sidebar = computed(() => resolveOptions(SIDEBAR, { publications: publications.value }));
 const suggested = computed(() => slugify(String(doc.current?.data.title ?? '')));
 
+const loadPost = (target: string) => async () => {
+  const entry = await api<Post & { version: string; readonly: boolean }>(`collections/posts/${target}`);
+  readonly.value = entry.readonly;
+  return { value: { data: entry.data, body: entry.body }, version: entry.version };
+};
+
 onMounted(async () => {
-  await doc.open(`posts/${props.slug}`, async () => {
-    if (isNew.value) {
-      return { value: { data: { title: '', date: new Date().toISOString().slice(0, 10), draft: true }, body: '' }, version: null };
-    }
-    const entry = await api<Post & { version: string; readonly: boolean }>(`collections/posts/${props.slug}`);
-    readonly.value = entry.readonly;
-    return { value: { data: entry.data, body: entry.body }, version: entry.version };
-  });
+  await doc.open(
+    `posts/${props.slug}`,
+    isNew.value
+      ? async () => ({ value: { data: { title: '', date: new Date().toISOString().slice(0, 10), draft: true }, body: '' }, version: null })
+      : loadPost(props.slug),
+  );
   api<Entry[]>('collections/publications').then((list) => {
     publications.value = list.map((p) => ({ value: p.slug, label: String(p.data.title ?? p.slug) }));
   }, report);
@@ -61,7 +65,7 @@ async function save(draft: boolean) {
   if (result && isNew.value) {
     isNew.value = false;
     slug.value = target;
-    doc.key = `posts/${target}`;
+    doc.retarget(`posts/${target}`, loadPost(target));
     history.replaceState(null, '', `/${props.ctx.adminPath}/posts/${target}`);
   }
 }

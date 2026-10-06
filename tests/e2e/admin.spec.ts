@@ -75,3 +75,16 @@ test('news: create an item', async ({ page }) => {
   await expect(page.getByText(COMMITTED)).toBeVisible();
   await expect(page.getByRole('region', { name: 'Entries' }).getByText(/E2E news/)).toBeVisible();
 });
+
+test('news: edit an item right after creating it', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/content/announcements`);
+  await page.getByRole('button', { name: 'New news item' }).click();
+  await page.getByLabel('Title', { exact: true }).fill(`E2E again ${Date.now()}`);
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+  await page.getByLabel('Title', { exact: true }).fill(`E2E again edited ${Date.now()}`);
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByText(COMMITTED)).toHaveCount(2);
+  await expect(page.getByText(/changed|conflict/i)).toHaveCount(0);
+});

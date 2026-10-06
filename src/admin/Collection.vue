@@ -58,12 +58,14 @@ async function select(slug: string) {
   confirmDelete.value = false;
   selected.value = slug;
   history.replaceState(null, '', `?slug=${slug}`);
-  await doc.open(`${props.name}/${slug}`, async () => {
-    const entry = await api<Doc & { version: string; readonly: boolean }>(`collections/${props.name}/${slug}`);
-    readonly.value = entry.readonly;
-    return { value: { data: entry.data, body: entry.body }, version: entry.version };
-  });
+  await doc.open(`${props.name}/${slug}`, loadEntry(slug));
 }
+
+const loadEntry = (slug: string) => async () => {
+  const entry = await api<Doc & { version: string; readonly: boolean }>(`collections/${props.name}/${slug}`);
+  readonly.value = entry.readonly;
+  return { value: { data: entry.data, body: entry.body }, version: entry.version };
+};
 
 function startNew() {
   creating.value = true;
@@ -91,7 +93,7 @@ async function save() {
   if (creating.value) {
     creating.value = false;
     selected.value = slug;
-    doc.key = `${props.name}/${slug}`;
+    doc.retarget(`${props.name}/${slug}`, loadEntry(slug));
     history.replaceState(null, '', `?slug=${slug}`);
   }
 }

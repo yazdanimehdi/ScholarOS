@@ -70,3 +70,14 @@ test('a successful save clears the draft and takes the new version', async () =>
   assert.equal(doc.version, 'v2');
   assert.equal(stored(), null);
 });
+
+test('retarget() makes reload() use the new loader and key', async () => {
+  const doc = await opened({ title: 'new' });
+  doc.retarget('k2', loader({ title: 'saved' }));
+  assert.equal(doc.current!.title, 'new');
+  await doc.reload();
+  assert.equal(doc.current!.title, 'saved');
+  doc.current!.title = 'edited';
+  await flush();
+  assert.deepEqual(JSON.parse(localStorage.getItem('scholaros-draft:k2') ?? 'null'), { title: 'edited' });
+});
