@@ -143,7 +143,8 @@ direct `getImage` calls.
   repo paths to Blob URLs; print a summary.
 - `pnpm db:export [dir]` (`scripts/db-export.ts`): write every document to `dir` (default
   repo root) at its path. Media references stay Blob URLs.
-- Backup cron: `vercel.json` `crons: [{ path: '/api/admin/cron/backup', schedule: '0 3 * * *' }]`.
+- Backup cron (amended by sub-project 4: runs as step 3 of `/api/admin/cron/daily`, and the
+  result is stored in `src/data/jobs.json` instead of `backup.json`): `vercel.json` `crons: [{ path: '/api/admin/cron/backup', schedule: '0 3 * * *' }]`.
   The route requires `Authorization: Bearer ${CRON_SECRET}`; snapshots all documents and
   commits changed files to branch `content-backup` via `GitHubStore` (branch created from the
   default branch if missing; files deleted in the DB are deleted on the branch). No changes →
@@ -158,7 +159,7 @@ direct `getImage` calls.
 - API: `GET /api/admin/history?path=…`, `GET /api/admin/history/[id]`,
   `POST /api/admin/history/[id]/restore` (body `{ version }` of the current document).
 - Dashboard: mode badge (Git / Postgres) and last backup time/result.
-- Generate PDF disabled in postgres mode with note "PDF generation in Postgres mode — coming in
+- Generate PDF disabled in postgres mode (amended by sub-project 4: enabled with a JS renderer) with note "PDF generation in Postgres mode — coming in
   sub-project 4".
 - Post-save toast in postgres mode: "Published" (no deploy delay); with purge warning when
   applicable.
