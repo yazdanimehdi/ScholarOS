@@ -61,7 +61,8 @@ Implements sub-project 2's `ContentStore` (`src/lib/admin/postgres-store.ts`), t
   3. Insert the new state into `revisions` (content or null, new version, author); upsert or
      delete in `documents` with `version = version + 1`.
   4. Prune: keep the newest 50 revisions per changed path.
-  5. Return `{ id: <max revision id> }`.
+  5. Return `{ id, versions }` (`CommitResult` in `src/lib/admin/store.ts`): `id` is the max
+     revision id, `versions` maps each changed path to its new row version, or null for a delete.
   After commit: purge cache tags (§6). `message` is stored nowhere in v1 (git-only concept);
   revisions record author and time.
 - Interface amendment to sub-project 2's `ContentStore` (applies to both stores):
