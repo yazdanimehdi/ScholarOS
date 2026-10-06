@@ -17,6 +17,8 @@ import { POST as publishCv } from '../../admin/routes/api/cv/publish';
 import { PUT as hideFeed } from '../../admin/routes/api/feeds/hidden';
 import { DELETE as deleteMedia, GET as listMedia, POST as uploadMedia } from '../../admin/routes/api/media';
 import { adminSettings } from './settings';
+import { commitChanges } from './http';
+import type { ContentStore } from './store';
 
 let store: MemoryStore;
 beforeEach(() => {
@@ -242,4 +244,12 @@ test('media: collection images vs site images get the right folder and URL', asy
     (await call(deleteMedia, { method: 'DELETE', body: { path: 'package.json', version: 'x' } })).status,
     400,
   );
+});
+
+test('commitChanges returns the versions the store reports, not its own blob shas', async () => {
+  const rowStore = {
+    commit: async () => ({ id: 'tx-1', versions: { 'config/site.yml': 'row-7' } }),
+  } as unknown as ContentStore;
+  const result = await commitChanges(rowStore, [{ path: 'config/site.yml', content: 'x' }], 'm', {});
+  assert.deepEqual(result, { id: 'tx-1', versions: { 'config/site.yml': 'row-7' } });
 });

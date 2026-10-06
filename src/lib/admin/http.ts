@@ -5,7 +5,9 @@ import { getStore } from './get-store';
 import { MediaError } from './media';
 import { PathError, assertAllowed } from './paths';
 import type { SessionUser } from './session';
-import { ConflictError, UpstreamError, gitBlobSha, type Author, type Change, type ContentStore } from './store';
+import { ConflictError, UpstreamError, type Author, type Change, type CommitResult, type ContentStore } from './store';
+
+export type { CommitResult };
 
 export class HttpError extends Error {
   constructor(
@@ -15,13 +17,6 @@ export class HttpError extends Error {
   ) {
     super(message);
   }
-}
-
-export interface CommitResult {
-  id: string;
-  url?: string;
-  /** New version of every file in the commit (null for deletions). */
-  versions: Record<string, string | null>;
 }
 
 export function json(body: unknown, status = 200): Response {
@@ -85,9 +80,5 @@ export async function commitChanges(
     throw new HttpError(400, 'The same file appears twice in one save');
   }
   for (const c of changes) assertAllowed(c.path);
-  const result = await store.commit(changes, message, base);
-  const versions = Object.fromEntries(
-    changes.map((c) => [c.path, c.content === null ? null : gitBlobSha(c.content, c.encoding)]),
-  );
-  return { ...result, versions };
+  return store.commit(changes, message, base);
 }

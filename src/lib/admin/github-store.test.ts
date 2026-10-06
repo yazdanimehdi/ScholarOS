@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GitHubStore, githubConfig } from './github-store';
-import { ConflictError, UpstreamError } from './store';
+import { ConflictError, UpstreamError, gitBlobSha } from './store';
 
 type Reply = { status?: number; json?: unknown; headers?: Record<string, string> };
 type Call = { method: string; path: string; body?: Record<string, any> };
@@ -52,7 +52,15 @@ test('commit: blobs → tree on the head → commit with author → fast-forward
     'Update CV',
     { 'config/cv.yml': 'cvsha', 'src/content/posts/new.md': null, 'public/images/x.png': null },
   );
-  assert.deepEqual(result, { id: 'c2', url: 'https://github.com/o/r/commit/c2' });
+  assert.deepEqual(result, {
+    id: 'c2',
+    url: 'https://github.com/o/r/commit/c2',
+    versions: {
+      'config/cv.yml': gitBlobSha('cv: {}\n'),
+      'src/content/posts/new.md': gitBlobSha('---\ntitle: N\n---\n'),
+      'public/images/x.png': gitBlobSha('iVBORw==', 'base64'),
+    },
+  });
   const blobs = calls.filter((c) => c.path === '/git/blobs').map((c) => c.body!.encoding);
   assert.deepEqual(blobs.sort(), ['base64', 'utf-8', 'utf-8']);
   const tree = calls.find((c) => c.path === '/git/trees')!.body!;

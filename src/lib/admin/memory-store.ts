@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ConflictError, gitBlobSha, type Change, type ContentStore, type StoredFile } from './store';
+import { ConflictError, blobVersions, gitBlobSha, type Change, type ContentStore, type StoredFile } from './store';
 
 type Overlay = { content: string; encoding: 'utf-8' | 'base64' } | null;
 
@@ -66,7 +66,7 @@ export class MemoryStore implements ContentStore {
     }
     const id = `memory-${this.log.length + 1}`;
     this.log.push({ id, message, paths: changes.map((c) => c.path) });
-    return { id };
+    return { id, versions: blobVersions(changes) };
   }
 
   async lastModified(p: string): Promise<string | null> {

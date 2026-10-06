@@ -1,4 +1,12 @@
-import { ConflictError, UpstreamError, type Author, type Change, type ContentStore, type StoredFile } from './store';
+import {
+  ConflictError,
+  UpstreamError,
+  blobVersions,
+  type Author,
+  type Change,
+  type ContentStore,
+  type StoredFile,
+} from './store';
 
 export interface GitHubConfig {
   token: string;
@@ -176,7 +184,7 @@ export class GitHubStore implements ContentStore {
       if (e instanceof GitHubError && e.githubStatus === 422) throw new RefRace();
       throw e;
     }
-    return { id: commit.sha, url: commit.html_url };
+    return { id: commit.sha, url: commit.html_url, versions: blobVersions(changes) };
   }
 
   async lastModified(path: string): Promise<string | null> {
