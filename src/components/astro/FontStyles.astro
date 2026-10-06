@@ -1,14 +1,30 @@
 ---
-import { getSiteConfig } from '../../lib/config';
+import { getSiteConfig, getTheme } from '../../lib/config';
 
 const config = getSiteConfig();
 const fonts = config.fonts;
+const theme = getTheme();
 
 // Defaults matching global.css @theme values
 const defaultFamilies = {
   sans: 'Roboto',
   serif: 'Roboto Slab',
   mono: 'Roboto Mono',
+};
+
+// Editorial defaults, used for any family fonts.families leaves unset
+const editorialFamilies = {
+  sans: 'IBM Plex Sans',
+  serif: 'Source Serif 4',
+  mono: 'IBM Plex Mono',
+};
+const themeFamilies = theme === 'editorial' ? editorialFamilies : defaultFamilies;
+
+// Axes the editorial design uses (italic + 600). Only requested for these families, because
+// Google Fonts rejects the whole stylesheet if a family lacks a requested axis value.
+const editorialAxes: Record<string, string> = {
+  'Source Serif 4': 'ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400',
+  'IBM Plex Sans': 'wght@400;500;600',
 };
 
 const defaultSizes = {
@@ -21,9 +37,9 @@ const defaultSizes = {
 };
 
 const families = {
-  sans: fonts?.families?.sans || defaultFamilies.sans,
-  serif: fonts?.families?.serif || defaultFamilies.serif,
-  mono: fonts?.families?.mono || defaultFamilies.mono,
+  sans: fonts?.families?.sans || themeFamilies.sans,
+  serif: fonts?.families?.serif || themeFamilies.serif,
+  mono: fonts?.families?.mono || themeFamilies.mono,
 };
 
 const sizes = {
@@ -40,6 +56,7 @@ const uniqueFamilies = [...new Set([families.sans, families.serif, families.mono
 const fontParams = uniqueFamilies
   .map((family) => {
     const encoded = family.replace(/ /g, '+');
+    if (theme === 'editorial' && editorialAxes[family]) return `family=${encoded}:${editorialAxes[family]}`;
     // Mono fonts get fewer weights
     if (family === families.mono && family !== families.sans && family !== families.serif) {
       return `family=${encoded}:wght@400;500`;

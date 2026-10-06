@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSiteConfig, getSiteName } from '../../lib/config';
+import { socialLinks } from '../../lib/editorial';
+import './editorial.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  keywords?: string;
+  /** Dark "get in touch" footer (home page) instead of the light one. */
+  contactFooter?: boolean;
+}
+
+const { title, description, ogImage, keywords, contactFooter = false } = Astro.props;
+const config = getSiteConfig();
+const name = getSiteName();
+const email = config.socials?.email;
+const links = socialLinks(config.socials);
+const contact = config.editorial?.contact;
+const year = new Date().getFullYear();
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage} keywords={keywords}>
+  <header class="ed-header">
+    <nav class="ed-wrap ed-nav" aria-label="Primary">
+      <a href="/" class="ed-brand">
+        <span class="ed-brand-mark" aria-hidden="true"></span>
+        <span class="ed-brand-name">{name}</span>
+      </a>
+      <div class="ed-navlinks">
+        {
+          config.nav.map((item) => (
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content" class="ed-grow">
+    <slot />
+  </main>
+
+  {
+    contactFooter ? (
+      <footer class="ed-contact">
+        <div class="ed-wrap ed-contact-inner">
+          <div class="ed-contact-top">
+            <div class="ed-contact-copy">
+              <h2>{contact?.heading || 'Get in touch'}</h2>
+              {contact?.text && <p>{contact.text}</p>}
+            </div>
+            {email && (
+              <a class="ed-btn-light" href={`mailto:${email}`}>
+                {email}
+              </a>
+            )}
+          </div>
+          <div class="ed-contact-bottom">
+            <span>
+              © {year} {name}
+            </span>
+            {links.length > 0 && (
+              <span class="ed-contact-links">
+                {links.map((l) => (
+                  <a class="ul" href={l.href}>
+                    {l.label}
+                  </a>
+                ))}
+              </span>
+            )}
+          </div>
+        </div>
+      </footer>
+    ) : (
+      <footer class="ed-footer">
+        <div class="ed-wrap ed-footer-inner">
+          <span>
+            © {year} {name}
+          </span>
+          {email && (
+            <a class="ul" href={`mailto:${email}`}>
+              {email}
+            </a>
+          )}
+        </div>
+      </footer>
+    )
+  }
+</BaseLayout>

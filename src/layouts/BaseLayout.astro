@@ -5,7 +5,7 @@ import CookieConsent from '../components/astro/CookieConsent.astro';
 import DarkModeScript from '../components/astro/DarkModeScript.astro';
 import { ClientRouter } from 'astro:transitions';
 import { getSiteConfig, getTheme } from '../lib/config';
-import { generateColorOverrides } from '../lib/colors';
+import { editorialAccentCss, generateColorOverrides } from '../lib/colors';
 
 interface Props {
   title: string;
@@ -19,8 +19,8 @@ const config = getSiteConfig();
 const lang = config.lang ?? 'en';
 const dir = config.direction ?? 'ltr';
 const defaultTheme = config.defaultTheme ?? 'system';
-const colorCSS = generateColorOverrides(config);
 const theme = getTheme();
+const colorCSS = generateColorOverrides(config) + (theme === 'editorial' ? editorialAccentCss(config) : '');
 ---
 
 <!doctype html>

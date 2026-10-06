@@ -44,6 +44,15 @@ for (const theme of THEMES) {
 
 // --- editorial page checks (one block per page) ---
 
+{
+  const html = ed('contact/index.html');
+  assert.match(html, /<header class="ed-header">/, 'editorial /contact: editorial header on an undesigned page');
+  assert.match(html, /<a href="\/contact" aria-current="page">\s*Contact\s*<\/a>/, 'editorial /contact: active nav item');
+  assert.match(html, /<footer class="ed-footer">/, 'editorial /contact: light footer');
+  assert.doesNotMatch(html, /ThemeToggle/, 'editorial: no theme toggle');
+  assert.doesNotMatch(read('classic', 'contact/index.html'), /class="ed-header"/, 'classic /contact: classic header');
+}
+
 // --- classic regression ---
 const BASELINE = 'dist-baseline';
 
