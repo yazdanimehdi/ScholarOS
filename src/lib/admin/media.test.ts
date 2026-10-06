@@ -95,3 +95,13 @@ test('SVGs with DTD entities or an internal DOCTYPE subset are rejected', () => 
   }
   assert.equal(sniffImage(bytes('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "x.dtd"><svg/>')), 'svg');
 });
+
+test('a `[` inside a quoted DOCTYPE identifier is not an internal subset', () => {
+  const external = bytes('<!DOCTYPE svg SYSTEM "x[1].dtd"><svg/>');
+  assert.equal(sniffImage(external), 'svg');
+  assert.match(prepareUpload('ext.svg', external).filename, /^ext-[0-9a-f]{6}\.svg$/);
+  assert.equal(sniffImage(bytes("<!DOCTYPE svg PUBLIC 'a[b' 'c>d'><svg/>")), 'svg');
+  const subset = bytes('<!DOCTYPE svg SYSTEM "x[1].dtd" [<!ATTLIST svg x CDATA "1">]><svg/>');
+  assert.equal(sniffImage(subset), 'svg');
+  assert.throws(() => prepareUpload('x.svg', subset), isMediaError(415));
+});

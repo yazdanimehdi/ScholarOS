@@ -25,7 +25,8 @@ const SIGNATURES: [ext: string, test: (b: Uint8Array) => boolean][] = [
 const SVG_DANGER: [RegExp, string][] = [
   // Internal DTD entities expand into markup (e.g. a <script>) that the checks below never see.
   [/<!ENTITY/i, 'DTD entities'],
-  [/<!DOCTYPE[^>[]*\[/i, 'DTD entities'],
+  // A `[` outside quoted identifiers opens an internal subset.
+  [/<!DOCTYPE(?:[^>["']|"[^"]*"|'[^']*')*\[/i, 'DTD entities'],
   [/<([\w.-]+:)?script/i, 'scripts'],
   [/[\s"'/]on[a-z]+\s*=/i, 'event handler attributes'],
   [/javascript:/i, 'javascript: URLs'],
@@ -44,6 +45,18 @@ function hasJavaScriptUrl(text: string): boolean {
   const decoded = decodeCharRefs(text);
   // eslint-disable-next-line no-control-regex -- control characters are stripped on purpose
   return /javascript\s*:/i.test(decoded.replace(/[\x00-\x20]/g, ''));
+}
+
+/** Index of the first `[` or `>` at or after `from`, skipping quoted strings; -1 when there is none. */
+function doctypeStop(text: string, from: number): number {
+  for (let i = from; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"' || c === "'") {
+      i = text.indexOf(c, i + 1);
+      if (i === -1) return -1;
+    } else if (c === '[' || c === '>') return i;
+  }
+  return -1;
 }
 
 /** Check if text is a valid SVG root element. Linear-time parse to avoid ReDoS. */
@@ -67,10 +80,10 @@ function isSvgRoot(text: string): boolean {
       if (i === -1) return false;
       i += 3;
     } else if (text.substr(i, 9) === '<!DOCTYPE') {
-      const close = text.indexOf('>', i);
-      const subset = text.indexOf('[', i);
+      const stop = doctypeStop(text, i + 9);
+      if (stop === -1) return false;
       // An internal subset `[ … ]` can hold `>`; skip to its closing `]>`.
-      i = subset !== -1 && subset < close ? text.indexOf(']>', subset) + 1 : close;
+      i = text[stop] === '[' ? text.indexOf(']>', stop) + 1 : stop;
       if (i <= 0) return false;
       i++;
     } else {
