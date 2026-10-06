@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from 'astro';
 import { SESSION_COOKIE, openSession, sessionSecret } from './lib/admin/session';
-import { adminSettings } from './lib/admin/settings';
+import { adminSettings, isAdminUser } from './lib/admin/settings';
 
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const jsonError = (status: number, error: string) =>
@@ -10,7 +10,7 @@ const jsonError = (status: number, error: string) =>
 export const onRequest: MiddlewareHandler = async (ctx, next) => {
   if (ctx.isPrerendered) return next();
   const { pathname } = ctx.url;
-  const { adminPath } = adminSettings();
+  const { adminPath, adminUsers } = adminSettings();
   const api = pathname.startsWith('/api/admin/');
   const page = pathname === `/${adminPath}` || pathname.startsWith(`/${adminPath}/`);
   if (!api && !page) return next();
@@ -23,7 +23,8 @@ export const onRequest: MiddlewareHandler = async (ctx, next) => {
   } else {
     const token = ctx.cookies.get(SESSION_COOKIE)?.value;
     const user = token ? await openSession(token, sessionSecret()) : null;
-    if (user) {
+    // Removing someone from adminUsers ends their session at the next request.
+    if (user && isAdminUser(user.login, adminUsers)) {
       ctx.locals.user = user;
       res = await next();
     } else {

@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SESSION_COOKIE, sealSession } from './lib/admin/session';
-import { adminSettings } from './lib/admin/settings';
+import { adminLogin, adminSettings } from './lib/admin/settings';
 import { onRequest } from './middleware';
 
 process.env.SESSION_SECRET = 'm'.repeat(32);
 const ORIGIN = 'https://site.test';
 const admin = `/${adminSettings().adminPath}`;
-const user = { login: 'jane', name: 'Jane', avatar: '' };
+const user = { login: adminLogin(adminSettings().adminUsers[0]), name: 'Jane', avatar: '' };
 
 function context(path: string, opts: { method?: string; cookie?: string; origin?: string } = {}) {
   const url = new URL(path, ORIGIN);
@@ -61,4 +61,12 @@ test('writes need a same-origin Origin header', async () => {
     (await run(context('/api/admin/auth/logout', { method: 'POST', origin: 'https://evil.test' }))).status,
     403,
   );
+});
+
+test('a valid session for a login no longer in adminUsers is treated as signed out', async () => {
+  const cookie = await sealSession({ ...user, login: 'removed-admin' }, process.env.SESSION_SECRET!);
+  assert.equal((await run(context('/api/admin/me', { cookie }))).status, 401);
+  const page = await run(context(`${admin}/cv`, { cookie }));
+  assert.equal(page.status, 302);
+  assert.equal(page.headers.get('location'), `${admin}/login`);
 });

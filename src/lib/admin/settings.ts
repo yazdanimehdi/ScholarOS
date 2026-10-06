@@ -40,11 +40,12 @@ export function adminSettings(): AdminSettings {
   return typeof __SCHOLAROS_ADMIN__ !== 'undefined' ? __SCHOLAROS_ADMIN__ : (loaded ??= loadAdminSettings());
 }
 
-/** adminUsers entries may be usernames, @usernames or https://github.com/<user> URLs; logins are case-insensitive. */
+/** The GitHub login an adminUsers entry names: entries may be usernames, @usernames or https://github.com/<user> URLs. */
+export const adminLogin = (entry: string) => (extractGitHubUsername(entry) ?? entry).trim().replace(/^@/, '');
+
+/** Logins are case-insensitive. */
 export function isAdminUser(login: string, adminUsers: string[]): boolean {
   const wanted = login.trim().toLowerCase();
   if (!wanted) return false;
-  return adminUsers.some(
-    (entry) => (extractGitHubUsername(entry) ?? entry).trim().replace(/^@/, '').toLowerCase() === wanted,
-  );
+  return adminUsers.some((entry) => adminLogin(entry).toLowerCase() === wanted);
 }
