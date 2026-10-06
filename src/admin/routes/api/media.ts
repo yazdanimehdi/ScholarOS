@@ -1,6 +1,9 @@
+import { posix } from 'node:path';
+import { listEntries } from '../../../lib/admin/content';
 import { HttpError, commitChanges, json, readBody, route } from '../../../lib/admin/http';
 import { MAX_UPLOAD, MediaError, prepareUpload } from '../../../lib/admin/media';
-import { SITE_MEDIA, assertMediaPath } from '../../../lib/admin/paths';
+import { COLLECTIONS, SITE_MEDIA, assertMediaPath, collectionDir } from '../../../lib/admin/paths';
+import type { ContentStore } from '../../../lib/admin/store';
 import { adminSettings } from '../../../lib/admin/settings';
 
 export const prerender = false;
@@ -44,9 +47,34 @@ export const POST = route(async ({ request }, store) => {
   return json({ path, url, version: result.versions[path], commit: { id: result.id, url: result.url } });
 });
 
+/**
+ * A collection image referenced from front matter (by its public URL or a path relative to the entry) must stay:
+ * image() fails the build when the file is gone. Site images are plain URLs and never break the build.
+ */
+async function refuseInUse(store: ContentStore, file: string) {
+  const { mediaFolder, publicFolder } = adminSettings();
+  if (!file.startsWith(`${mediaFolder}/`)) return;
+  const url = publicFolder + file.slice(mediaFolder.length);
+  const users = (
+    await Promise.all(
+      COLLECTIONS.map(async (name) => {
+        const relative = posix.relative(collectionDir(name), file);
+        return (await listEntries(store, name))
+          .filter((e) => {
+            const text = JSON.stringify(e.data);
+            return text.includes(url) || text.includes(relative);
+          })
+          .map((e) => `${name}/${e.slug}`);
+      }),
+    )
+  ).flat();
+  if (users.length) throw new HttpError(409, `In use by ${users.join(', ')}`);
+}
+
 export const DELETE = route(async (ctx, store) => {
   const { path, version } = await readBody<{ path?: unknown; version?: unknown }>(ctx);
   if (typeof version !== 'string' || !version) throw new HttpError(400, '`version` is required to delete');
   const file = assertMediaPath(path);
+  await refuseInUse(store, file);
   return json(await commitChanges(store, [{ path: file, content: null }], `Delete ${file}`, { [file]: version }));
 });

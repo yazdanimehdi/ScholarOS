@@ -34,6 +34,9 @@ export const PUT = route(async (ctx, store) => {
     message?: unknown;
   }>(ctx);
   const change = entryChange(name, slug, data, body);
+  if (version === null && (await store.read(change.path))) {
+    throw new HttpError(409, `${name}/${slug} already exists — choose another slug`, { exists: true });
+  }
   const summary =
     typeof message === 'string' && message.trim()
       ? message.trim().slice(0, 200)

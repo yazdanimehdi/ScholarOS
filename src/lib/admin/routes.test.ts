@@ -253,3 +253,35 @@ test('commitChanges returns the versions the store reports, not its own blob sha
   const result = await commitChanges(rowStore, [{ path: 'config/site.yml', content: 'x' }], 'm', {});
   assert.deepEqual(result, { id: 'tx-1', versions: { 'config/site.yml': 'row-7' } });
 });
+
+test('media: a collection image used in front matter cannot be deleted', async () => {
+  const image = await (await upload('content')).json();
+  const params = { name: 'posts', slug: 'uses-image' };
+  const data = { title: 'Cover', date: '2024-06-01', coverImage: image.url };
+  assert.equal((await call(putEntry, { method: 'PUT', params, body: { data, body: '', version: null } })).status, 200);
+  const commits = store.log.length;
+  const refused = await call(deleteMedia, { method: 'DELETE', body: { path: image.path, version: image.version } });
+  assert.equal(refused.status, 409);
+  assert.match((await refused.json()).error, /^In use by posts\/uses-image/);
+  assert.equal(store.log.length, commits, 'no commit');
+
+  const avatar = 'src/assets/images/people/placeholder-avatar.svg'; // referenced as ../../assets/images/…
+  const relative = await call(deleteMedia, {
+    method: 'DELETE',
+    body: { path: avatar, version: (await store.read(avatar))!.version },
+  });
+  assert.equal(relative.status, 409);
+  assert.match((await relative.json()).error, /people\/jane-smith/);
+});
+
+test('collections: creating over an existing slug names the clash', async () => {
+  const params = { name: 'posts', slug: 'taken' };
+  const body = { data: { title: 'T', date: '2024-06-01' }, body: '', version: null };
+  assert.equal((await call(putEntry, { method: 'PUT', params, body })).status, 200);
+  const clash = await call(putEntry, { method: 'PUT', params, body });
+  assert.equal(clash.status, 409);
+  assert.deepEqual(await clash.json(), {
+    error: 'posts/taken already exists — choose another slug',
+    details: { exists: true },
+  });
+});
