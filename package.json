@@ -19,7 +19,7 @@
     "lint:fix": "eslint --fix . && prettier --write .",
     "format": "prettier --write .",
     "check": "astro check",
-    "test": "tsx --test src/lib/*.test.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "check:themes": "node scripts/check-themes.mjs"
   },
   "dependencies": {
