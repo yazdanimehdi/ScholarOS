@@ -18,7 +18,8 @@
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
     "format": "prettier --write .",
-    "check": "astro check"
+    "check": "astro check",
+    "test": "tsx --test src/lib/*.test.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",

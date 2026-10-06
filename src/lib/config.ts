@@ -1,17 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
-import type { SiteConfig, HomepageSectionId, HomepageSectionEntry } from './types';
+import type { SiteConfig, HomepageSectionId, HomepageSectionEntry, ThemeName } from './types';
 
 let _siteConfig: SiteConfig | null = null;
+
+/** '' or missing → 'classic' (the CMS writes '' for untouched fields); any other unknown value is a config error. */
+export function normalizeTheme(value: unknown, source: string): ThemeName {
+  if (value === undefined || value === null || value === '') return 'classic';
+  if (value === 'classic' || value === 'editorial') return value;
+  throw new Error(`${source}: theme must be 'classic' or 'editorial', got '${String(value)}'`);
+}
 
 export function getSiteConfig(): SiteConfig {
   if (_siteConfig) return _siteConfig;
 
   const configPath = path.resolve(process.cwd(), 'config/site.yml');
   const raw = fs.readFileSync(configPath, 'utf-8');
-  _siteConfig = yaml.load(raw) as SiteConfig;
+  const config = yaml.load(raw) as SiteConfig;
+  const envTheme = process.env.SCHOLAROS_THEME;
+  config.theme = envTheme
+    ? normalizeTheme(envTheme, 'SCHOLAROS_THEME')
+    : normalizeTheme(config.theme, 'config/site.yml');
+  _siteConfig = config;
   return _siteConfig;
+}
+
+export function getTheme(): ThemeName {
+  return getSiteConfig().theme ?? 'classic';
 }
 
 export function isLabMode(): boolean {

@@ -6,7 +6,7 @@ import globals from 'globals';
 
 export default [
   // Global ignores
-  { ignores: ['dist/', 'node_modules/', '.astro/', 'src/content/', 'src/data/'] },
+  { ignores: ['dist/', 'dist-*/', 'node_modules/', '.astro/', 'src/content/', 'src/data/'] },
 
   // Base JS recommended rules
   js.configs.recommended,

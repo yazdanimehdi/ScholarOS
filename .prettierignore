@@ -4,3 +4,4 @@ node_modules/
 pnpm-lock.yaml
 src/data/*.json
 src/components/astro/Analytics.astro
+dist-*/

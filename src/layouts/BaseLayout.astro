@@ -2,8 +2,9 @@
 import BaseHead from '../components/astro/BaseHead.astro';
 import Analytics from '../components/astro/Analytics.astro';
 import CookieConsent from '../components/astro/CookieConsent.astro';
+import DarkModeScript from '../components/astro/DarkModeScript.astro';
 import { ClientRouter } from 'astro:transitions';
-import { getSiteConfig } from '../lib/config';
+import { getSiteConfig, getTheme } from '../lib/config';
 import { generateColorOverrides } from '../lib/colors';
 
 interface Props {
@@ -19,37 +20,16 @@ const lang = config.lang ?? 'en';
 const dir = config.direction ?? 'ltr';
 const defaultTheme = config.defaultTheme ?? 'system';
 const colorCSS = generateColorOverrides(config);
+const theme = getTheme();
 ---
 
 <!doctype html>
-<html lang={lang} dir={dir} class="scroll-smooth" data-default-theme={defaultTheme}>
+<html lang={lang} dir={dir} class="scroll-smooth" data-default-theme={defaultTheme} data-theme={theme}>
   <head>
     <BaseHead title={title} description={description} ogImage={ogImage} keywords={keywords} />
     {colorCSS && <style set:html={colorCSS} />}
     <ClientRouter />
-    <script is:inline>
-      // Apply theme from localStorage or configured default
-      function applyTheme() {
-        const saved = localStorage.getItem('theme');
-        if (saved === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else if (saved === 'light') {
-          document.documentElement.classList.remove('dark');
-        } else {
-          // No saved preference — use configured default
-          const d = document.documentElement.getAttribute('data-default-theme') || 'system';
-          if (d === 'dark' || (d === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        }
-      }
-      // Apply on initial load
-      applyTheme();
-      // Re-apply after ViewTransitions page swap
-      document.addEventListener('astro:after-swap', applyTheme);
-    </script>
+    {theme === 'classic' && <DarkModeScript />}
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main-content" class="skip-link">Skip to main content</a>

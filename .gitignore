@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # template init marker (created by CI, should not be in template)
 .template-initialized
+
+# theme check builds (scripts/check-themes.mjs)
+dist-*/

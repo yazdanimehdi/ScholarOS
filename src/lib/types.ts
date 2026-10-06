@@ -69,6 +69,8 @@ export interface HeroConfig {
 export type SiteDirection = 'ltr' | 'rtl';
 export type DefaultTheme = 'light' | 'dark' | 'system';
 
+export type ThemeName = 'classic' | 'editorial';
+
 export type ImageShape = 'rectangular' | 'circular' | 'oval';
 
 export interface AboutConfig {
@@ -163,6 +165,7 @@ export interface BackgroundConfig {
 
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
+  theme?: ThemeName;
   title: string;
   description: string;
   author: string;
