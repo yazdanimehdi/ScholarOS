@@ -250,6 +250,10 @@
     line-height: 1.65;
     color: var(--ed-muted);
   }
+  /* Flex drops the formatter's line breaks, so a link's trailing punctuation sits flush against it. */
+  & .ed-link-punct {
+    display: inline-flex;
+  }
   & .ed-btn {
     display: inline-flex;
     align-items: center;
@@ -532,6 +536,10 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+  /* In a column-direction list row the 520px basis would become a height. */
+  & .ed-paper--list .ed-paper-body {
+    flex: none;
   }
   & .ed-paper-title {
     font-family: var(--font-serif);
@@ -1361,6 +1369,10 @@
     & .ed-hero {
       gap: 40px;
       padding-block: 56px 48px;
+    }
+    /* Label on its own line; otherwise space-between strands the first affiliation at the right edge. */
+    & .ed-band-label {
+      flex-basis: 100%;
     }
     & .ed-home-section {
       padding-block: 56px 32px;

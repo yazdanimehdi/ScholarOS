@@ -64,7 +64,10 @@ const fontParams = uniqueFamilies
     return `family=${encoded}:wght@300;400;500;700`;
   })
   .join('&');
-const googleFontsUrl = `https://fonts.googleapis.com/css2?${fontParams}&display=swap`;
+// Editorial: `optional` keeps the fallback instead of swapping late, which shifted every
+// block below the hero (CLS ~0.32 in Lighthouse); cached fonts are used on later visits.
+const fontDisplay = theme === 'editorial' ? 'optional' : 'swap';
+const googleFontsUrl = `https://fonts.googleapis.com/css2?${fontParams}&display=${fontDisplay}`;
 
 // Font family stacks
 const sansFallback = 'ui-sans-serif, system-ui, -apple-system, sans-serif';

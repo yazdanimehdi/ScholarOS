@@ -54,7 +54,7 @@ const list = variant === 'list';
       }
     </span>
     <span class="ed-paper-meta">
-      <span class="ed-venue">{list ? `${p.venue}, ${p.year}` : p.venue}</span>
+      <span class="ed-venue">{list && !p.venue.includes(String(p.year)) ? `${p.venue}, ${p.year}` : p.venue}</span>
       {p.note && <span class="ed-note">{p.note}</span>}
       {
         link && (
