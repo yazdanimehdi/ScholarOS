@@ -1,20 +1,49 @@
+# Editorial theme: heading of the home research section and the Research page
+headline: 'Language technology that is capable, fair and safe.'
 description: ''
 
 areas:
-  - title: 'Natural Language Processing'
+  - id: 'nlp'
+    label: 'NLP'
+    title: 'Natural Language Processing'
     description: 'Developing models that understand and generate human language, with a focus on multilingual and low-resource settings.'
+    body: |
+      Most of the world's languages have little labelled data. We study how large language models can be adapted to these settings with **parameter-efficient fine-tuning**, so that a model trained mostly on English transfers to a new language or domain from a few thousand examples.
+
+      Our benchmarks measure what that transfer costs, language by language.
+    result: 'Adaptive fine-tuning matches full fine-tuning on six low-resource benchmarks while updating under 2% of the parameters (EMNLP 2024).'
+    figure: '/images/research-figure.svg'
+    caption: 'Only the small adapters (accent) are trained; the pretrained layers stay frozen.'
+    publications:
+      - 'smith2024adaptive'
+      - 'smith2023fairness'
     tags:
       - 'Language Models'
       - 'Multilingual NLP'
       - 'Text Generation'
-  - title: 'Computer Vision & Multimodal Learning'
+  - id: 'multimodal'
+    label: 'Multimodal'
+    title: 'Computer Vision & Multimodal Learning'
     description: 'Building systems that combine visual and textual understanding for tasks like image captioning, visual QA, and cross-modal retrieval.'
+    body: |
+      Language rarely arrives alone. We build models that ground words in images and in the actions of embodied agents, and we survey which architectures and training strategies make that grounding reliable.
+    publications:
+      - 'chen2024multimodal'
+      - 'chen2023visual'
     tags:
       - 'Vision-Language Models'
       - 'Image Understanding'
       - 'Multimodal Reasoning'
-  - title: 'AI Safety & Robustness'
+  - id: 'safety'
+    label: 'Safety'
+    title: 'AI Safety & Robustness'
     description: 'Ensuring AI systems are safe, fair, and reliable through formal verification, alignment techniques, and robust evaluation methodologies.'
+    body: |
+      We want models whose behaviour holds up outside the benchmark. That means **fairness** across languages and populations, and agents that respect constraints written in plain language.
+    result: 'Natural-language safety constraints cut constraint violations during exploration by a third without slowing learning (ICML 2024).'
+    publications:
+      - 'garcia2024safe'
+      - 'smith2023fairness'
     tags:
       - 'Alignment'
       - 'Fairness'

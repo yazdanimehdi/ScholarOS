@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" width="360" height="320">
+  <g fill="none" stroke="#A9B4D0" stroke-width="1.2">
+    <path d="M60 70 130 50 200 85 270 60M60 70 90 145M130 50 150 130M200 85 150 130M200 85 235 155M270 60 305 135M90 145 150 130M235 155 305 135M90 145 70 225M235 155 260 235M305 135 260 235M70 225 160 215 260 235M70 225 120 280M160 215 120 280M260 235 210 285M120 280 210 285"/>
+  </g>
+  <path d="M150 130 235 155 160 215Z" fill="none" stroke="#1F3C88" stroke-width="2"/>
+  <circle cx="182" cy="167" r="68" fill="none" stroke="#1F3C88" stroke-dasharray="3 5" opacity=".55"/>
+  <g fill="#fff" stroke="#7D8AAE" stroke-width="1.4">
+    <circle cx="60" cy="70" r="5"/><circle cx="130" cy="50" r="5"/><circle cx="200" cy="85" r="5"/>
+    <circle cx="270" cy="60" r="5"/><circle cx="90" cy="145" r="5"/><circle cx="305" cy="135" r="5"/>
+    <circle cx="70" cy="225" r="5"/><circle cx="260" cy="235" r="5"/><circle cx="120" cy="280" r="5"/>
+    <circle cx="210" cy="285" r="5"/>
+  </g>
+  <g fill="#1F3C88"><circle cx="150" cy="130" r="7"/><circle cx="235" cy="155" r="7"/><circle cx="160" cy="215" r="7"/></g>
+</svg>

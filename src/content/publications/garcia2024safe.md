@@ -12,4 +12,8 @@ featured: false
 abstract: 'We propose a method for incorporating natural language safety constraints into reinforcement learning, enabling safer exploration in complex environments.'
 bibtex: "@inproceedings{garcia2024safe,\n  title={Safe Exploration in Reinforcement Learning with Natural Language Constraints},\n  author={Garcia, Maria and Smith, Jane and Taylor, Robert},\n  booktitle={Proceedings of ICML},\n  year={2024}\n}"
 image: ''
+venueShort: 'ICML'
+topic: 'safety'
+arxiv: 'arXiv:2024.00003'
+code: 'https://github.com/example-lab/safe-rl'
 ---

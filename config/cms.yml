@@ -78,6 +78,16 @@ collections:
     fields:
       - { label: 'Title', name: 'title', widget: 'string' }
       - { label: 'Date', name: 'date', widget: 'datetime' }
+      - label: 'Date Precision'
+        name: 'datePrecision'
+        widget: 'select'
+        default: 'month'
+        required: false
+        hint: 'How the date is shown in the editorial news list'
+        options:
+          - { label: 'Day (Oct 3, 2025)', value: 'day' }
+          - { label: 'Month (Oct 2025)', value: 'month' }
+          - { label: 'Year (2025)', value: 'year' }
       - label: 'Category'
         name: 'category'
         widget: 'select'
@@ -155,6 +165,8 @@ collections:
     slug: '{{slug}}'
     fields:
       - { label: 'Title', name: 'title', widget: 'string' }
+      - { label: 'Subtitle', name: 'subtitle', widget: 'string', required: false }
+      - { label: 'Related Publication', name: 'relatedPublication', widget: 'relation', collection: 'publications', value_field: '{{slug}}', search_fields: ['title'], display_fields: ['title'], required: false }
       - { label: 'Date', name: 'date', widget: 'datetime' }
       - { label: 'Draft (unpublished)', name: 'draft', widget: 'boolean', default: true, hint: 'Draft posts are hidden from the site. Turn off to publish.' }
       - { label: 'Author', name: 'author', widget: 'string', required: false }
@@ -196,6 +208,11 @@ collections:
       - { label: 'DOI', name: 'doi', widget: 'string', required: false }
       - { label: 'URL', name: 'url', widget: 'string', required: false }
       - { label: 'PDF', name: 'pdf', widget: 'string', required: false }
+      - { label: 'Short Venue', name: 'venueShort', widget: 'string', required: false, hint: 'e.g. NeurIPS (editorial venue tile)' }
+      - { label: 'Topic', name: 'topic', widget: 'string', required: false, hint: 'Research area id from Research Areas, e.g. nlp. Unmatched topics are filed under Other.' }
+      - { label: 'Note', name: 'note', widget: 'string', required: false, hint: 'e.g. Oral, Spotlight' }
+      - { label: 'arXiv ID', name: 'arxiv', widget: 'string', required: false, hint: 'e.g. 2410.12459' }
+      - { label: 'Code URL', name: 'code', widget: 'string', required: false }
       - { label: 'Abstract', name: 'abstract', widget: 'text', required: false }
       - {
           label: 'Image',
@@ -420,6 +437,43 @@ collections:
               - { label: 'Light', value: 'light' }
               - { label: 'Dark', value: 'dark' }
               - { label: 'System', value: 'system' }
+          - label: 'Visual Theme'
+            name: 'theme'
+            widget: 'select'
+            default: 'classic'
+            options:
+              - { label: 'Classic', value: 'classic' }
+              - { label: 'Editorial', value: 'editorial' }
+          - label: 'Editorial Theme Content'
+            name: 'editorial'
+            widget: 'object'
+            required: false
+            collapsed: true
+            hint: 'Used only by the editorial theme. Name, email and links come from Author and Socials.'
+            fields:
+              - { label: 'Eyebrow', name: 'eyebrow', widget: 'string', required: false, hint: 'Small label above your name, e.g. "Associate Professor · Computer Science"' }
+              - { label: 'Tagline', name: 'tagline', widget: 'string', required: false }
+              - { label: 'Bio', name: 'bio', widget: 'markdown', required: false }
+              - label: 'Hero Figure'
+                name: 'figure'
+                widget: 'object'
+                required: false
+                fields:
+                  - { label: 'Image', name: 'image', widget: 'image', required: false, media_folder: '/public/images', public_folder: '/images' }
+                  - { label: 'Alt Text', name: 'alt', widget: 'string', required: false }
+                  - { label: 'Caption', name: 'caption', widget: 'string', required: false }
+              - label: 'Affiliations'
+                name: 'affiliations'
+                widget: 'list'
+                required: false
+                field: { label: 'Affiliation', name: 'affiliation', widget: 'string' }
+              - label: 'Contact Footer'
+                name: 'contact'
+                widget: 'object'
+                required: false
+                fields:
+                  - { label: 'Heading', name: 'heading', widget: 'string', required: false }
+                  - { label: 'Text', name: 'text', widget: 'text', required: false }
           - { label: 'Site Title', name: 'title', widget: 'string' }
           - { label: 'Description', name: 'description', widget: 'text' }
           - { label: 'Author', name: 'author', widget: 'string' }
@@ -1175,6 +1229,7 @@ collections:
         label: 'Research Areas'
         file: 'config/research.yml'
         fields:
+          - { label: 'Headline', name: 'headline', widget: 'string', required: false, hint: 'Editorial theme: heading of the home research section and the Research page' }
           - label: 'Research Page Description'
             name: 'description'
             widget: 'text'
@@ -1186,8 +1241,15 @@ collections:
             required: false
             hint: 'Define your research focus areas shown on the Research page'
             fields:
+              - { label: 'ID', name: 'id', widget: 'string', required: false, hint: 'Page anchor and publication topic key, e.g. nlp. Defaults to the title, slugified.' }
+              - { label: 'Short Label', name: 'label', widget: 'string', required: false, hint: 'Editorial theme: publication filter label' }
               - { label: 'Title', name: 'title', widget: 'string' }
               - { label: 'Description', name: 'description', widget: 'text' }
+              - { label: 'Body', name: 'body', widget: 'markdown', required: false, hint: 'Editorial theme: long form on the Research page' }
+              - { label: 'Result', name: 'result', widget: 'text', required: false }
+              - { label: 'Figure', name: 'figure', widget: 'image', required: false, media_folder: '/public/images', public_folder: '/images' }
+              - { label: 'Figure Caption', name: 'caption', widget: 'string', required: false }
+              - { label: 'Related Publications', name: 'publications', widget: 'relation', collection: 'publications', value_field: '{{slug}}', search_fields: ['title'], display_fields: ['title'], multiple: true, required: false }
               - label: 'Tags'
                 name: 'tags'
                 widget: 'list'

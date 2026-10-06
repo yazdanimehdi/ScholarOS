@@ -23,6 +23,7 @@
     "check:themes": "node scripts/check-themes.mjs"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "6.3.10",
     "@astrojs/mdx": "^4.0.0",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",

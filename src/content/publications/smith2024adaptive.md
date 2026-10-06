@@ -14,4 +14,8 @@ featured: true
 abstract: 'We present a novel approach to efficiently adapt large language models to specialized domains with limited training data, achieving state-of-the-art results while requiring significantly fewer compute resources.'
 bibtex: "@inproceedings{smith2024adaptive,\n  title={Adaptive Fine-Tuning Strategies for Large Language Models in Low-Resource Domains},\n  author={Smith, Jane and Chen, Alex and Liu, Wei and Johnson, Sarah},\n  booktitle={Proceedings of EMNLP},\n  year={2024}\n}"
 image: ''
+venueShort: 'EMNLP'
+topic: 'nlp'
+note: 'Oral'
+code: 'https://github.com/example-lab/nlp-toolkit'
 ---

@@ -12,4 +12,6 @@ featured: true
 abstract: 'A comprehensive survey of multimodal learning approaches that combine visual and textual information, covering architectures, training strategies, and evaluation methodologies.'
 bibtex: "@inproceedings{chen2024multimodal,\n  title={Bridging Vision and Language: A Survey of Multimodal Learning Approaches},\n  author={Chen, Alex and Smith, Jane},\n  booktitle={Proceedings of ACL},\n  year={2024}\n}"
 image: ''
+venueShort: 'ACL'
+topic: 'multimodal'
 ---

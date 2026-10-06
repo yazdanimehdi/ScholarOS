@@ -18,6 +18,11 @@ export async function getSearchItems(): Promise<SearchItem[]> {
     getCollection('talks'),
   ]);
 
+  // Sort by id: glob-loader order varies between builds, which would reshuffle the index.
+  for (const c of [posts, publications, people, projects, announcements, positions]) {
+    c.sort((a, b) => a.id.localeCompare(b.id));
+  }
+
   const items: SearchItem[] = [];
 
   for (const post of posts) {

@@ -163,9 +163,26 @@ export interface BackgroundConfig {
   dark?: BackgroundModeConfig;
 }
 
+export interface EditorialFigure {
+  image: string;
+  alt?: string;
+  caption?: string;
+}
+
+export interface EditorialConfig {
+  eyebrow?: string;
+  tagline?: string;
+  /** Markdown */
+  bio?: string;
+  figure?: EditorialFigure;
+  affiliations?: string[];
+  contact?: { heading?: string; text?: string };
+}
+
 export interface SiteConfig {
   siteMode: 'personal' | 'lab';
   theme?: ThemeName;
+  editorial?: EditorialConfig;
   title: string;
   description: string;
   author: string;

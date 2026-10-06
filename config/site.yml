@@ -11,6 +11,28 @@ direction: 'ltr' # "ltr" (left-to-right) or "rtl" (right-to-left)
 # Default theme when no user preference is saved
 defaultTheme: 'light' # "light" | "dark" | "system"
 
+# Visual theme: "classic" (default) or "editorial" (restrained researcher layout).
+# Build-time override: SCHOLAROS_THEME=editorial pnpm build
+theme: 'classic'
+
+# Editorial theme content (ignored by the classic theme). Name, email and links come from
+# author/socials below. Without `figure` the home hero is a single column.
+editorial:
+  eyebrow: 'Associate Professor · Computer Science'
+  tagline: 'Language technology that works for every language, and that people can trust.'
+  bio: 'I lead the Smith Research Lab at the **University of Technology**, where we study natural language processing, multimodal learning and AI safety. Before that I was an assistant professor at **Previous University**.'
+  figure:
+    image: '/images/hero-figure.svg'
+    alt: 'Line drawing of a graph in which three highlighted nodes form a small cluster'
+    caption: 'Attention concentrates on a few tokens of a long input, the idea behind adaptive fine-tuning.'
+  affiliations:
+    - 'University of Technology'
+    - 'Previous University'
+    - 'University of Example'
+  contact:
+    heading: 'Interested in collaborating?'
+    text: 'I am open to research collaborations, talks and conversations about language technology and AI safety.'
+
 # Top bar (thin bar above header)
 topBar:
   enabled: true
@@ -42,10 +64,10 @@ hero:
 
 # Typography
 fonts:
-  families:
-    sans: 'Roboto' # Body text, UI elements
-    serif: 'Roboto Slab' # Headings
-    mono: 'Roboto Mono' # Code blocks
+  # families:                 # optional; theme defaults when unset
+  #   sans: 'Roboto'          # classic default; editorial default 'IBM Plex Sans'
+  #   serif: 'Roboto Slab'    # classic default; editorial default 'Source Serif 4'
+  #   mono: 'Roboto Mono'     # classic default; editorial default 'IBM Plex Mono'
   sizes:
     base: '1.2rem' # Body text (default: 1rem / 16px)
     sm: '0.95rem' # Meta text, dates, tags (default: 0.875rem / 14px)

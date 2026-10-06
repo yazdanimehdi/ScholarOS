@@ -53,6 +53,8 @@ const announcements = defineCollection({
       emoji: z.string().optional(),
       excerpt: z.string().optional(),
       people: z.array(z.string()).optional(),
+      // The CMS writes '' for an untouched select; treat it as unset.
+      datePrecision: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['day', 'month', 'year']).default('month')),
     }),
 });
 
@@ -87,6 +89,8 @@ const posts = defineCollection({
       tags: z.array(z.string()).optional(),
       keywords: z.string().optional(),
       draft: z.boolean().default(false),
+      subtitle: emptyToUndefined,
+      relatedPublication: emptyToUndefined,
     }),
 });
 
@@ -106,6 +110,11 @@ const publications = defineCollection({
       featured: z.boolean().default(false),
       abstract: z.string().optional(),
       image: image().optional(),
+      venueShort: emptyToUndefined,
+      topic: emptyToUndefined,
+      note: emptyToUndefined,
+      arxiv: emptyToUndefined,
+      code: optionalUrl,
     }),
 });
 
