@@ -5,6 +5,7 @@ import {
   homeBlocks,
   isOwner,
   jsonLd,
+  featuredFirst,
   mergeWriting,
   normalizeAreas,
   paperLink,
@@ -167,4 +168,13 @@ test('homeBlocks: hero, affiliations, research, then papers/updates in configure
 
 test('jsonLd: escapes "<" so content cannot close the script tag', () => {
   assert.equal(jsonLd({ t: '</script>' }), '{"t":"\\u003c/script>"}');
+});
+
+test('featuredFirst: featured site posts lead, each group keeps its order', () => {
+  const item = (href: string, featured?: boolean) => ({ kind: 'site' as const, title: href, href, date: new Date(0), featured });
+  const out = featuredFirst([item('/a'), item('/b', true), item('/c'), item('/d', true)]);
+  assert.deepEqual(
+    out.map((i) => i.href),
+    ['/b', '/d', '/a', '/c'],
+  );
 });

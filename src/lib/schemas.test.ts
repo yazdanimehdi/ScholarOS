@@ -44,3 +44,20 @@ test('feeds config: hidden is a list of ids', () => {
   assert.ok(feedsConfigSchema.safeParse({ feeds: [], hidden: ['feed-1'] }).success);
   assert.ok(!feedsConfigSchema.safeParse({ hidden: 'feed-1' }).success);
 });
+
+test('Sveltia config exposes the new fields (featured, visible, hidden)', () => {
+  type Field = { name: string; fields?: Field[]; field?: Field };
+  type Coll = { name: string; fields?: Field[]; files?: { name: string; fields: Field[] }[] };
+  const cms = yaml.load(fs.readFileSync('config/cms.yml', 'utf8')) as { collections: Coll[] };
+  const names = (fields: Field[] = []) => fields.map((f) => f.name);
+  const posts = cms.collections.find((c) => c.name === 'posts')!;
+  assert.ok(names(posts.fields).includes('featured'));
+  const files = cms.collections.find((c) => c.name === 'settings')!.files!;
+  assert.ok(names(files.find((f) => f.name === 'feeds')!.fields).includes('hidden'));
+  const sections = files
+    .find((f) => f.name === 'cv')!
+    .fields[0].fields!.find((f) => f.name === 'sections')!.fields!;
+  for (const s of ['education', 'experience', 'publications', 'awards', 'skills']) {
+    assert.ok(names(sections.find((f) => f.name === s)!.fields).includes('visible'), `cv ${s} has visible`);
+  }
+});

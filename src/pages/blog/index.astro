@@ -3,7 +3,8 @@ import ClassicBlog from '../../themes/classic/Blog.astro';
 import EditorialBlog from '../../themes/editorial/Blog.astro';
 import { loadBlog } from '../../themes/editorial/data';
 import { getCollection } from 'astro:content';
-import { getTheme, isPersonalMode } from '../../lib/config';
+import { getTheme, hiddenFeedIds, isPersonalMode } from '../../lib/config';
+import { withoutHidden } from '../../lib/utils';
 
 const personal = isPersonalMode();
 
@@ -11,7 +12,7 @@ const posts = (await getCollection('posts'))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const feeds = (await getCollection('feeds')).sort(
+const feeds = withoutHidden(await getCollection('feeds'), hiddenFeedIds()).sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
 );
 

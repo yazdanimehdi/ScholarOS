@@ -46,12 +46,15 @@ export function sectionTitle(key: string): string {
   return key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
 }
 
-/** All non-empty list sections, in YAML order. */
+/** All non-empty list sections in YAML order, without entries marked `visible: false`. */
 export function cvSections(cv: CvData): [string, unknown[]][] {
-  return Object.entries(cv.sections ?? {}).filter(([, entries]) => Array.isArray(entries) && entries.length > 0) as [
-    string,
-    unknown[],
-  ][];
+  return Object.entries(cv.sections ?? {}).flatMap(([key, entries]): [string, unknown[]][] => {
+    if (!Array.isArray(entries)) return [];
+    const shown = (entries as unknown[]).filter(
+      (e) => !(typeof e === 'object' && e !== null && (e as { visible?: unknown }).visible === false),
+    );
+    return shown.length > 0 ? [[key, shown]] : [];
+  });
 }
 
 /** True when some section already lists publications (title + authors), so the collection fallback is skipped. */

@@ -84,3 +84,18 @@ test('cvEntryView: each RenderCV entry shape', () => {
   assert.equal(cvEntryView({ foo: 1 }), null);
   assert.equal(cvEntryView(42), null);
 });
+
+test('cvSections: entries with visible: false are hidden, and a section left empty disappears', () => {
+  const cv = {
+    name: 'x',
+    sections: {
+      education: [{ institution: 'A', visible: false }, { institution: 'B' }],
+      awards: [{ label: 'L', details: 'D', visible: false }],
+      summary: ['text'],
+    },
+  } as unknown as CvData;
+  assert.deepEqual(cvSections(cv), [
+    ['education', [{ institution: 'B' }]],
+    ['summary', ['text']],
+  ]);
+});

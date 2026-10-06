@@ -151,6 +151,8 @@ export interface WritingItem {
   minutes?: number;
   /** Site only: first tag. */
   tag?: string;
+  /** Site only: "Show on home page". */
+  featured?: boolean;
 }
 
 const time = (d: Date) => (Number.isFinite(d.getTime()) ? d.getTime() : -Infinity);
@@ -158,6 +160,11 @@ const time = (d: Date) => (Number.isFinite(d.getTime()) ? d.getTime() : -Infinit
 /** Newest first (ties by href); items with unparseable dates go last. */
 export function mergeWriting(items: WritingItem[]): WritingItem[] {
   return [...items].sort((a, b) => time(b.date) - time(a.date) || a.href.localeCompare(b.href));
+}
+
+/** Home page order: featured site posts first; each group keeps its newest-first order. */
+export function featuredFirst(items: WritingItem[]): WritingItem[] {
+  return [...items.filter((i) => i.featured), ...items.filter((i) => !i.featured)];
 }
 
 /** Label for the third Writing tab: the one shared feed source ("Medium"), else "Elsewhere". */

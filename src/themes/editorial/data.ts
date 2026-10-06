@@ -8,9 +8,10 @@ import {
   sectionTitle,
   type CvEntryView,
 } from '../../lib/cv';
-import { getHomepageSections, getSiteConfig, getSiteName, loadYamlConfig } from '../../lib/config';
+import { getHomepageSections, getSiteConfig, getSiteName, hiddenFeedIds, loadYamlConfig } from '../../lib/config';
 import {
   elsewhereLabel,
+  featuredFirst,
   homeBlocks,
   isOwner,
   mergeWriting,
@@ -22,7 +23,7 @@ import {
   type WritingItem,
 } from '../../lib/editorial';
 import { renderMarkdown } from '../../lib/markdown';
-import { byId as idOrder, readingTime } from '../../lib/utils';
+import { byId as idOrder, readingTime, withoutHidden } from '../../lib/utils';
 
 export function loadResearchConfig(): ResearchConfig {
   try {
@@ -45,7 +46,7 @@ export function pick<T>(ids: string[], byId: Map<string, T>, where: string): T[]
 /** Site posts (non-draft) and feed items, newest first. External items never carry content. */
 export async function writingItems(): Promise<WritingItem[]> {
   const posts = (await getCollection('posts')).filter((p) => !p.data.draft);
-  const feeds = await getCollection('feeds');
+  const feeds = withoutHidden(await getCollection('feeds'), hiddenFeedIds());
   return mergeWriting([
     ...posts.map((p) => ({
       kind: 'site' as const,
@@ -55,6 +56,7 @@ export async function writingItems(): Promise<WritingItem[]> {
       excerpt: p.data.excerpt,
       minutes: readingTime(p.body ?? ''),
       tag: p.data.tags?.[0],
+      featured: p.data.featured,
     })),
     ...feeds.map((f) => ({
       kind: 'external' as const,
@@ -100,7 +102,7 @@ export async function loadHome() {
       .sort(idOrder)
       .sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned) || b.data.date.getTime() - a.data.date.getTime())
       .slice(0, 5),
-    writing: (await writingItems()).slice(0, 3),
+    writing: featuredFirst(await writingItems()).slice(0, 3),
   };
 }
 

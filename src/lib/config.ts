@@ -89,3 +89,12 @@ export function loadYamlConfig<T>(filename: string): T {
   const raw = fs.readFileSync(configPath, 'utf-8');
   return yaml.load(raw) as T;
 }
+
+/** Feed item ids hidden from the site (`hidden:` in config/feeds.yml). */
+export function hiddenFeedIds(): string[] {
+  try {
+    return loadYamlConfig<{ hidden?: string[] } | null>('feeds.yml')?.hidden ?? [];
+  } catch {
+    return [];
+  }
+}

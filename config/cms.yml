@@ -202,6 +202,7 @@ collections:
           default: true,
           hint: 'Draft posts are hidden from the site. Turn off to publish.',
         }
+      - { label: 'Show on home page', name: 'featured', widget: 'boolean', default: false, required: false }
       - { label: 'Author', name: 'author', widget: 'string', required: false }
       - { label: 'Excerpt', name: 'excerpt', widget: 'string', required: false }
       - { label: 'Cover Image', name: 'coverImage', widget: 'image', required: false }
@@ -1171,6 +1172,7 @@ collections:
                         widget: 'list'
                         required: false
                         field: { label: 'Highlight', name: 'highlight', widget: 'string' }
+                      - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
                   - label: 'Experience'
                     name: 'experience'
                     widget: 'list'
@@ -1191,6 +1193,7 @@ collections:
                         widget: 'list'
                         required: false
                         field: { label: 'Highlight', name: 'highlight', widget: 'string' }
+                      - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
                   - label: 'Publications'
                     name: 'publications'
                     widget: 'list'
@@ -1207,6 +1210,7 @@ collections:
                       - { label: 'Date / Year', name: 'date', widget: 'string', hint: 'e.g. 2025 or 2025-01' }
                       - { label: 'DOI', name: 'doi', widget: 'string', required: false }
                       - { label: 'URL', name: 'url', widget: 'string', required: false }
+                      - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
                   - label: 'Awards'
                     name: 'awards'
                     widget: 'list'
@@ -1214,6 +1218,7 @@ collections:
                     fields:
                       - { label: 'Award', name: 'label', widget: 'string' }
                       - { label: 'Year / Details', name: 'details', widget: 'string' }
+                      - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
                   - label: 'Skills'
                     name: 'skills'
                     widget: 'list'
@@ -1221,6 +1226,7 @@ collections:
                     fields:
                       - { label: 'Category', name: 'label', widget: 'string' }
                       - { label: 'Details', name: 'details', widget: 'string' }
+                      - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
           - label: 'Design'
             name: 'design'
             widget: 'object'
@@ -1253,6 +1259,11 @@ collections:
               - { label: 'Daily', value: 'daily' }
               - { label: 'Weekly', value: 'weekly' }
           - { label: 'Max Items per Feed', name: 'maxItemsPerFeed', widget: 'number', default: 20, value_type: 'int' }
+          - label: 'Hidden feed items'
+            name: 'hidden'
+            widget: 'list'
+            required: false
+            hint: 'Ids from src/data/feeds.json to hide from the site. The custom admin manages this list.'
 
       - name: 'scholar'
         label: 'Google Scholar Sync'

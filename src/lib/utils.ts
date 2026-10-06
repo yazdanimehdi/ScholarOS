@@ -116,3 +116,9 @@ export function formatNewsDate(date: Date, precision: DatePrecision = 'month'): 
 
 /** The content layer's entry order is not stable, so lists get an id tie-break before their real sort. */
 export const byId = (a: { id: string }, b: { id: string }) => a.id.localeCompare(b.id);
+
+/** Feed items minus the ids listed in config/feeds.yml `hidden`. */
+export function withoutHidden<T extends { id: string }>(items: T[], hidden: string[]): T[] {
+  const set = new Set(hidden);
+  return items.filter((item) => !set.has(item.id));
+}

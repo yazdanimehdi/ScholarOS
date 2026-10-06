@@ -4,8 +4,8 @@ import EditorialHome from '../themes/editorial/Home.astro';
 import { loadHome } from '../themes/editorial/data';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
-import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections, getTheme } from '../lib/config';
-import { byId } from '../lib/utils';
+import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections, getTheme, hiddenFeedIds } from '../lib/config';
+import { byId, withoutHidden } from '../lib/utils';
 
 const config = getSiteConfig();
 const personal = isPersonalMode();
@@ -71,7 +71,7 @@ const posts = sections.includes('blog')
   : [];
 
 const feeds = sections.includes('blog')
-  ? (await getCollection('feeds'))
+  ? withoutHidden(await getCollection('feeds'), hiddenFeedIds())
       .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
       .slice(0, 2)
   : [];

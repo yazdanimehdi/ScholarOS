@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatNewsDate, readingTime } from './utils';
+import { formatNewsDate, readingTime, withoutHidden } from './utils';
 
 // West of UTC: date-only frontmatter (UTC midnight) must not slip to the previous day.
 process.env.TZ = 'America/Los_Angeles';
@@ -23,4 +23,10 @@ test('readingTime: ceil(words / 230), at least 1 minute', () => {
   assert.equal(readingTime('word '.repeat(230)), 1);
   assert.equal(readingTime('word '.repeat(231)), 2);
   assert.equal(readingTime('  spaced\n\nout\twords  '), 1);
+});
+
+test('withoutHidden drops listed feed ids only', () => {
+  const items = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.deepEqual(withoutHidden(items, ['b', 'zzz']), [{ id: 'a' }, { id: 'c' }]);
+  assert.deepEqual(withoutHidden(items, []), items);
 });
