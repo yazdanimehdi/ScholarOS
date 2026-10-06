@@ -5,6 +5,7 @@ import { Window } from 'happy-dom';
 // Tiptap needs a DOM even without a mounted view.
 const window = new Window();
 window.document.write('<!DOCTYPE html><html><body></body></html>');
+Object.defineProperty(window.document, 'compatMode', { value: 'CSS1Compat' });
 Object.assign(globalThis, { window, document: window.document });
 for (const key of ['navigator', 'Node', 'HTMLElement', 'Element', 'getComputedStyle', 'DOMParser', 'MutationObserver']) {
   (globalThis as Record<string, unknown>)[key] ??= (window as unknown as Record<string, unknown>)[key];
