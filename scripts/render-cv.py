@@ -233,13 +233,23 @@ def is_publication(entry) -> bool:
 
 def read_front_matter(path: Path) -> dict:
     match = re.match(r"^---\r?\n(.*?)\r?\n---", path.read_text(encoding="utf-8"), re.S)
-    return (yaml.safe_load(match.group(1)) or {}) if match else {}
+    if not match:
+        return {}
+    try:
+        data = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as e:
+        print(f"WARNING: skipping {path.name}: {e}")
+        return {}
+    if data is not None and not isinstance(data, dict):
+        print(f"WARNING: skipping {path.name}: front matter is not a mapping")
+        return {}
+    return data or {}
 
 
 def collection_publications(directory: Path = PUBLICATIONS_DIR) -> list:
     """RenderCV publication entries built from the publications collection, newest first."""
     entries = []
-    for path in sorted(directory.glob("*.md*")):
+    for path in sorted([*directory.glob("*.md"), *directory.glob("*.mdx")]):
         data = read_front_matter(path)
         if not data.get("title"):
             continue
@@ -266,11 +276,14 @@ def build_rendercv_input(config: dict, with_collection: bool = False) -> dict:
     converted = convert_keys(config)
 
     cv = converted.get("cv", {})
-    sections_raw = drop_hidden(cv.pop("sections", {}))
+    written = cv.pop("sections", {}) or {}
+    # Decided before hiding: a CV that lists its own publications (even all hidden) never gets the collection.
+    has_own_publications = any(
+        isinstance(entries, list) and entries and is_publication(entries[0]) for entries in written.values()
+    )
+    sections_raw = drop_hidden(written)
 
-    if with_collection and not any(
-        isinstance(entries, list) and entries and is_publication(entries[0]) for entries in sections_raw.values()
-    ):
+    if with_collection and not has_own_publications:
         publications = collection_publications()
         if publications:
             sections_raw["publications"] = publications

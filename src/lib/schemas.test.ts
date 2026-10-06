@@ -61,4 +61,10 @@ test('Sveltia config exposes the new fields (featured, visible, hidden)', () => 
   for (const s of ['education', 'experience', 'publications', 'awards', 'skills']) {
     assert.ok(names(sections.find((f) => f.name === s)!.fields).includes('visible'), `cv ${s} has visible`);
   }
+  const personCv = cms.collections.find((c) => c.name === 'person-cvs')!.fields!.find((f) => f.name === 'cv')!;
+  const personSections = personCv.fields!.find((f) => f.name === 'sections')!.fields!;
+  assert.ok(personSections.length > 0);
+  for (const s of personSections.filter((f) => f.fields)) {
+    assert.equal(names(s.fields).at(-1), 'visible', `person-cvs ${s.name} ends with visible`);
+  }
 });

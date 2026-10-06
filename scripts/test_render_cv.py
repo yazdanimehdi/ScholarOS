@@ -30,4 +30,17 @@ assert out["cv"]["sections"]["publications"], "filled from src/content/publicati
 own_pubs = {"cv": {"name": "N", "sections": {"selected": [{"title": "T", "authors": ["A"]}]}}}
 assert "publications" not in rc.build_rendercv_input(own_pubs, with_collection=True)["cv"]["sections"]
 assert "publications" not in rc.build_rendercv_input(hidden_only)["cv"]["sections"], "per-person CVs stay as written"
+
+# Malformed or non-mapping front matter is skipped with a warning; backups are not publications.
+with tempfile.TemporaryDirectory() as d:
+    Path(d, "good.md").write_text("---\ntitle: Good\nauthors: [A]\n---\n")
+    Path(d, "bad.md").write_text("---\ntitle: [unclosed\n---\n")
+    Path(d, "list.md").write_text("---\n- a\n- b\n---\n")
+    Path(d, "good.md.bak").write_text("---\ntitle: Backup\nauthors: [A]\n---\n")
+    Path(d, "mdx.mdx").write_text("---\ntitle: Mdx\nauthors: [A]\n---\n")
+    assert sorted(p["title"] for p in rc.collection_publications(Path(d))) == ["Good", "Mdx"]
+
+# A CV whose own publications are all hidden keeps them hidden instead of showing the collection.
+all_hidden = {"cv": {"name": "N", "sections": {"selected": [{"title": "T", "authors": ["A"], "visible": False}]}}}
+assert "publications" not in rc.build_rendercv_input(all_hidden, with_collection=True)["cv"]["sections"]
 print("render-cv self-check passed")

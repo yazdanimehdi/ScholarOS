@@ -390,6 +390,7 @@ collections:
                       required: false,
                       field: { label: 'Highlight', name: 'highlight', widget: 'string' },
                     }
+                  - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
               - label: 'Experience'
                 name: 'experience'
                 widget: 'list'
@@ -407,6 +408,7 @@ collections:
                       required: false,
                       field: { label: 'Highlight', name: 'highlight', widget: 'string' },
                     }
+                  - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
               - label: 'Publications'
                 name: 'publications'
                 widget: 'list'
@@ -424,6 +426,7 @@ collections:
                   - { label: 'Date', name: 'date', widget: 'string' }
                   - { label: 'DOI', name: 'doi', widget: 'string', required: false }
                   - { label: 'URL', name: 'url', widget: 'string', required: false }
+                  - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
               - label: 'Awards'
                 name: 'awards'
                 widget: 'list'
@@ -431,6 +434,7 @@ collections:
                 fields:
                   - { label: 'Award', name: 'label', widget: 'string' }
                   - { label: 'Details', name: 'details', widget: 'string' }
+                  - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
               - label: 'Skills'
                 name: 'skills'
                 widget: 'list'
@@ -438,6 +442,7 @@ collections:
                 fields:
                   - { label: 'Category', name: 'label', widget: 'string' }
                   - { label: 'Details', name: 'details', widget: 'string' }
+                  - { label: 'Visible', name: 'visible', widget: 'boolean', default: true, required: false }
       - label: 'Design'
         name: 'design'
         widget: 'object'
