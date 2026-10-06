@@ -11,7 +11,7 @@ export const onRequest: MiddlewareHandler = async (ctx, next) => {
   if (ctx.isPrerendered) return next();
   const { pathname } = ctx.url;
   const { adminPath, adminUsers } = adminSettings();
-  const api = pathname.startsWith('/api/admin/');
+  const api = pathname === '/api/admin' || pathname.startsWith('/api/admin/');
   const page = pathname === `/${adminPath}` || pathname.startsWith(`/${adminPath}/`);
   if (!api && !page) return next();
 

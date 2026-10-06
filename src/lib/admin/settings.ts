@@ -25,6 +25,10 @@ export function loadAdminSettings(root = process.cwd()): AdminSettings {
   const site = read('site.yml');
   const cms = read('cms.yml');
   const mediaFolder = trimSlashes(String(cms.media_folder ?? 'src/assets/images'));
+  // The folder is the root of the upload allowlist: '', '/', '.' or '..' would widen it to the repo or beyond.
+  if (mediaFolder.split('/').some((s) => s === '' || s === '.' || s === '..')) {
+    throw new Error('config/cms.yml media_folder must be a relative folder inside the repo');
+  }
   return {
     adminPath: trimSlashes(String(site.adminPath || 'admin')),
     adminUsers: Array.isArray(site.adminUsers) ? site.adminUsers.map(String) : [],

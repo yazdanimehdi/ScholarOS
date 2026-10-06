@@ -19,6 +19,13 @@ test('tampered, wrong-key and malformed tokens are rejected', async () => {
   assert.equal(await openSession('', SECRET), null);
 });
 
+test('a payload without name or avatar opens with safe defaults', async () => {
+  const token = await sealSession({ login: 'jane' } as never, SECRET);
+  assert.deepEqual(await openSession(token, SECRET), { login: 'jane', name: 'jane', avatar: '' });
+  const odd = await sealSession({ login: 'jane', name: 5, avatar: { x: 1 } } as never, SECRET);
+  assert.deepEqual(await openSession(odd, SECRET), { login: 'jane', name: 'jane', avatar: '' });
+});
+
 test('sessions expire after 7 days', async () => {
   const now = Date.UTC(2026, 0, 1);
   const token = await sealSession(user, SECRET, now);

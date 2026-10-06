@@ -37,6 +37,16 @@ test('loadAdminSettings defaults: admin path, empty users, lab name in lab mode'
   assert.equal(s.publicFolder, '/public/uploads');
 });
 
+test('loadAdminSettings refuses a media_folder outside the repo', () => {
+  for (const folder of ["''", "'/'", "'.'", "'../outside'", "'src/../../x'", "'src/..'"]) {
+    assert.throws(
+      () => loadAdminSettings(fixture('author: A\n', `media_folder: ${folder}\n`)),
+      { message: 'config/cms.yml media_folder must be a relative folder inside the repo' },
+      folder,
+    );
+  }
+});
+
 test('isAdminUser: usernames or profile URLs, case-insensitive', () => {
   const users = ['JaneSmith', 'https://github.com/alex-chen/', '@maria'];
   assert.ok(isAdminUser('janesmith', users));

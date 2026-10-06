@@ -46,9 +46,18 @@ export async function openSession(token: string, secret: string, now = Date.now(
   try {
     const raw = Buffer.from(token, 'base64url');
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.subarray(0, 12) }, key, raw.subarray(12));
-    const p = JSON.parse(new TextDecoder().decode(plain)) as SessionUser & { exp: unknown };
+    const p = JSON.parse(new TextDecoder().decode(plain)) as {
+      login: unknown;
+      name: unknown;
+      avatar: unknown;
+      exp: unknown;
+    };
     if (typeof p.exp !== 'number' || p.exp * 1000 <= now || typeof p.login !== 'string') return null;
-    return { login: p.login, name: p.name, avatar: p.avatar };
+    return {
+      login: p.login,
+      name: typeof p.name === 'string' ? p.name : p.login,
+      avatar: typeof p.avatar === 'string' ? p.avatar : '',
+    };
   } catch {
     return null;
   }

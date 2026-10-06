@@ -42,8 +42,8 @@ export const GET: APIRoute = async ({ cookies, redirect, url }) => {
       Accept: 'application/vnd.github+json',
       'User-Agent': 'ScholarOS-admin',
     },
-  });
-  if (!res.ok) return fail('expired');
+  }).catch(() => null);
+  if (!res?.ok) return fail('expired');
   const gh = (await res.json()) as { login: string; name?: string | null; avatar_url?: string };
   if (!isAdminUser(gh.login, adminUsers)) return fail('denied');
 

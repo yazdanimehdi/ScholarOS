@@ -68,3 +68,14 @@ test('an admin login gets a session cookie and lands on the admin', async () => 
   assert.equal(location, `/${adminPath}`);
   assert.equal((await openSession(session!, process.env.SESSION_SECRET!))?.login, login.toUpperCase());
 });
+
+test('a network error fetching the GitHub user → expired, no session cookie', async () => {
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    if (String(input) === 'https://github.com/login/oauth/access_token')
+      return Response.json({ access_token: 'gho_x' });
+    throw new TypeError('fetch failed');
+  }) as typeof fetch;
+  const { location, session } = await run('?code=c&state=abc', 'abc');
+  assert.equal(location, `/${adminPath}/login?error=expired`);
+  assert.equal(session, undefined);
+});

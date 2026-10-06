@@ -70,3 +70,10 @@ test('a valid session for a login no longer in adminUsers is treated as signed o
   assert.equal(page.status, 302);
   assert.equal(page.headers.get('location'), `${admin}/login`);
 });
+
+test('the bare /api/admin path is guarded too', async () => {
+  const res = await run(context('/api/admin'));
+  assert.equal(res.status, 401);
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+  assert.equal((await run(context('/api/admin', { method: 'POST', origin: 'https://evil.test' }))).status, 403);
+});
