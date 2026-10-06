@@ -16,9 +16,11 @@ import { GET as pdfStatus, POST as generatePdf } from '../../admin/routes/api/cv
 import { POST as publishCv } from '../../admin/routes/api/cv/publish';
 import { PUT as hideFeed } from '../../admin/routes/api/feeds/hidden';
 import { DELETE as deleteMedia, GET as listMedia, POST as uploadMedia } from '../../admin/routes/api/media';
+import { POST as syncFeedsRoute } from '../../admin/routes/api/feeds/sync';
+import { GET as me } from '../../admin/routes/api/me';
 import { adminSettings } from './settings';
-import { commitChanges } from './http';
-import type { ContentStore } from './store';
+import { commitChanges, route } from './http';
+import { UpstreamError, type ContentStore } from './store';
 
 let store: MemoryStore;
 beforeEach(() => {
@@ -284,4 +286,98 @@ test('collections: creating over an existing slug names the clash', async () => 
     error: 'posts/taken already exists — choose another slug',
     details: { exists: true },
   });
+});
+
+test('media: an entry in a collection subfolder that uses the image blocks deletion', async () => {
+  const image = await (await upload('content')).json();
+  const entry = 'src/content/people/team/jane.md';
+  const photo = `../../../assets/images/${image.path.split('/').pop()}`;
+  await store.commit([{ path: entry, content: `---\nname: Jane\nrole: pi\nphoto: '${photo}'\n---\n` }], 'seed', {
+    [entry]: null,
+  });
+  const refused = await call(deleteMedia, { method: 'DELETE', body: { path: image.path, version: image.version } });
+  assert.equal(refused.status, 409);
+  assert.match((await refused.json()).error, /people\/jane\b/);
+});
+
+test('config: a file with YAML syntax errors names the file instead of a bare 500', async () => {
+  await store.commit([{ path: 'config/site.yml', content: 'title: [unclosed\n' }], 'seed', {
+    'config/site.yml': (await store.read('config/site.yml'))!.version,
+  });
+  const res = await call(getConfig, { params: { file: 'site' } });
+  assert.equal(res.status, 500);
+  assert.match((await res.json()).error, /^config\/site\.yml is not valid YAML: .+\. Fix it in the repository\.$/);
+});
+
+test('a corrupt feeds.json: the dashboard still loads; a sync rewrites it', async () => {
+  const feeds = 'src/data/feeds.json';
+  const old = await store.read(feeds);
+  await store.commit([{ path: feeds, content: '{ not json' }], 'corrupt', { [feeds]: old?.version ?? null });
+  const res = await call(dashboard);
+  assert.equal(res.status, 200);
+  const d = await res.json();
+  assert.deepEqual(d.feedItems, []);
+  assert.equal(d.feedsError, 'src/data/feeds.json is not valid JSON');
+
+  const rss =
+    '<?xml version="1.0"?><rss version="2.0"><channel><title>F</title>' +
+    '<item><title>Post</title><link>https://example.com/p</link><pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate></item>' +
+    '</channel></rss>';
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async () => new Response(rss)) as unknown as typeof fetch;
+  try {
+    const synced = await call(syncFeedsRoute, { method: 'POST' });
+    assert.equal(synced.status, 200);
+    assert.equal((await synced.json()).changed, true);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  assert.ok(Array.isArray(JSON.parse((await store.read(feeds))!.content)));
+});
+
+test('a JSON body that is not an object → 400', async () => {
+  for (const body of [null, 5, []]) {
+    const res = await call(putConfig, { method: 'PUT', params: { file: 'site' }, body });
+    assert.equal(res.status, 400, JSON.stringify(body));
+    assert.equal((await res.json()).error, 'The request body must be a JSON object');
+  }
+});
+
+test('unexpected errors answer a generic 500 and are logged', async () => {
+  const logged: unknown[] = [];
+  const realError = console.error;
+  console.error = (e: unknown) => logged.push(e);
+  try {
+    const res = await call(
+      route(async () => {
+        throw new Error('ENOENT /var/task/secret');
+      }),
+    );
+    assert.equal(res.status, 500);
+    assert.deepEqual(await res.json(), { error: 'Internal error' });
+  } finally {
+    console.error = realError;
+  }
+  assert.equal(logged.length, 1);
+});
+
+test('me: capabilities.error carries UpstreamError messages only', async () => {
+  setStoreForTests(() => {
+    throw new UpstreamError('GITHUB_TOKEN is not set.', 500);
+  });
+  assert.equal((await (await call(me)).json()).capabilities.error, 'GITHUB_TOKEN is not set.');
+  setStoreForTests(() => {
+    throw new Error('ENOENT /var/task/secret');
+  });
+  const realError = console.error;
+  console.error = () => {};
+  try {
+    assert.deepEqual((await (await call(me)).json()).capabilities, {
+      contents: false,
+      actions: false,
+      error: 'Could not check the GitHub token',
+    });
+  } finally {
+    console.error = realError;
+  }
 });

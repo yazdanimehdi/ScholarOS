@@ -43,7 +43,7 @@ function errorResponse(e: unknown): Response {
   if (e instanceof UpstreamError) return json({ error: e.message }, e.status);
   // eslint-disable-next-line no-console
   console.error(e);
-  return json({ error: e instanceof Error ? e.message : 'Internal error' }, 500);
+  return json({ error: 'Internal error' }, 500);
 }
 
 type Handler = (ctx: APIContext, store: ContentStore, user: SessionUser) => Promise<Response>;
@@ -62,11 +62,16 @@ export function route(handler: Handler): APIRoute {
 }
 
 export async function readBody<T>(ctx: APIContext): Promise<T> {
+  let body: unknown;
   try {
-    return (await ctx.request.json()) as T;
+    body = await ctx.request.json();
   } catch {
     throw new HttpError(400, 'The request body must be JSON');
   }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new HttpError(400, 'The request body must be a JSON object');
+  }
+  return body as T;
 }
 
 /** Checks every path against the allowlist, commits once, and returns the new version of each file. */

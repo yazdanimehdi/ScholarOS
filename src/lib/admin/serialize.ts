@@ -1,14 +1,14 @@
 import { isDeepStrictEqual } from 'node:util';
 import { type Document, parse, parseDocument, stringify } from 'yaml';
 
-const FRONT_MATTER = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)([\s\S]*)$/;
+const FRONT_MATTER = /^---\r?\n(?:([\s\S]*?)\r?\n)?---[ \t]*(?:\r?\n|$)([\s\S]*)$/;
 /** No folding (keeps long lines as written), no padding inside [flow, lists]: matches the repo's files. */
 const YAML_OUT = { lineWidth: 0, flowCollectionPadding: false } as const;
 
 export function parseMarkdown(text: string): { data: Record<string, unknown>; body: string } {
   const match = FRONT_MATTER.exec(text);
   if (!match) return { data: {}, body: text };
-  return { data: (parse(match[1]) ?? {}) as Record<string, unknown>, body: match[2].replace(/^\r?\n/, '') };
+  return { data: (parse(match[1] ?? '') ?? {}) as Record<string, unknown>, body: match[2].replace(/^\r?\n/, '') };
 }
 
 /** `---\n<yaml>---\n\n<body>`: keys in `keyOrder` first, then the rest in their existing order. */

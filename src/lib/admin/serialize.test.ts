@@ -23,6 +23,8 @@ test('front matter: schema order first, unknown keys after, raw values kept', ()
 
 test('front matter: no front matter, empty body, undefined values', () => {
   assert.deepEqual(parseMarkdown('Just text'), { data: {}, body: 'Just text' });
+  assert.deepEqual(parseMarkdown('---\n---\n\nBody\n'), { data: {}, body: 'Body\n' });
+  assert.deepEqual(parseMarkdown(serializeMarkdown({}, 'B', [])), { data: {}, body: 'B\n' });
   assert.equal(serializeMarkdown({ title: 'T', gone: undefined }, '', ['title']), '---\ntitle: T\n---\n');
 });
 

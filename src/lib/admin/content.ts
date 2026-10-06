@@ -68,8 +68,16 @@ export async function readConfig(
   file: ConfigFile,
 ): Promise<{ data: Record<string, unknown>; version: string | null; source: string }> {
   const found = await store.read(configPath(file));
+  let data: unknown;
+  try {
+    data = found ? parse(found.content) : null;
+  } catch (e) {
+    // yaml's message is "<problem> at line L, column C:" plus a code frame; the first line is enough.
+    const message = (e as Error).message.split('\n')[0].replace(/:$/, '');
+    throw new HttpError(500, `${configPath(file)} is not valid YAML: ${message}. Fix it in the repository.`);
+  }
   return {
-    data: ((found ? parse(found.content) : null) ?? {}) as Record<string, unknown>,
+    data: (data ?? {}) as Record<string, unknown>,
     version: found?.version ?? null,
     source: found?.content ?? '',
   };
