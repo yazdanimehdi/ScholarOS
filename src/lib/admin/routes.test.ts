@@ -6,6 +6,13 @@ import { GET as listCollection } from '../../admin/routes/api/collections/[name]
 import { DELETE as deleteEntry, GET as getEntry, PUT as putEntry } from '../../admin/routes/api/collections/[name]/[slug]';
 import { GET as getConfig, PUT as putConfig } from '../../admin/routes/api/config/[file]';
 import { GET as dashboard } from '../../admin/routes/api/dashboard';
+import fs from 'node:fs';
+import { POST as importCv } from '../../admin/routes/api/cv/import';
+import { GET as pdfStatus, POST as generatePdf } from '../../admin/routes/api/cv/pdf';
+import { POST as publishCv } from '../../admin/routes/api/cv/publish';
+import { PUT as hideFeed } from '../../admin/routes/api/feeds/hidden';
+import { DELETE as deleteMedia, GET as listMedia, POST as uploadMedia } from '../../admin/routes/api/media';
+import { adminSettings } from './settings';
 
 let store: MemoryStore;
 beforeEach(() => {
@@ -100,4 +107,90 @@ test('collections: an .mdx entry refuses PUT and DELETE and never commits', asyn
   assert.equal((await call(putEntry, { method: 'PUT', params, body: { data, body: '', version: null } })).status, 409);
   assert.equal((await call(deleteEntry, { method: 'DELETE', params, body: { version: 'x' } })).status, 409);
   assert.equal(store.log.length, commits);
+});
+
+const publication = (title: string) => ({ title, authors: ['A'], venue: 'V', year: 2024, type: 'journal' });
+
+test('cv/publish: cv.yml, publications and the upload switch land in one commit', async () => {
+  const cv = await (await call(getConfig, { params: { file: 'cv' } })).json();
+  const upload = (await store.read('config/cv-upload.yml'))!;
+  const res = await call(publishCv, {
+    method: 'POST',
+    body: {
+      cv: { ...cv.data, cv: { ...cv.data.cv, name: 'Publish Test Person' } },
+      cvVersion: cv.version,
+      publications: [{ slug: 'route-pub', data: publication('P'), body: '', version: null }],
+      uploadVersion: upload.version,
+    },
+  });
+  assert.equal(res.status, 200);
+  assert.equal(store.log.length, 1);
+  assert.deepEqual(store.log[0].paths.sort(), ['config/cv-upload.yml', 'config/cv.yml', 'src/content/publications/route-pub.md']);
+  assert.match((await store.read('config/cv-upload.yml'))!.content, /enabled: false/);
+
+  const { versions } = await res.json();
+  const twice = [
+    { slug: 'dup', data: publication('A'), body: '', version: null },
+    { slug: 'dup', data: publication('B'), body: '', version: null },
+  ];
+  const dup = await call(publishCv, { method: 'POST', body: { cv: cv.data, cvVersion: versions['config/cv.yml'], publications: twice } });
+  assert.equal(dup.status, 400);
+  const stale = await call(publishCv, { method: 'POST', body: { cv: cv.data, cvVersion: cv.version, publications: [] } });
+  assert.equal(stale.status, 409);
+});
+
+test('cv/import: a preview with bodies, never a commit; bad input → 422', async () => {
+  const res = await call(importCv, { method: 'POST', body: { yaml: fs.readFileSync('tests/fixtures/rendercv.yaml', 'utf8') } });
+  assert.equal(res.status, 200);
+  const preview = await res.json();
+  assert.ok(preview.publications.length > 0);
+  assert.ok(preview.publications.every((p: { body: unknown }) => typeof p.body === 'string'));
+  assert.equal(store.log.length, 0);
+  assert.equal((await call(importCv, { method: 'POST', body: { yaml: 'cv: [' } })).status, 422);
+  assert.equal((await call(importCv, { method: 'POST', body: {} })).status, 422);
+});
+
+test('cv/pdf: needs the GitHub store', async () => {
+  assert.deepEqual(await (await call(pdfStatus)).json(), { run: null });
+  assert.equal((await call(generatePdf, { method: 'POST' })).status, 501);
+});
+
+test('feeds/hidden toggles an id in feeds.yml', async () => {
+  assert.equal((await call(hideFeed, { method: 'PUT', body: { id: 'feed-x', hidden: true } })).status, 200);
+  assert.match((await store.read('config/feeds.yml'))!.content, /- feed-x\n/);
+  assert.equal((await call(hideFeed, { method: 'PUT', body: { id: 'feed-x', hidden: false } })).status, 200);
+  assert.doesNotMatch((await store.read('config/feeds.yml'))!.content, /feed-x/);
+  assert.equal((await call(hideFeed, { method: 'PUT', body: { id: '', hidden: true } })).status, 400);
+});
+
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
+function upload(folder: string, name = 'Fig One.png', bytes: Uint8Array = PNG) {
+  const form = new FormData();
+  form.append('file', new File([bytes], name));
+  form.append('folder', folder);
+  return call(uploadMedia, { method: 'POST', body: form });
+}
+
+test('media: collection images vs site images get the right folder and URL', async () => {
+  const { mediaFolder, publicFolder } = adminSettings();
+  const content = await (await upload('content')).json();
+  assert.match(content.path, new RegExp(`^${mediaFolder}/fig-one-[0-9a-f]{6}\\.png$`));
+  assert.equal(content.url, `${publicFolder}/${content.path.split('/').pop()}`);
+  assert.ok(content.commit.id);
+
+  const site = await (await upload('site')).json();
+  assert.match(site.path, /^public\/images\/fig-one-[0-9a-f]{6}\.png$/);
+  assert.match(site.url, /^\/images\/fig-one-[0-9a-f]{6}\.png$/);
+  assert.equal((await (await upload('site')).json()).commit, null, 'same bytes: no second commit');
+
+  const listed = await (await call(listMedia, { query: '?folder=site' })).json();
+  assert.ok(listed.some((f: { path: string; url: string }) => f.path === site.path && f.url === site.url));
+  assert.equal((await upload('site', 'notes.txt', Buffer.from('hello'))).status, 415);
+  assert.equal((await upload('elsewhere')).status, 400);
+
+  assert.equal((await call(deleteMedia, { method: 'DELETE', body: { path: site.path, version: site.version } })).status, 200);
+  assert.equal((await call(deleteMedia, { method: 'DELETE', body: { path: 'package.json', version: 'x' } })).status, 400);
 });
