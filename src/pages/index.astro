@@ -1,8 +1,10 @@
 ---
 import ClassicHome from '../themes/classic/Home.astro';
+import EditorialHome from '../themes/editorial/Home.astro';
+import { loadHome } from '../themes/editorial/data';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
-import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections } from '../lib/config';
+import { getSiteConfig, getSiteName, isPersonalMode, getHomepageSections, getTheme } from '../lib/config';
 import { byId } from '../lib/utils';
 
 const config = getSiteConfig();
@@ -72,18 +74,25 @@ const feeds = sections.includes('blog')
       .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
       .slice(0, 2)
   : [];
+const editorialHome = getTheme() === 'editorial' ? await loadHome() : null;
 ---
 
-<ClassicHome
-  {config}
-  {personal}
-  {siteName}
-  {sections}
-  {enabledGridSections}
-  {firstGridId}
-  {bottomGridClass}
-  {announcementData}
-  {publications}
-  {posts}
-  {feeds}
-/>
+{
+  editorialHome ? (
+    <EditorialHome {...editorialHome} />
+  ) : (
+    <ClassicHome
+      {config}
+      {personal}
+      {siteName}
+      {sections}
+      {enabledGridSections}
+      {firstGridId}
+      {bottomGridClass}
+      {announcementData}
+      {publications}
+      {posts}
+      {feeds}
+    />
+  )
+}

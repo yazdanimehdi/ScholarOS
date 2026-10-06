@@ -1,0 +1,87 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { bibtexFor } from '../../lib/bibtex';
+import { isOwner, paperLink } from '../../lib/editorial';
+
+interface Props {
+  pub: CollectionEntry<'publications'>;
+  /** Site author; bolded wherever they appear in the author list. */
+  owner: string;
+  /** home: venue tile + Cite link. list: publications page row with filter data + BibTeX. */
+  variant?: 'home' | 'list';
+  topic?: string;
+  first?: boolean;
+}
+
+const { pub, owner, variant = 'home', topic, first = false } = Astro.props;
+const p = pub.data;
+const link = paperLink(p);
+const list = variant === 'list';
+---
+
+<li
+  id={list ? pub.id : undefined}
+  class:list={['row ed-paper', { 'ed-paper--list': list }]}
+  data-topic={list ? topic : undefined}
+  data-first={list ? String(first) : undefined}
+>
+  {
+    !list && (
+      <div class="ed-venue-tile" aria-hidden="true">
+        <span class="ed-venue-tile-short">{p.venueShort ?? p.venue}</span>
+        <span class="ed-venue-tile-year num">{p.year}</span>
+      </div>
+    )
+  }
+  <div class="ed-paper-body">
+    {
+      link ? (
+        <a href={link} class="ed-paper-title">
+          {p.title}
+        </a>
+      ) : (
+        <span class="ed-paper-title">{p.title}</span>
+      )
+    }
+    <span class="ed-authors">
+      {
+        p.authors.map((a, i) => (
+          <>
+            {i > 0 && ', '}
+            {isOwner(a, owner) ? <strong>{a}</strong> : a}
+          </>
+        ))
+      }
+    </span>
+    <span class="ed-paper-meta">
+      <span class="ed-venue">{list ? `${p.venue}, ${p.year}` : p.venue}</span>
+      {p.note && <span class="ed-note">{p.note}</span>}
+      {
+        link && (
+          <a href={link} class="ul">
+            Paper
+          </a>
+        )
+      }
+      {
+        p.code && (
+          <a href={p.code} class="ul">
+            Code
+          </a>
+        )
+      }
+      {
+        list ? (
+          <details class="ed-bib">
+            <summary class="ul">Cite</summary>
+            <pre>{bibtexFor(p)}</pre>
+          </details>
+        ) : (
+          <a href={`/publications#${pub.id}`} class="ul">
+            Cite
+          </a>
+        )
+      }
+    </span>
+  </div>
+</li>

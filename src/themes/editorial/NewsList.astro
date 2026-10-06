@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatNewsDate } from '../../lib/utils';
+
+interface Props {
+  items: CollectionEntry<'announcements'>[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="ed-news">
+  {
+    items.map((n) => (
+      <li>
+        <span class="ed-news-date num">{formatNewsDate(n.data.date, n.data.datePrecision)}</span>
+        <span class="ed-news-text">{n.data.title}</span>
+      </li>
+    ))
+  }
+</ul>

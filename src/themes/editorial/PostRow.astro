@@ -1,0 +1,24 @@
+---
+import type { WritingItem } from '../../lib/editorial';
+import { formatNewsDate } from '../../lib/utils';
+
+interface Props {
+  item: WritingItem;
+}
+
+const { item } = Astro.props;
+const external = item.kind === 'external';
+const meta = [formatNewsDate(item.date, 'month'), external ? item.source : `${item.minutes} min read`]
+  .filter(Boolean)
+  .join(' · ');
+---
+
+<li>
+  <a href={item.href} class="row ed-post-link" rel={external ? 'noopener' : undefined}>
+    <span>
+      <span class="ed-post-title">{item.title}</span>
+      <span class="ed-post-meta">{meta}</span>
+    </span>
+    <span class="arr" aria-hidden="true">{external ? '↗' : '→'}</span>
+  </a>
+</li>

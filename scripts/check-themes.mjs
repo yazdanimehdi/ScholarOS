@@ -53,6 +53,22 @@ for (const theme of THEMES) {
   assert.doesNotMatch(read('classic', 'contact/index.html'), /class="ed-header"/, 'classic /contact: classic header');
 }
 
+{
+  const html = ed('index.html');
+  assert.match(html, /<h1 class="ed-hero-name">Prof\. Jane Smith<\/h1>/, 'editorial /: hero name');
+  assert.match(html, /<div class="ed-bio"><p>I lead the Smith Research Lab at the <strong>/, 'editorial /: bio rendered from Markdown');
+  assert.match(html, /"@type":"Person"/, 'editorial /: Person JSON-LD');
+  assert.match(html, /class="ed-band-item">University of Technology</, 'editorial /: affiliations band');
+  assert.match(html, /href="\/research#nlp"/, 'editorial /: research card links to its area');
+  assert.match(html, /Adaptive Fine-Tuning Strategies for Large Language Models in Low-Resource Domains · Fairness-Aware/, 'editorial /: card lists related papers by short title');
+  assert.match(html, /All 5 publications/, 'editorial /: publication count');
+  assert.match(html, /href="\/publications#smith2024adaptive"/, 'editorial /: Cite link');
+  assert.match(html, /<strong>Jane Smith<\/strong>/, 'editorial /: owner bold in author lists');
+  assert.match(html, /class="ed-news-date num">2024</, 'editorial /: year-precision news date');
+  assert.match(html, /<footer class="ed-contact">/, 'editorial /: contact footer');
+  assert.doesNotMatch(html, /astro-island/, 'editorial /: no framework islands');
+}
+
 // --- classic regression ---
 const BASELINE = 'dist-baseline';
 

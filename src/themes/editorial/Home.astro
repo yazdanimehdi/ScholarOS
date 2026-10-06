@@ -1,0 +1,208 @@
+---
+import Layout from './Layout.astro';
+import Eyebrow from './Eyebrow.astro';
+import PaperRow from './PaperRow.astro';
+import NewsList from './NewsList.astro';
+import PostRow from './PostRow.astro';
+import { jsonLd, socialLinks } from '../../lib/editorial';
+import type { HomeData } from './data';
+
+type Props = HomeData;
+
+const {
+  config,
+  name,
+  blocks,
+  showBio,
+  showNews,
+  showWriting,
+  bioHtml,
+  affiliations,
+  researchHeadline,
+  areas,
+  selected,
+  pubCount,
+  news,
+  writing,
+} = Astro.props;
+const ed = config.editorial ?? {};
+const email = config.socials?.email;
+const links = socialLinks(config.socials);
+const blogLabel = config.nav.find((n) => n.href === '/blog')?.label ?? 'Writing';
+const hasUpdates = (showNews && news.length > 0) || (showWriting && writing.length > 0);
+
+const ld =
+  config.siteMode === 'personal'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name,
+        jobTitle: ed.eyebrow,
+        affiliation: affiliations.map((a) => ({ '@type': 'Organization', name: a })),
+        sameAs: links.map((l) => l.href),
+        email: email ? `mailto:${email}` : undefined,
+        url: config.siteUrl,
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'ResearchOrganization',
+        name,
+        url: config.siteUrl,
+        sameAs: links.map((l) => l.href),
+      };
+---
+
+<Layout title={config.title} contactFooter>
+  <script type="application/ld+json" set:html={jsonLd(ld)} />
+  {!blocks.includes('hero') && <h1 class="ed-sr-only">{name}</h1>}
+  {
+    blocks.map((block) => {
+      if (block === 'hero') {
+        return (
+          <section class="ed-wrap ed-hero">
+            <div class="ed-hero-text">
+              {ed.eyebrow && <Eyebrow>{ed.eyebrow}</Eyebrow>}
+              <h1 class="ed-hero-name">{name}</h1>
+              {ed.tagline && <p class="ed-tagline">{ed.tagline}</p>}
+              {showBio && bioHtml && <div class="ed-bio" set:html={bioHtml} />}
+              <div class="ed-actions">
+                <a href="/publications" class="ed-btn">
+                  View publications
+                </a>
+                <a href="/cv" class="ul ed-more">
+                  Curriculum vitae <span class="arr">→</span>
+                </a>
+              </div>
+              {(links.length > 0 || email) && (
+                <div class="ed-links">
+                  {links.map((l) => (
+                    <a href={l.href} class="ul">
+                      {l.label}
+                    </a>
+                  ))}
+                  {email && (
+                    <a href={`mailto:${email}`} class="ul">
+                      {email}
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+            {ed.figure?.image && (
+              <figure class="ed-figure">
+                <div class="ed-figure-box">
+                  <img src={ed.figure.image} alt={ed.figure.alt ?? ''} width="360" height="320" decoding="async" />
+                </div>
+                {ed.figure.caption && (
+                  <figcaption class="ed-figcaption">
+                    <b>Fig. 1.</b> {ed.figure.caption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+          </section>
+        );
+      }
+
+      if (block === 'affiliations') {
+        return (
+          <section class="ed-band" aria-label="Affiliations">
+            <div class="ed-wrap ed-band-inner">
+              <span class="ed-band-label">Affiliations</span>
+              {affiliations.map((a) => (
+                <span class="ed-band-item">{a}</span>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      if (block === 'research') {
+        return (
+          <section class="ed-wrap ed-home-section">
+            <div class="ed-section-head">
+              {researchHeadline ? (
+                <div class="ed-stack">
+                  <Eyebrow>Research</Eyebrow>
+                  <h2 class="ed-h2">{researchHeadline}</h2>
+                </div>
+              ) : (
+                <h2 class="ed-h2">Research</h2>
+              )}
+              <a href="/research" class="ul ed-more">
+                Research overview <span class="arr">→</span>
+              </a>
+            </div>
+            <div class="ed-cards">
+              {areas.map((a) => (
+                <a href={`/research#${a.id}`} class="row ed-card">
+                  <span class="ed-card-num" aria-hidden="true">
+                    {a.numeral}
+                  </span>
+                  <h3>{a.title}</h3>
+                  <p>{a.description}</p>
+                  {a.papers.length > 0 && (
+                    <span class="ed-card-papers">
+                      {a.papers.join(' · ')} <span class="arr">→</span>
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      if (block === 'publications' && selected.length > 0) {
+        return (
+          <section class="ed-wrap ed-home-section ed-home-section--papers">
+            <div class="ed-section-head">
+              <div class="ed-stack">
+                <Eyebrow>Publications</Eyebrow>
+                <h2 class="ed-h2">Selected papers</h2>
+              </div>
+              <a href="/publications" class="ul ed-more">
+                All {pubCount} publications <span class="arr">→</span>
+              </a>
+            </div>
+            <ol class="ed-papers">
+              {selected.map((pub) => (
+                <PaperRow pub={pub} owner={config.author} />
+              ))}
+            </ol>
+          </section>
+        );
+      }
+
+      if (block === 'updates' && hasUpdates) {
+        return (
+          <section class="ed-wrap ed-split" aria-label="News and writing">
+            {showNews && news.length > 0 && (
+              <div>
+                <Eyebrow as="h2">News</Eyebrow>
+                <NewsList items={news} />
+              </div>
+            )}
+            {showWriting && writing.length > 0 && (
+              <div>
+                <div class="ed-split-head">
+                  <Eyebrow as="h2">{blogLabel}</Eyebrow>
+                  <a href="/blog" class="ul ed-more">
+                    All posts <span class="arr">→</span>
+                  </a>
+                </div>
+                <ul class="ed-posts">
+                  {writing.map((item) => (
+                    <PostRow item={item} />
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        );
+      }
+
+      return null;
+    })
+  }
+</Layout>
