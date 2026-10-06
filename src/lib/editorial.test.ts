@@ -71,6 +71,19 @@ test('normalizeAreas: keeps explicit ids, de-duplicates, and avoids page anchors
   assert.equal(areas[0].label, 'NLP');
 });
 
+test('normalizeAreas: explicit ids are slugified; "all"/"other" are reserved', () => {
+  const areas = normalizeAreas([
+    { id: 'Machine Learning', title: 'x', description: '' },
+    { id: 'all', title: 'All', description: '' },
+    { id: 'other', title: 'Other', description: '' },
+    { id: '!!!', title: 'Fallback Title', description: '' },
+  ]);
+  assert.deepEqual(
+    areas.map((a) => a.id),
+    ['machine-learning', 'all-2', 'other-2', 'fallback-title'],
+  );
+});
+
 test('normalizeAreas: no areas → empty list', () => {
   assert.deepEqual(normalizeAreas(undefined), []);
 });
@@ -80,6 +93,7 @@ test('topicOf: unknown or missing topics fall into "other"', () => {
   assert.equal(topicOf('nlp', ids), 'nlp');
   assert.equal(topicOf('robotics', ids), 'other');
   assert.equal(topicOf(undefined, ids), 'other');
+  assert.equal(topicOf(' Machine Learning ', new Set(['machine-learning'])), 'machine-learning');
 });
 
 test('topicFilters: All first, empty areas hidden, Other only when used', () => {
@@ -104,6 +118,15 @@ test('mergeWriting: newest first, unparseable dates last', () => {
   assert.deepEqual(
     sorted.map((i) => i.title),
     ['new', 'old', 'bad'],
+  );
+});
+
+test('mergeWriting: equal dates tie-break on href', () => {
+  const item = (href: string) => ({ kind: 'site' as const, title: href, href, date: new Date('2024-01-01') });
+  const sorted = mergeWriting([item('/b'), item('/c'), item('/a')]);
+  assert.deepEqual(
+    sorted.map((i) => i.href),
+    ['/a', '/b', '/c'],
   );
 });
 

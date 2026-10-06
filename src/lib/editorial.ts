@@ -95,13 +95,13 @@ export function toRoman(n: number): string {
 }
 
 /** Ids already used by the Research page itself; areas never take them. */
-const RESERVED_IDS = ['software', 'main-content'];
+const RESERVED_IDS = ['software', 'main-content', 'all', 'other'];
 
 /** Fills in id (slug of title, unique on the page), label and numeral ("i.", "ii.", …). */
 export function normalizeAreas(areas: ResearchAreaInput[] = []): ResearchArea[] {
   const seen = new Set(RESERVED_IDS);
   return areas.map((area, i) => {
-    const base = area.id?.trim() || slugify(area.title) || `area-${i + 1}`;
+    const base = slugify(area.id ?? '') || slugify(area.title) || `area-${i + 1}`;
     let id = base;
     for (let n = 2; seen.has(id); n++) id = `${base}-${n}`;
     seen.add(id);
@@ -117,7 +117,8 @@ export function normalizeAreas(areas: ResearchAreaInput[] = []): ResearchArea[] 
 
 /** Publication topic → research-area id, or 'other' when it matches none. */
 export function topicOf(topic: string | undefined, areaIds: ReadonlySet<string>): string {
-  return topic && areaIds.has(topic) ? topic : 'other';
+  const id = slugify(topic ?? '');
+  return id && areaIds.has(id) ? id : 'other';;
 }
 
 export interface TopicFilter {
@@ -154,9 +155,9 @@ export interface WritingItem {
 
 const time = (d: Date) => (Number.isFinite(d.getTime()) ? d.getTime() : -Infinity);
 
-/** Newest first; items with unparseable dates go last. */
+/** Newest first (ties by href); items with unparseable dates go last. */
 export function mergeWriting(items: WritingItem[]): WritingItem[] {
-  return [...items].sort((a, b) => time(b.date) - time(a.date));
+  return [...items].sort((a, b) => time(b.date) - time(a.date) || a.href.localeCompare(b.href));
 }
 
 /** Label for the third Writing tab: the one shared feed source ("Medium"), else "Elsewhere". */
