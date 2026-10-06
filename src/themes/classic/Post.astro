@@ -1,0 +1,34 @@
+---
+import MarkdownLayout from '../../layouts/MarkdownLayout.astro';
+import SEO from '../../components/astro/SEO.astro';
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  ogImage?: string;
+}
+
+const { post, ogImage } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<MarkdownLayout
+  title={post.data.title}
+  description={post.data.excerpt}
+  ogImage={ogImage}
+  date={post.data.date}
+  author={post.data.author}
+  tags={post.data.tags}
+  keywords={post.data.keywords}
+  headings={headings}
+>
+  <SEO
+    type="blogPost"
+    title={post.data.title}
+    description={post.data.excerpt}
+    datePublished={post.data.date}
+    author={post.data.author}
+    keywords={post.data.keywords}
+  />
+  <Content />
+</MarkdownLayout>

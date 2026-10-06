@@ -1,0 +1,202 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import HeroSection from '../../components/astro/HeroSection.astro';
+import AboutSection from '../../components/astro/AboutSection.astro';
+import SectionHeading from '../../components/astro/SectionHeading.astro';
+import AnnouncementCard from '../../components/astro/AnnouncementCard.astro';
+import PostCard from '../../components/astro/PostCard.astro';
+import FeedItem from '../../components/astro/FeedItem.astro';
+import SEO from '../../components/astro/SEO.astro';
+import type { CollectionEntry } from 'astro:content';
+import type { HomepageSectionId, SiteConfig } from '../../lib/types';
+
+interface Props {
+  config: SiteConfig;
+  personal: boolean;
+  siteName: string;
+  sections: HomepageSectionId[];
+  enabledGridSections: HomepageSectionId[];
+  firstGridId: HomepageSectionId | null;
+  bottomGridClass: string;
+  announcementData: (CollectionEntry<'announcements'> & { imageUrl?: string })[];
+  publications: (CollectionEntry<'publications'> & { imageUrl?: string })[];
+  posts: CollectionEntry<'posts'>[];
+  feeds: CollectionEntry<'feeds'>[];
+}
+
+const {
+  config,
+  personal,
+  siteName,
+  sections,
+  enabledGridSections,
+  firstGridId,
+  bottomGridClass,
+  announcementData,
+  publications,
+  posts,
+  feeds,
+} = Astro.props;
+---
+
+<PageLayout title={config.title} fullWidth>
+  <SEO type="website" title={config.title} />
+
+  {
+    sections.map((id) => {
+      if (id === 'hero') {
+        return (
+          <HeroSection
+            title={siteName}
+            subtitle={config.description}
+            ctaText={personal ? 'View Publications' : 'Explore Research'}
+            ctaHref={personal ? '/publications' : '/research'}
+            secondaryCtaText={personal ? 'CV' : 'Join the Lab'}
+            secondaryCtaHref={personal ? '/cv' : '/join'}
+          />
+        );
+      }
+
+      if (id === 'about') {
+        return <AboutSection />;
+      }
+
+      // Announcements: full-width row below About
+      if (id === 'news' && announcementData.length > 0) {
+        return (
+          <div class="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
+            <SectionHeading
+              title={personal ? 'Recent Updates' : 'Latest Announcements'}
+              viewAllHref="/news"
+            />
+            <div class="mt-3 space-y-0">
+              {announcementData.map((a) => (
+                <AnnouncementCard
+                  id={a.id}
+                  title={a.data.title}
+                  date={a.data.date}
+                  category={a.data.category}
+                  excerpt={a.data.excerpt}
+                  pinned={a.data.pinned}
+                  image={a.imageUrl}
+                  emoji={a.data.emoji}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Publications + Blog: wider 2-column grid
+      if (id === firstGridId && enabledGridSections.length > 0) {
+        return (
+          <div class="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
+            <div class={`grid grid-cols-1 ${bottomGridClass} gap-8`}>
+              {enabledGridSections.map((gridId) => {
+                if (gridId === 'publications') {
+                  return (
+                    <div>
+                      <SectionHeading
+                        title={personal ? 'Latest Publications' : 'Recent Publications'}
+                        viewAllHref="/publications"
+                      />
+                      <div class="mt-3 divide-y divide-surface-100 dark:divide-dm-border">
+                        {publications.map((pub) => (
+                          <div class="py-2">
+                            <a
+                              href={pub.data.url || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="group flex items-start gap-3"
+                            >
+                              {pub.imageUrl ? (
+                                <img
+                                  src={pub.imageUrl}
+                                  alt=""
+                                  class="mt-0.5 h-10 w-10 shrink-0 rounded object-cover"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <span class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded bg-surface-100 dark:bg-dm-border">
+                                  <span class="text-[10px] leading-none font-semibold text-surface-500 uppercase dark:text-dm-muted">
+                                    {pub.data.type === 'journal'
+                                      ? 'J'
+                                      : pub.data.type === 'conference'
+                                        ? 'C'
+                                        : pub.data.type === 'preprint'
+                                          ? 'P'
+                                          : pub.data.type === 'workshop'
+                                            ? 'W'
+                                            : pub.data.type === 'thesis'
+                                              ? 'T'
+                                              : 'B'}
+                                  </span>
+                                </span>
+                              )}
+                              <div class="min-w-0">
+                                <h3 class="line-clamp-2 text-sm leading-snug font-medium text-surface-900 transition-colors group-hover:text-primary-600 dark:text-dm-heading dark:group-hover:text-accent-400">
+                                  {pub.data.featured && <span class="me-1 text-xs text-primary-600 dark:text-accent-400">📌</span>}
+                                  {pub.data.title}
+                                </h3>
+                                <p class="mt-0.5 text-xs text-surface-500 dark:text-dm-muted">
+                                  {pub.data.venue}, {pub.data.year}
+                                </p>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                  <span class="inline-block rounded bg-surface-100 px-1.5 py-0.5 text-[10px] font-medium text-surface-600 uppercase dark:bg-dm-border dark:text-dm-muted">
+                                    {pub.data.type}
+                                  </span>
+                                  {pub.data.pdf && (
+                                    <span class="text-xs text-primary-600 dark:text-accent-400">PDF</span>
+                                  )}
+                                  {pub.data.bibtex && (
+                                    <span class="text-xs text-surface-500 dark:text-dm-muted">BibTeX</span>
+                                  )}
+                                </div>
+                              </div>
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (gridId === 'blog') {
+                  return (
+                    <div>
+                      <SectionHeading title={personal ? 'Recent Posts' : 'From Our Blog'} viewAllHref="/blog" />
+                      <div class="mt-3">
+                        {posts.map((post) => (
+                          <PostCard
+                            id={post.id}
+                            title={post.data.title}
+                            date={post.data.date}
+                            excerpt={post.data.excerpt}
+                            tags={post.data.tags}
+                            author={post.data.author}
+                          />
+                        ))}
+                        {feeds.slice(0, 1).map((feed) => (
+                          <FeedItem
+                            title={feed.data.title}
+                            link={feed.data.link}
+                            date={feed.data.date}
+                            source={feed.data.source}
+                            excerpt={feed.data.excerpt}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      // Subsequent grid IDs already rendered above
+      return null;
+    })
+  }
+</PageLayout>
