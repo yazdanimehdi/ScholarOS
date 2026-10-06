@@ -25,3 +25,32 @@ test('media: upload a site image, then delete it', async ({ page }) => {
   await tile.getByRole('button', { name: 'Confirm delete' }).click();
   await expect(tile).toHaveCount(0);
 });
+
+test('posts: create, save a draft, then publish', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`${ADMIN}/posts/new`);
+  const title = `E2E post ${Date.now()}`;
+  await page.getByLabel('Title', { exact: true }).fill(title);
+  await page.locator('.tiptap').click();
+  await page.keyboard.type('Hello from the admin.');
+  await page.getByRole('button', { name: 'Save draft' }).click();
+  await expect(page.getByText(COMMITTED)).toBeVisible();
+  await expect(page).toHaveURL(/\/admin\/posts\/e2e-post-\d+$/);
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(page.getByText(COMMITTED)).toHaveCount(2);
+  await page.goto(`${ADMIN}/posts`);
+  await expect(page.getByRole('row', { name: new RegExp(title) }).getByText('Published')).toBeVisible();
+});
+
+test('dashboard: hide and unhide an imported post', async ({ page }) => {
+  await signIn(page);
+  await page.goto(ADMIN);
+  const hide = page.getByRole('button', { name: 'Hide', exact: true });
+  const row = page.getByRole('row').filter({ has: hide }).first();
+  const title = (await row.getByRole('cell').first().innerText()).trim();
+  await row.getByRole('button', { name: 'Hide', exact: true }).click();
+  const same = page.getByRole('row').filter({ hasText: title });
+  await expect(same.getByText('Hidden')).toBeVisible();
+  await same.getByRole('button', { name: 'Unhide' }).click();
+  await expect(same.getByText('Published')).toBeVisible();
+});
