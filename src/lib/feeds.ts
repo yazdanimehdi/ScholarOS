@@ -25,7 +25,10 @@ export interface SyncResult {
 }
 
 const fetchText: FetchText = async (url) => {
-  const res = await fetch(url, { headers: { 'User-Agent': 'ScholarOS feed sync' } });
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'ScholarOS feed sync' },
+    signal: AbortSignal.timeout(15_000),
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.text();
 };

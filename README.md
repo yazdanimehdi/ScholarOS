@@ -511,6 +511,8 @@ Built-in content management system at `/admin`:
 
 On Vercel, ScholarOS replaces Sveltia with its own admin at `/<adminPath>` (default `/admin`). It has a dashboard, a post editor with math, a three-column CV editor with RenderCV import, and forms for every other kind of content. Every publish is one commit to your repository; Vercel redeploys and the change is live in about a minute. Public pages stay static, and GitHub Pages and Netlify keep using Sveltia.
 
+If your site already runs on Vercel, set the environment variables below before its next redeploy: from then on the custom admin replaces Sveltia at `/<adminPath>`, and without them nobody can sign in.
+
 1. **Import the repository in Vercel** (New Project → your repository). No build settings are needed.
 2. **Create a GitHub OAuth App** (GitHub → Settings → Developer settings → OAuth Apps → New OAuth App).
    - Homepage URL: `https://<your-domain>`

@@ -7,6 +7,7 @@ on:
       - 'config/cv.yml'
       - 'config/cv-upload.yml'
       - 'cv/*.yml'
+      - 'src/content/publications/**'
   workflow_dispatch:
 
 permissions:

@@ -54,7 +54,7 @@ const LOGIN_ERRORS: Record<string, string> = {
           </a>
           {error && (
             <p class="adm-error" role="alert">
-              {LOGIN_ERRORS[error] ?? LOGIN_ERRORS.expired}
+              {Object.hasOwn(LOGIN_ERRORS, error) ? LOGIN_ERRORS[error] : LOGIN_ERRORS.expired}
             </p>
           )}
         </main>
