@@ -2,7 +2,7 @@
 import ClassicCv from '../themes/classic/Cv.astro';
 import EditorialCv from '../themes/editorial/Cv.astro';
 import { loadCvPage } from '../themes/editorial/data';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../lib/content';
 import { getSiteConfig, getTheme } from '../lib/config';
 import { cvSections, hasYamlPublications, loadCv, loadCvMeta } from '../lib/cv';
 import { byId } from '../lib/utils';
@@ -10,7 +10,7 @@ import { byId } from '../lib/utils';
 const config = getSiteConfig();
 const cv = loadCv().cv;
 const allSections = cvSections(cv);
-const publications = (await getCollection('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
+const publications = (await getEntries('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
 const cvMeta = loadCvMeta();
 const hasPdf = cvMeta?.pdfPath != null;
 const pdfHref = cvMeta?.pdfPath ?? '#';

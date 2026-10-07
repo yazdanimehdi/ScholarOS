@@ -1,11 +1,11 @@
 ---
 import PageLayout from '../../../layouts/PageLayout.astro';
 import PostCard from '../../../components/astro/PostCard.astro';
-import { getCollection } from 'astro:content';
+import { getEntries, staticProps } from '../../../lib/content';
 import { slugify } from '../../../lib/utils';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getEntries('posts');
   const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
 
   return allTags.map((tag) => ({
@@ -19,7 +19,9 @@ export async function getStaticPaths() {
   }));
 }
 
-const { tag, posts } = Astro.props;
+const props = await staticProps(Astro, getStaticPaths);
+if (!props) return new Response(null, { status: 404 });
+const { tag, posts } = props;
 ---
 
 <PageLayout title={`Posts tagged "${tag}"`} description={`Blog posts tagged with "${tag}".`}>

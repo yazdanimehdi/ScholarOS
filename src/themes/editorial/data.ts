@@ -1,4 +1,5 @@
-import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getEntries, getEntry } from '../../lib/content';
 import {
   cvEntryView,
   cvSections,
@@ -45,8 +46,8 @@ export function pick<T>(ids: string[], byId: Map<string, T>, where: string): T[]
 
 /** Site posts (non-draft) and feed items, newest first. External items never carry content. */
 export async function writingItems(): Promise<WritingItem[]> {
-  const posts = (await getCollection('posts')).filter((p) => !p.data.draft);
-  const feeds = withoutHidden(await getCollection('feeds'), hiddenFeedIds());
+  const posts = (await getEntries('posts')).filter((p) => !p.data.draft);
+  const feeds = withoutHidden(await getEntries('feeds'), hiddenFeedIds());
   return mergeWriting([
     ...posts.map((p) => ({
       kind: 'site' as const,
@@ -74,7 +75,7 @@ export async function loadHome() {
   const ed = config.editorial ?? {};
   const research = loadResearchConfig();
   const areas = normalizeAreas(research.areas);
-  const pubs = await getCollection('publications');
+  const pubs = await getEntries('publications');
   const byId = new Map(pubs.map((p) => [p.id, p]));
   const sections = getHomepageSections();
   const affiliations = (ed.affiliations ?? []).filter((a) => a?.trim());
@@ -98,7 +99,7 @@ export async function loadHome() {
       .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.year - a.data.year)
       .slice(0, 4),
     pubCount: pubs.length,
-    news: (await getCollection('announcements'))
+    news: (await getEntries('announcements'))
       .sort(idOrder)
       .sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned) || b.data.date.getTime() - a.data.date.getTime())
       .slice(0, 5),
@@ -111,7 +112,7 @@ export type HomeData = Awaited<ReturnType<typeof loadHome>>;
 export async function loadResearch() {
   const config = getSiteConfig();
   const research = loadResearchConfig();
-  const pubs = await getCollection('publications');
+  const pubs = await getEntries('publications');
   const byId = new Map(pubs.map((p) => [p.id, p]));
   const areas = await Promise.all(
     normalizeAreas(research.areas).map(async (a) => ({
@@ -120,7 +121,7 @@ export async function loadResearch() {
       papers: pick(a.publications, byId, `research.yml area "${a.id}"`),
     })),
   );
-  const software = (await getCollection('projects'))
+  const software = (await getEntries('projects'))
     .filter((p) => p.data.type === 'software')
     .map((p) => ({
       name: p.data.title,
@@ -137,7 +138,7 @@ export async function loadPublications() {
   const config = getSiteConfig();
   const areas = normalizeAreas(loadResearchConfig().areas);
   const areaIds = new Set(areas.map((a) => a.id));
-  const items = (await getCollection('publications'))
+  const items = (await getEntries('publications'))
     .sort(idOrder)
     .sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title))
     .map((pub) => ({
@@ -173,7 +174,7 @@ export async function loadCvPage() {
     }))
     .filter((s) => s.entries.length > 0);
   if (!hasYamlPublications(sections)) {
-    const pubs = (await getCollection('publications'))
+    const pubs = (await getEntries('publications'))
       .sort(idOrder)
       .sort((a, b) => b.data.year - a.data.year)
       .slice(0, 5);
@@ -208,7 +209,7 @@ export type BlogData = Awaited<ReturnType<typeof loadBlog>>;
 
 export async function loadPost(post: CollectionEntry<'posts'>) {
   const config = getSiteConfig();
-  const posts = (await getCollection('posts'))
+  const posts = (await getEntries('posts'))
     .filter((p) => !p.data.draft)
     .sort(idOrder)
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -217,7 +218,7 @@ export async function loadPost(post: CollectionEntry<'posts'>) {
   const related = relatedId ? await getEntry('publications', relatedId) : undefined;
   // eslint-disable-next-line no-console
   if (relatedId && !related) console.warn(`[editorial] post "${post.id}": unknown relatedPublication "${relatedId}"`);
-  const people = await getCollection('people');
+  const people = await getEntries('people');
   return {
     config,
     post,

@@ -1,7 +1,7 @@
 ---
 import ClassicPublications from '../themes/classic/Publications.astro';
-import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
+import { getEntries } from '../lib/content';
+import { resolveImage } from '../lib/content/image';
 import EditorialPublications from '../themes/editorial/Publications.astro';
 import { loadPublications } from '../themes/editorial/data';
 import { getSiteConfig, getTheme, isPersonalMode } from '../lib/config';
@@ -10,13 +10,13 @@ import { byId } from '../lib/utils';
 const config = getSiteConfig();
 const personal = isPersonalMode();
 
-const publications = (await getCollection('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
+const publications = (await getEntries('publications')).sort(byId).sort((a, b) => b.data.year - a.data.year);
 
 const pubData = await Promise.all(
   publications.map(async (p) => {
     let imageUrl: string | undefined;
     if (p.data.image) {
-      const resolved = await getImage({ src: p.data.image, width: 480 });
+      const resolved = await resolveImage(p.data.image, 480);
       imageUrl = resolved.src;
     }
     return {

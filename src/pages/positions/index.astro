@@ -1,12 +1,12 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import TagBadge from '../../components/astro/TagBadge.astro';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../../lib/content';
 import { isPersonalMode } from '../../lib/config';
 
 const personal = isPersonalMode();
 
-const positions = (await getCollection('positions')).sort((a, b) => {
+const positions = (await getEntries('positions')).sort((a, b) => {
   // Open positions first, then closed
   const statusOrder = { open: 0, closed: 1 };
   const aStatus = statusOrder[a.data.status] ?? 2;

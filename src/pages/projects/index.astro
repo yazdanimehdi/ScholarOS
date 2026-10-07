@@ -1,12 +1,12 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import ProjectCard from '../../components/astro/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../../lib/content';
 import { isPersonalMode } from '../../lib/config';
 
 const personal = isPersonalMode();
 
-const projects = (await getCollection('projects')).sort((a, b) => {
+const projects = (await getEntries('projects')).sort((a, b) => {
   const statusOrder = { active: 0, upcoming: 1, completed: 2 };
   const aOrder = statusOrder[a.data.status as keyof typeof statusOrder] ?? 3;
   const bOrder = statusOrder[b.data.status as keyof typeof statusOrder] ?? 3;

@@ -1,4 +1,4 @@
-import { getCollection } from 'astro:content';
+import { getEntries } from './content';
 import { byId } from './utils';
 
 export interface SearchItem {
@@ -10,13 +10,13 @@ export interface SearchItem {
 
 export async function getSearchItems(): Promise<SearchItem[]> {
   const [posts, publications, people, projects, announcements, positions, talks] = await Promise.all([
-    getCollection('posts'),
-    getCollection('publications'),
-    getCollection('people'),
-    getCollection('projects'),
-    getCollection('announcements'),
-    getCollection('positions'),
-    getCollection('talks'),
+    getEntries('posts'),
+    getEntries('publications'),
+    getEntries('people'),
+    getEntries('projects'),
+    getEntries('announcements'),
+    getEntries('positions'),
+    getEntries('talks'),
   ]);
 
   // Id tie-break (see byId). Talks stay unsorted: their classic baseline order is not id order, so sorting would change classic output.

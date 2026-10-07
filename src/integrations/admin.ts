@@ -52,6 +52,13 @@ export default function admin(): AstroIntegration {
             prerender: false,
           });
         }
+        if (mode === 'postgres') {
+          injectRoute({
+            pattern: '/sitemap-index.xml',
+            entrypoint: entry('src/lib/content/sitemap.ts'),
+            prerender: false,
+          });
+        }
       },
       'astro:route:setup': ({ route }) => {
         // Postgres mode: every page renders per request from the database and is cached on Vercel's CDN.

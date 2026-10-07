@@ -1,11 +1,11 @@
 ---
 import PageLayout from '../../../layouts/PageLayout.astro';
 import AnnouncementCard from '../../../components/astro/AnnouncementCard.astro';
-import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
+import { getEntries, staticProps } from '../../../lib/content';
+import { resolveImage } from '../../../lib/content/image';
 
 export async function getStaticPaths() {
-  const announcements = await getCollection('announcements');
+  const announcements = await getEntries('announcements');
   const categories = [...new Set(announcements.map((a) => a.data.category))];
 
   return categories.map((category) => ({
@@ -19,20 +19,22 @@ export async function getStaticPaths() {
   }));
 }
 
-const { category, announcements: announcementsRaw } = Astro.props;
+const props = await staticProps(Astro, getStaticPaths);
+if (!props) return new Response(null, { status: 404 });
+const { category, announcements: announcementsRaw } = props;
 
 const announcements = await Promise.all(
   announcementsRaw.map(async (a: any) => {
     let imageUrl: string | undefined;
     if (a.data.image) {
-      const resolved = await getImage({ src: a.data.image, width: 200 });
+      const resolved = await resolveImage(a.data.image, 200);
       imageUrl = resolved.src;
     }
     return { ...a, imageUrl };
   }),
 );
 
-const allAnnouncements = await getCollection('announcements');
+const allAnnouncements = await getEntries('announcements');
 const categories = [...new Set(allAnnouncements.map((a) => a.data.category))].sort();
 ---
 

@@ -2,8 +2,8 @@
 import ClassicHome from '../themes/classic/Home.astro';
 import EditorialHome from '../themes/editorial/Home.astro';
 import { loadHome } from '../themes/editorial/data';
-import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
+import { getEntries } from '../lib/content';
+import { resolveImage } from '../lib/content/image';
 import {
   getSiteConfig,
   getSiteName,
@@ -27,7 +27,7 @@ const bottomGridClass = enabledGridSections.length >= 2 ? 'md:grid-cols-2' : '';
 
 // Only fetch data for enabled sections
 const announcements = sections.includes('news')
-  ? (await getCollection('announcements'))
+  ? (await getEntries('announcements'))
       .sort((a, b) => {
         if (a.data.pinned && !b.data.pinned) return -1;
         if (!a.data.pinned && b.data.pinned) return 1;
@@ -37,7 +37,7 @@ const announcements = sections.includes('news')
   : [];
 
 const publicationsRaw = sections.includes('publications')
-  ? (await getCollection('publications'))
+  ? (await getEntries('publications'))
       .sort(byId)
       .sort((a, b) => {
         if (a.data.featured && !b.data.featured) return -1;
@@ -51,7 +51,7 @@ const publications = await Promise.all(
   publicationsRaw.map(async (pub) => {
     let imageUrl: string | undefined;
     if (pub.data.image) {
-      const resolved = await getImage({ src: pub.data.image, width: 80 });
+      const resolved = await resolveImage(pub.data.image, 80);
       imageUrl = resolved.src;
     }
     return { ...pub, imageUrl };
@@ -63,7 +63,7 @@ const announcementData = await Promise.all(
   announcements.map(async (a) => {
     let imageUrl: string | undefined;
     if (a.data.image) {
-      const resolved = await getImage({ src: a.data.image, width: 200 });
+      const resolved = await resolveImage(a.data.image, 200);
       imageUrl = resolved.src;
     }
     return { ...a, imageUrl };
@@ -71,14 +71,14 @@ const announcementData = await Promise.all(
 );
 
 const posts = sections.includes('blog')
-  ? (await getCollection('posts'))
+  ? (await getEntries('posts'))
       .filter((p) => !p.data.draft)
       .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
       .slice(0, 3)
   : [];
 
 const feeds = sections.includes('blog')
-  ? withoutHidden(await getCollection('feeds'), hiddenFeedIds())
+  ? withoutHidden(await getEntries('feeds'), hiddenFeedIds())
       .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
       .slice(0, 2)
   : [];

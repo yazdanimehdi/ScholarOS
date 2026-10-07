@@ -3,24 +3,26 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import Breadcrumb from '../../components/astro/Breadcrumb.astro';
 import TagBadge from '../../components/astro/TagBadge.astro';
 import ProseEnhancements from '../../components/astro/ProseEnhancements.astro';
-import { getCollection, getEntry, render } from 'astro:content';
-import { getImage } from 'astro:assets';
+import EntryBody from '../../components/astro/EntryBody.astro';
+import { getEntries, getEntry, staticProps } from '../../lib/content';
+import { resolveImage } from '../../lib/content/image';
 import { getRoleName } from '../../lib/utils';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
+  const projects = await getEntries('projects');
   return projects.map((project) => ({
     params: { id: project.id },
     props: { project },
   }));
 }
 
-const { project } = Astro.props;
-const { Content } = await render(project);
+const props = await staticProps(Astro, getStaticPaths);
+if (!props) return new Response(null, { status: 404 });
+const { project } = props;
 
 let ogImage: string | undefined;
 if (project.data.image) {
-  const resolved = await getImage({ src: project.data.image, width: 1200 });
+  const resolved = await resolveImage(project.data.image, 1200);
   ogImage = resolved.src;
 }
 
@@ -115,7 +117,7 @@ if (project.data.team) {
 
     <!-- Content -->
     <div class="prose mb-8">
-      <Content />
+      <EntryBody entry={project} />
     </div>
     <ProseEnhancements />
 

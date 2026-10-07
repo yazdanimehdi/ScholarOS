@@ -1,11 +1,11 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { isPersonalMode } from '../lib/config';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../lib/content';
 
 const personal = isPersonalMode();
 
-const talks = (await getCollection('talks')).sort((a, b) => {
+const talks = (await getEntries('talks')).sort((a, b) => {
   if (a.data.sortDate && b.data.sortDate) {
     return b.data.sortDate.getTime() - a.data.sortDate.getTime();
   }

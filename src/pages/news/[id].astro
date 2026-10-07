@@ -1,22 +1,25 @@
 ---
 import MarkdownLayout from '../../layouts/MarkdownLayout.astro';
-import { getCollection, render } from 'astro:content';
-import { getImage } from 'astro:assets';
+import EntryBody from '../../components/astro/EntryBody.astro';
+import { entryHeadings, getEntries, staticProps } from '../../lib/content';
+import { resolveImage } from '../../lib/content/image';
 
 export async function getStaticPaths() {
-  const announcements = await getCollection('announcements');
+  const announcements = await getEntries('announcements');
   return announcements.map((entry) => ({
     params: { id: entry.id },
     props: { entry },
   }));
 }
 
-const { entry } = Astro.props;
-const { Content, headings } = await render(entry);
+const props = await staticProps(Astro, getStaticPaths);
+if (!props) return new Response(null, { status: 404 });
+const { entry } = props;
+const headings = await entryHeadings(entry);
 
 let ogImage: string | undefined;
 if (entry.data.image) {
-  const resolved = await getImage({ src: entry.data.image, width: 1200 });
+  const resolved = await resolveImage(entry.data.image, 1200);
   ogImage = resolved.src;
 }
 ---
@@ -28,5 +31,5 @@ if (entry.data.image) {
   date={entry.data.date}
   headings={headings}
 >
-  <Content />
+  <EntryBody entry={entry} />
 </MarkdownLayout>

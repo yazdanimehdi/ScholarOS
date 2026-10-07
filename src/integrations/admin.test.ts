@@ -63,6 +63,7 @@ test('postgres mode: every route renders on demand, the mode is baked in, the si
     const define: Record<string, string> = {};
     const injected: { pattern: string }[] = [];
     setupHook(define, injected);
+    assert.ok(injected.some((r) => r.pattern === '/sitemap-index.xml'));
     assert.equal(define.__SCHOLAROS_MODE__, '"postgres"');
     const route = { component: 'src/pages/index.astro', prerender: undefined as boolean | undefined };
     (admin().hooks['astro:route:setup'] as (o: unknown) => void)({ route, logger: {} });
@@ -73,7 +74,9 @@ test('postgres mode: every route renders on demand, the mode is baked in, the si
 test('git mode: public routes stay prerendered', () => {
   withEnv({ VERCEL: '1', DATABASE_URL: undefined }, () => {
     const define: Record<string, string> = {};
-    setupHook(define, []);
+    const injected: { pattern: string }[] = [];
+    setupHook(define, injected);
+    assert.ok(!injected.some((r) => r.pattern === '/sitemap-index.xml'));
     assert.equal(define.__SCHOLAROS_MODE__, '"git"');
     const route = { component: 'src/pages/index.astro', prerender: undefined as boolean | undefined };
     (admin().hooks['astro:route:setup'] as (o: unknown) => void)({ route, logger: {} });

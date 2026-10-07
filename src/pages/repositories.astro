@@ -1,7 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { getSiteConfig, isPersonalMode } from '../lib/config';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../lib/content';
 import { getRoleName, extractGitHubUsername } from '../lib/utils';
 
 const config = getSiteConfig();
@@ -28,7 +28,7 @@ const lightTheme = 'default';
 const darkTheme = 'github_dark';
 
 // Get all active people who have a GitHub link
-const members = (await getCollection('people'))
+const members = (await getEntries('people'))
   .filter((p) => p.data.active && p.data.socials?.github)
   .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
   .map((p) => ({

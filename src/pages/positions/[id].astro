@@ -3,19 +3,21 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import Breadcrumb from '../../components/astro/Breadcrumb.astro';
 import TagBadge from '../../components/astro/TagBadge.astro';
 import ApplicationForm from '../../components/vue/ApplicationForm.vue';
-import { getCollection, render } from 'astro:content';
+import EntryBody from '../../components/astro/EntryBody.astro';
+import { getEntries, staticProps } from '../../lib/content';
 import { getSiteConfig } from '../../lib/config';
 
 export async function getStaticPaths() {
-  const positions = await getCollection('positions');
+  const positions = await getEntries('positions');
   return positions.map((position) => ({
     params: { id: position.id },
     props: { position },
   }));
 }
 
-const { position } = Astro.props;
-const { Content } = await render(position);
+const props = await staticProps(Astro, getStaticPaths);
+if (!props) return new Response(null, { status: 404 });
+const { position } = props;
 const config = getSiteConfig();
 
 const contactEmail = position.data.contact || config.socials.email || '';
@@ -89,7 +91,7 @@ function formatType(type: string): string {
 
     <!-- Content -->
     <div class="prose mb-8">
-      <Content />
+      <EntryBody entry={position} />
     </div>
 
     <!-- Application Form (only for open positions) -->

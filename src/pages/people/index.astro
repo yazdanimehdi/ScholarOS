@@ -2,14 +2,14 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import PersonCard from '../../components/astro/PersonCard.astro';
 import SocialLinks from '../../components/astro/SocialLinks.astro';
-import { getCollection } from 'astro:content';
+import { getEntries } from '../../lib/content';
 import { getRoleGroup, getRoleName } from '../../lib/utils';
 import { isPersonalMode } from '../../lib/config';
 import { getImageShapeClass } from '../../lib/imageShape';
 
 const personal = isPersonalMode();
 
-const people = (await getCollection('people')).sort((a, b) => a.data.sortOrder - b.data.sortOrder);
+const people = (await getEntries('people')).sort((a, b) => a.data.sortOrder - b.data.sortOrder);
 
 const groups: Record<string, typeof people> = {};
 for (const person of people) {
