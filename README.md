@@ -546,7 +546,7 @@ publish. Git stays a safety net: every save keeps a revision (History in the adm
 content to the `content-backup` branch.
 
 1. In the Vercel project: **Storage → Marketplace → Neon** (sets `DATABASE_URL`) and **Storage → Blob**
-   (sets `BLOB_READ_WRITE_TOKEN`). Add `CRON_SECRET` (`openssl rand -base64 48`). Keep `GITHUB_TOKEN` for the backup.
+   (sets `BLOB_READ_WRITE_TOKEN`). Add `CRON_SECRET` (`openssl rand -base64 48`). Vercel Cron calls `/api/admin/cron/daily` at 03:00 UTC: it syncs feeds, releases scheduled posts and backs up to git; the dashboard shows each result and has **Run now**. Keep `GITHUB_TOKEN` for the backup.
 2. Locally: `vercel env pull .env.local --environment=production`, then `pnpm db:setup`. It creates the tables, copies `config/`,
    `src/content/` and `src/data/` into the database, uploads `src/assets/images` and `public/images` to Blob, and
    rewrites image references to Blob URLs. It lists any file it could not copy. On a database that already has
@@ -554,13 +554,53 @@ content to the `content-backup` branch.
    that exist only in the database.
 3. Redeploy. The admin dashboard now shows **Postgres**.
 
-Notes: MDX posts are shown with a notice (MDX needs a build). PDF CV generation arrives in a later release.
+Notes: MDX posts are shown with a notice (MDX needs a build). The CV PDF is rendered on Vercel (see _CV PDF in Postgres mode_).
 Editing `adminUsers` takes effect after a redeploy. The feeds, Google Scholar and SEO workflows
 (`sync-feeds.yml`, `sync-scholar.yml`, `generate-seo.yml`) commit to git and have no effect on a Postgres-mode site;
-use **Check now** under feeds in the admin dashboard to refresh feeds.
+the daily job syncs feeds, and **Check now** syncs them at once.
 
 **Back to git mode:** `pnpm db:export` (writes the database's files into the repo; image references stay Blob
 URLs), commit, remove `DATABASE_URL` from the project, redeploy.
+
+### Scheduled posts
+
+A post whose date is in the future is _scheduled_: the editor's button reads **Schedule**, the admin lists it as
+`Scheduled · <date>`, and the site hides it (lists, tag pages, RSS, sitemap, search; its URL is a 404) until that date.
+Precision is one day.
+
+- **Postgres mode:** the daily job (03:00 UTC) refreshes the cached pages.
+- **Git mode on Vercel:** `.github/workflows/release-scheduled.yml` runs daily at 06:00 UTC and, when a post became
+  due, calls a deploy hook. Create one (Vercel → Project → Settings → Git → Deploy Hooks) and save its URL as the
+  repository secret `VERCEL_DEPLOY_HOOK_URL`. Without it the workflow only logs a notice. GitHub sometimes skips
+  scheduled workflow runs; if a scheduled post didn't appear, run "Release scheduled posts" manually from the
+  Actions tab (`workflow_dispatch`).
+- **GitHub Pages:** `deploy.yml` checks daily at 06:00 UTC and rebuilds only when a post became due.
+
+### Cross-posting to Medium
+
+Tick **Also publish to Medium** before publishing a post.
+
+- With `MEDIUM_TOKEN` set (an existing Medium integration token; Medium no longer issues new ones), the post is
+  sent as a Medium **draft** with its canonical link pointing at your site; the Medium link is saved in the post.
+- Without a token, **Import to Medium** copies the post's URL and opens Medium's import tool, which sets the
+  canonical link itself. Paste the resulting Medium link into **Medium URL**.
+
+A post is sent once; afterwards the editor shows **Already on Medium**. When your Medium feed later brings the same
+story in, the Writing page shows only the site's copy.
+
+### CV PDF in Postgres mode
+
+The CV PDF is rendered on Vercel whenever you publish the CV or a publication (and with **Generate PDF**), stored in
+Vercel Blob, and linked from the CV page. It uses fixed fonts (Source Serif 4 and IBM Plex Sans) and its own layout,
+so it looks different from the RenderCV PDF that git mode builds on GitHub Actions. Paper size:
+
+```yaml
+# config/cv.yml
+pdf:
+  pageSize: A4 # or LETTER (default)
+```
+
+Per-person lab CVs (`cv/*.yml`) are rendered in git mode only.
 
 ### Cookie Consent (GDPR)
 
