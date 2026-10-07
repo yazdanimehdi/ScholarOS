@@ -1,5 +1,5 @@
 import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
-import { cvEntryView, cvSections, sectionTitle, type CvEntryView } from '../cv';
+import { cvEntryView, cvSections, isPublicationEntry, sectionTitle, type CvEntryView } from '../cv';
 import { isOwner } from '../editorial';
 import type { CvData } from '../types';
 
@@ -62,7 +62,8 @@ const row = (key: string, label: string, body: Content[]): Content => ({
 /**
  * The CV as a pdfmake document, mirroring the editorial CV page: header, then one "label | entries" row per visible
  * section in cv.yml order. Publications come from the collection, where the `publications` key is (else after
- * experience, else last); with an empty collection the YAML section renders as written.
+ * experience, else last, but only when the CV lists no publications of its own under any key, even hidden ones);
+ * with an empty collection the YAML section renders as written.
  */
 export function buildCvDocument(
   cv: CvData,
@@ -71,6 +72,10 @@ export function buildCvDocument(
   options: { pageSize?: PageSize } = {},
 ): TDocumentDefinitions {
   const written = cvSections(cv);
+  // Decided before hiding, like render-cv.py: a CV with its own publications never gets the collection added.
+  const ownPublications = Object.values(cv.sections ?? {}).some(
+    (entries) => Array.isArray(entries) && isPublicationEntry(entries[0]),
+  );
   const pubs = [...publications].sort((a, b) => a.id.localeCompare(b.id)).sort((a, b) => b.data.year - a.data.year);
   const pubRow = row(
     'publications',
@@ -82,7 +87,7 @@ export function buildCvDocument(
     const body = entries.map(cvEntryView).filter((e): e is CvEntryView => e !== null);
     return body.length ? [row(key, sectionTitle(key), body.map(entry))] : [];
   });
-  if (pubs.length && !written.some(([key]) => key === 'publications')) {
+  if (pubs.length && !ownPublications && !written.some(([key]) => key === 'publications')) {
     const experience = rows.findIndex((r) => (r as { id?: string }).id === 'section-experience');
     rows.splice(experience === -1 ? rows.length : experience + 1, 0, pubRow);
   }

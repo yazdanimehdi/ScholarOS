@@ -89,6 +89,32 @@ test('buildCvDocument: without a publications key the section goes after experie
   );
 });
 
+test('buildCvDocument: own publications under another key render as written; no collection is added', () => {
+  const cv = {
+    name: 'N',
+    sections: {
+      experience: [{ company: 'C', position: 'P' }],
+      journal_articles: [{ title: 'Own paper', authors: ['N'] }],
+    },
+  } as unknown as CvData;
+  const def = buildCvDocument(cv, [pub('p', 2024)], { author: 'N' });
+  assert.deepEqual(ids(def), ['section-experience', 'section-journal_articles']);
+  assert.doesNotMatch(JSON.stringify(def), /Paper p/);
+});
+
+test('buildCvDocument: own publications that are all hidden mean no publications section at all', () => {
+  const cv = {
+    name: 'N',
+    sections: {
+      experience: [{ company: 'C', position: 'P' }],
+      selected: [{ title: 'Hidden paper', authors: ['N'], visible: false }],
+    },
+  } as unknown as CvData;
+  const def = buildCvDocument(cv, [pub('p', 2024)], { author: 'N' });
+  assert.deepEqual(ids(def), ['section-experience']);
+  assert.doesNotMatch(JSON.stringify(def), /Paper p|Hidden paper/);
+});
+
 test('buildCvDocument: an empty collection keeps the YAML publications section as written', () => {
   const cv = { name: 'N', sections: { publications: [{ title: 'Own paper', authors: ['N'] }] } } as unknown as CvData;
   const def = buildCvDocument(cv, [], { author: 'N' });
