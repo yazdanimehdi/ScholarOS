@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { loadAdminSettings } from '../lib/admin/settings';
+import { modeFromEnv } from '../lib/mode';
 
 const API_DIR = 'src/admin/routes/api';
 
@@ -15,8 +16,8 @@ function apiRouteFiles(root: string): string[] {
 }
 
 /**
- * On Vercel (VERCEL set): injects the custom admin's on-demand pages and API routes, with the settings the
- * functions need baked in. Everywhere else: injects the Sveltia admin, so static builds have no functions.
+ * On Vercel: injects the custom admin's on-demand pages and API routes (settings and mode baked in); in Postgres
+ * mode every public route renders on demand too. Static builds get the Sveltia admin and no functions.
  */
 export default function admin(): AstroIntegration {
   return {
@@ -25,14 +26,19 @@ export default function admin(): AstroIntegration {
       'astro:config:setup': ({ command, config, injectRoute, logger, updateConfig }) => {
         const root = fileURLToPath(config.root);
         const entry = (file: string) => path.join(root, file);
-        if (!process.env.VERCEL) {
+        const mode = modeFromEnv(process.env);
+        if (mode === 'static') {
           injectRoute({ pattern: '/[...cms]', entrypoint: entry('src/admin/sveltia/[...cms].astro') });
           injectRoute({ pattern: '/[...cmsConfig]', entrypoint: entry('src/admin/sveltia/[...cmsConfig].ts') });
           return;
         }
         const settings = loadAdminSettings(root);
         if (!process.env.SESSION_SECRET) logger.warn('SESSION_SECRET is not set: the admin will refuse every request.');
-        updateConfig({ vite: { define: { __SCHOLAROS_ADMIN__: JSON.stringify(settings) } } });
+        updateConfig({
+          vite: {
+            define: { __SCHOLAROS_ADMIN__: JSON.stringify(settings), __SCHOLAROS_MODE__: JSON.stringify(mode) },
+          },
+        });
         injectRoute({
           pattern: `/${settings.adminPath}/[...path]`,
           entrypoint: entry('src/admin/routes/[...path].astro'),
@@ -46,6 +52,10 @@ export default function admin(): AstroIntegration {
             prerender: false,
           });
         }
+      },
+      'astro:route:setup': ({ route }) => {
+        // Postgres mode: every page renders per request from the database and is cached on Vercel's CDN.
+        if (modeFromEnv(process.env) === 'postgres') route.prerender = false;
       },
     },
   };

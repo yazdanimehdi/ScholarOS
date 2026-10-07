@@ -8,12 +8,20 @@ import remarkMath from 'remark-math';
 import { rehypeExternalLinks } from './src/lib/rehype-external-links';
 import { rehypeMathJaxPassthrough } from './src/lib/rehype-mathjax-passthrough';
 import admin from './src/integrations/admin';
+import { modeFromEnv } from './src/lib/mode';
+
+const mode = modeFromEnv(process.env);
 
 export default defineConfig({
   site: 'https://example.com',
-  // Vercel only: the custom admin's routes run as functions. Every public page stays prerendered.
-  adapter: process.env.VERCEL ? vercel() : undefined,
-  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), sitemap(), admin()],
+  // Vercel only. Git mode: admin routes are functions, public pages prerendered. Postgres mode: every page is a
+  // function, and Blob images are optimized by /_vercel/image.
+  adapter: mode === 'static' ? undefined : mode === 'postgres' ? vercel({ imageService: true }) : vercel(),
+  ...(mode === 'postgres'
+    ? { image: { remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }] } }
+    : {}),
+  // @astrojs/sitemap only sees prerendered pages; Postgres mode serves its own /sitemap-index.xml.
+  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), ...(mode === 'postgres' ? [] : [sitemap()]), admin()],
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeExternalLinks, rehypeMathJaxPassthrough],

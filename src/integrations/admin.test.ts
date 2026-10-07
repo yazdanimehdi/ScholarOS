@@ -32,3 +32,51 @@ test('routes and settings resolve against config.root, not the working directory
   assert.ok(fs.existsSync(me.entrypoint), me.entrypoint);
   assert.ok(injected.every((r) => fs.existsSync(r.entrypoint)));
 });
+
+function withEnv(env: Record<string, string | undefined>, fn: () => void) {
+  const saved = Object.fromEntries(Object.keys(env).map((k) => [k, process.env[k]]));
+  Object.assign(process.env, env);
+  for (const [k, v] of Object.entries(env)) if (v === undefined) delete process.env[k];
+  try {
+    fn();
+  } finally {
+    for (const [k, v] of Object.entries(saved)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
+}
+
+function setupHook(define: Record<string, string>, injected: { pattern: string }[]) {
+  const setup = admin().hooks['astro:config:setup'] as (options: unknown) => void;
+  setup({
+    command: 'build',
+    config: { root: pathToFileURL(`${process.cwd()}/`) },
+    injectRoute: (r: { pattern: string }) => injected.push(r),
+    logger: { warn: () => {} },
+    updateConfig: (c: { vite: { define: Record<string, string> } }) => Object.assign(define, c.vite.define),
+  });
+}
+
+test('postgres mode: every route renders on demand, the mode is baked in, the sitemap is served', () => {
+  withEnv({ VERCEL: '1', DATABASE_URL: 'postgres://ci@localhost:1/ci' }, () => {
+    const define: Record<string, string> = {};
+    const injected: { pattern: string }[] = [];
+    setupHook(define, injected);
+    assert.equal(define.__SCHOLAROS_MODE__, '"postgres"');
+    const route = { component: 'src/pages/index.astro', prerender: undefined as boolean | undefined };
+    (admin().hooks['astro:route:setup'] as (o: unknown) => void)({ route, logger: {} });
+    assert.equal(route.prerender, false);
+  });
+});
+
+test('git mode: public routes stay prerendered', () => {
+  withEnv({ VERCEL: '1', DATABASE_URL: undefined }, () => {
+    const define: Record<string, string> = {};
+    setupHook(define, []);
+    assert.equal(define.__SCHOLAROS_MODE__, '"git"');
+    const route = { component: 'src/pages/index.astro', prerender: undefined as boolean | undefined };
+    (admin().hooks['astro:route:setup'] as (o: unknown) => void)({ route, logger: {} });
+    assert.equal(route.prerender, undefined);
+  });
+});

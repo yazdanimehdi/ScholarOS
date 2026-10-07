@@ -43,6 +43,18 @@ jobs:
           test -d .vercel/output/functions
           if grep -rq "__SCHOLAROS_ADMIN__" .vercel/output/functions; then echo "admin settings were not baked in"; exit 1; fi
 
+      - name: Postgres-mode build (public pages are functions; the build never connects)
+        env:
+          VERCEL: '1'
+          DATABASE_URL: postgres://ci@localhost:1/ci
+          SESSION_SECRET: ci-build-only-not-a-real-secret-0000
+        run: |
+          rm -rf .vercel/output
+          pnpm build
+          test -d .vercel/output/functions
+          test ! -e .vercel/output/static/index.html
+          test ! -e .vercel/output/static/blog/index.html
+
       # Full demo assertions only in the template repo; forks edit content, so they get the structural check.
       # The dist-baseline comparison is a local pre-merge gate (gitignored), so CI always skips it.
       - name: Build both themes (template, full check)
