@@ -4,9 +4,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
-import remarkMath from 'remark-math';
-import { rehypeExternalLinks } from './src/lib/rehype-external-links';
-import { rehypeMathJaxPassthrough } from './src/lib/rehype-mathjax-passthrough';
+import { markdownOptions } from './src/lib/markdown';
 import admin from './src/integrations/admin';
 import { modeFromEnv } from './src/lib/mode';
 
@@ -22,16 +20,7 @@ export default defineConfig({
     : {}),
   // @astrojs/sitemap only sees prerendered pages; Postgres mode serves its own /sitemap-index.xml.
   integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), ...(mode === 'postgres' ? [] : [sitemap()]), admin()],
-  markdown: {
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeExternalLinks, rehypeMathJaxPassthrough],
-    shikiConfig: {
-      themes: {
-        light: 'github-light',
-        dark: 'github-dark',
-      },
-    },
-  },
+  markdown: markdownOptions,
   vite: {
     plugins: [tailwindcss()],
     build: {

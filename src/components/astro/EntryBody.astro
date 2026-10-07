@@ -1,0 +1,16 @@
+---
+import { render, type CollectionEntry, type CollectionKey } from 'astro:content';
+import { getMode } from '../../lib/mode';
+import { renderEntryHtml } from '../../lib/content';
+
+interface Props {
+  entry: CollectionEntry<CollectionKey>;
+}
+
+const { entry } = Astro.props;
+// Static/git: Astro's build-time render. Postgres: the same Markdown pipeline at request time.
+const Content = getMode() === 'postgres' ? null : (await render(entry)).Content;
+const html = Content ? '' : (await renderEntryHtml(entry)).html;
+---
+
+{Content ? <Content /> : <Fragment set:html={html} />}

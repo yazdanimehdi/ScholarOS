@@ -33,6 +33,7 @@ jobs:
           admin_path=$(node -e "const y=require('js-yaml');console.log(y.load(require('fs').readFileSync('config/site.yml','utf8')).adminPath||'admin')")
           test -f "dist/$admin_path/index.html"
           test ! -e .vercel/output
+          pnpm exec tsx --test src/lib/markdown-parity.test.ts
 
       - name: Vercel build (admin routes are functions)
         env:
