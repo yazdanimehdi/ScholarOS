@@ -130,6 +130,26 @@ export class GitHubStore implements ContentStore {
     return nested.flat();
   }
 
+  /** Every file on the branch with its blob sha; null when the branch doesn't exist. */
+  async tree(): Promise<Map<string, string> | null> {
+    const t = await this.gh<{ truncated: boolean; tree: { path: string; type: string; sha: string }[] }>(
+      'GET',
+      `/git/trees/${encodePath(this.cfg.branch)}?recursive=1`,
+      undefined,
+      true,
+    );
+    if (!t) return null;
+    if (t.truncated) throw new UpstreamError('The repository tree is too large to compare in one request.');
+    return new Map(t.tree.filter((e) => e.type === 'blob').map((e) => [e.path, e.sha]));
+  }
+
+  /** Creates the configured branch at the head of the repository's default branch. */
+  async createBranch(): Promise<void> {
+    const repo = await this.gh<{ default_branch: string }>('GET', '');
+    const head = await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${encodePath(repo!.default_branch)}`);
+    await this.gh('POST', '/git/refs', { ref: `refs/heads/${this.cfg.branch}`, sha: head!.object.sha });
+  }
+
   async commit(changes: Change[], message: string, base: Record<string, string | null>) {
     try {
       return await this.tryCommit(changes, message, base);

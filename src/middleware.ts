@@ -66,7 +66,11 @@ export const onRequest: MiddlewareHandler = async (ctx, next) => {
   let res: Response;
   if (api && MUTATING.has(ctx.request.method) && ctx.request.headers.get('origin') !== ctx.url.origin) {
     res = jsonError(403, 'Cross-origin request refused');
-  } else if (pathname.startsWith('/api/admin/auth/') || pathname === `/${adminPath}/login`) {
+  } else if (
+    pathname.startsWith('/api/admin/auth/') ||
+    pathname.startsWith('/api/admin/cron/') ||
+    pathname === `/${adminPath}/login`
+  ) {
     res = await next();
   } else {
     const token = ctx.cookies.get(SESSION_COOKIE)?.value;

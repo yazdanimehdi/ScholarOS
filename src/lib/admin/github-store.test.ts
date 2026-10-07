@@ -238,3 +238,28 @@ test('capabilities reports a missing branch separately from an unreadable repo',
   const denied = await new GitHubStore(cfg, author, fakeGitHub(actions).fetchFn).capabilities();
   assert.match(denied.error!, /token can't read o\/r/);
 });
+
+test('tree: blobs of the branch by path; null when the branch is missing', async () => {
+  const { fetchFn } = fakeGitHub({
+    'GET /git/trees/main?recursive=1': () => ({
+      json: { truncated: false, tree: [{ path: 'a.md', type: 'blob', sha: 's1' }, { path: 'src', type: 'tree', sha: 't' }] },
+    }),
+  });
+  assert.deepEqual(await new GitHubStore(cfg, author, fetchFn).tree(), new Map([['a.md', 's1']]));
+  const missing = fakeGitHub({});
+  assert.equal(await new GitHubStore(cfg, author, missing.fetchFn).tree(), null);
+});
+
+test('createBranch: from the default branch head', async () => {
+  const { fetchFn, calls } = fakeGitHub({
+    'GET ': () => ({ json: { default_branch: 'main' } }),
+    'GET /git/ref/heads/main': () => ({ json: { object: { sha: 'head1' } } }),
+    'POST /git/refs': () => ({ status: 201, json: {} }),
+  });
+  await new GitHubStore({ ...cfg, branch: 'content-backup' }, author, fetchFn).createBranch();
+  assert.deepEqual(calls.at(-1), {
+    method: 'POST',
+    path: '/git/refs',
+    body: { ref: 'refs/heads/content-backup', sha: 'head1' },
+  });
+});
