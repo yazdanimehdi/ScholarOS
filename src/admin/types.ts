@@ -11,7 +11,8 @@ export interface CommitResult {
   id: string;
   url?: string;
   versions: Record<string, string | null>;
-  warning?: 'cache-purge-failed';
+  warning?: 'cache-purge-failed' | 'pdf-failed';
+  detail?: string;
   tags?: string[];
 }
 

@@ -223,3 +223,13 @@ test('media: a Blob failure is a 502 with the reason', async () => {
     (e) => e instanceof UpstreamError && e.status === 502 && /token expired/.test(e.message),
   );
 });
+
+test('the image library lists images only (the CV PDF shares the media table)', async () => {
+  const { store } = await setup();
+  await store.putMedia('site', 'cv/cv-12345678.pdf', Buffer.from('%PDF-1.7').toString('base64'), 'application/pdf');
+  await store.putMedia('site', 'fig-abc123.png', 'iVBO', 'image/png');
+  assert.deepEqual(
+    (await store.listMedia('site')).map((f) => f.url.slice(f.url.lastIndexOf('/') + 1)),
+    ['fig-abc123.png'],
+  );
+});

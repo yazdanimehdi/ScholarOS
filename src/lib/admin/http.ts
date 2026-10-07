@@ -6,6 +6,7 @@ import { MediaError } from './media';
 import { PathError, assertAllowed } from './paths';
 import { PostgresStore } from './postgres-store';
 import type { SessionUser } from './session';
+import { affectsCvPdf, generateCvPdf } from '../cv-pdf/generate';
 import { ConflictError, UpstreamError, type Author, type Change, type CommitResult, type ContentStore } from './store';
 
 export type { CommitResult };
@@ -75,7 +76,7 @@ export async function readBody<T>(ctx: APIContext): Promise<T> {
   return body as T;
 }
 
-/** Checks every path against the allowlist, commits once, and returns the new version of each file. */
+/** Checks every path against the allowlist, commits once, regenerates the CV PDF when a Postgres-mode save changes it, and returns the new version of each file. */
 export async function commitChanges(
   store: ContentStore,
   changes: Change[],
@@ -86,7 +87,19 @@ export async function commitChanges(
     throw new HttpError(400, 'The same file appears twice in one save');
   }
   for (const c of changes) assertAllowed(c.path);
-  return store.commit(changes, message, base);
+  const result = await store.commit(changes, message, base);
+  if (!(store instanceof PostgresStore) || !affectsCvPdf(changes.map((c) => c.path))) return result;
+  try {
+    await generateCvPdf(store);
+    return result;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('[cv-pdf]', e);
+    // ponytail: one warning per response; a failed cache purge wins because it carries the Retry action.
+    return result.warning
+      ? result
+      : { ...result, warning: 'pdf-failed', detail: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 /** History and cache purges only exist in Postgres mode. */

@@ -30,7 +30,7 @@ export function toast(text: string, href?: string, action?: ToastAction): void {
 /** Set by AdminShell from the page context; `outage` is the persistent "database unreachable" banner. */
 export const session = reactive({ mode: 'git' as AdminCtx['mode'], outage: '' });
 
-export function committed(result: Pick<CommitResult, 'url' | 'warning' | 'tags'>): void {
+export function committed(result: Pick<CommitResult, 'url' | 'warning' | 'tags' | 'detail'>): void {
   if (result.warning === 'cache-purge-failed') {
     const tags = result.tags ?? [];
     return toast('Published, but the page cache could not be refreshed: visitors may see the old version.', undefined, {
@@ -38,6 +38,8 @@ export function committed(result: Pick<CommitResult, 'url' | 'warning' | 'tags'>
       run: () => void api('cache/purge', { body: { tags } }).then(() => toast('Cache refreshed'), report),
     });
   }
+  if (result.warning === 'pdf-failed')
+    return toast(`Saved; PDF generation failed: ${result.detail ?? 'unknown error'}`);
   if (session.mode === 'postgres') return toast('Published');
   toast('Committed · live in about a minute', result.url);
 }

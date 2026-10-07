@@ -195,9 +195,14 @@ export class PostgresStore implements ContentStore {
     return row ? { path: row.path, content: row.content } : null;
   }
 
-  /** Postgres mode keeps every image in Blob, so both folders list the same library. */
+  /** Postgres mode keeps every image in Blob, so both folders list the same library (images only: the CV PDF is stored here too). */
   async listMedia(_folder: MediaFolder): Promise<MediaFile[]> {
-    const rows = await this.db(() => this.sql<{ url: string }>`select url from media order by created_at desc, url`);
+    const rows = await this.db(
+      () =>
+        this.sql<{
+          url: string;
+        }>`select url from media where content_type like 'image/%' order by created_at desc, url`,
+    );
     return rows.map((r) => ({ path: r.url, url: r.url, version: '1' }));
   }
 

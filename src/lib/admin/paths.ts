@@ -83,7 +83,9 @@ export function assertAllowed(path: string): void {
 }
 
 /** Read-only data files Postgres mode keeps beside the editable ones: pages read them, the admin never writes them. */
-export const DATA_FILES = ['src/data/cv.json', 'src/data/cv-people.json'];
+/** CV PDF metadata: the RenderCV Action writes it in git mode, the admin in Postgres mode. */
+export const CV_JSON = 'src/data/cv.json';
+export const DATA_FILES = [CV_JSON, 'src/data/cv-people.json'];
 
 /** A file Postgres mode stores as a document: the write allowlist without images, plus MDX entries and DATA_FILES. */
 export function isDocumentPath(path: string): boolean {

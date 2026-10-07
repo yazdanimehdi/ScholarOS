@@ -16,6 +16,7 @@ import {
   type CvEntryKind,
 } from './fields';
 import { useDocument } from './useDocument';
+import type { CvMetadata } from '../lib/types';
 import type { AdminCtx, CommitResult, Entry } from './types';
 
 interface CvDoc {
@@ -61,6 +62,8 @@ const importing = ref(false);
 const importText = ref('');
 const preview = ref<ImportPreview | null>(null);
 const pdf = ref<Run | null>(null);
+const pdfMeta = ref<CvMetadata | null>(null);
+const generating = ref(false);
 // The imported publications and the upload switch belong to the CV draft: keep them across reloads with it.
 const IMPORT_KEY = 'scholaros-cv-import';
 try {
@@ -247,6 +250,7 @@ async function publish() {
     'config/cv.yml',
   );
   if (!result) return;
+  if (props.ctx.mode === 'postgres') void checkPdf(); // the save regenerated it
   publicationCount.value += pending.value.filter((p) => !p.version).length;
   pending.value = [];
   if (turnOffUpload.value) {
@@ -286,7 +290,14 @@ function closeImport() {
 
 // ── PDF (GitHub Actions: render-cv.yml) ──
 async function checkPdf() {
-  if (props.ctx.mode === 'postgres') return;
+  if (props.ctx.mode === 'postgres') {
+    try {
+      pdfMeta.value = (await api<{ pdf: CvMetadata | null }>('cv/pdf')).pdf;
+    } catch (e) {
+      report(e);
+    }
+    return;
+  }
   try {
     const { run } = await api<{ run: Run | null }>('cv/pdf');
     pdf.value = run;
@@ -298,6 +309,18 @@ async function checkPdf() {
   }
 }
 async function generatePdf() {
+  if (props.ctx.mode === 'postgres') {
+    generating.value = true;
+    try {
+      pdfMeta.value = (await api<{ pdf: CvMetadata }>('cv/pdf', { method: 'POST' })).pdf;
+      toast('PDF updated', pdfMeta.value.pdfPath);
+    } catch (e) {
+      report(e);
+    } finally {
+      generating.value = false;
+    }
+    return;
+  }
   try {
     await api('cv/pdf', { method: 'POST' });
     pdfStarted = Date.now();
@@ -317,12 +340,13 @@ async function generatePdf() {
         >{{ pdfLabel }} · <a :href="pdf.url" target="_blank" rel="noopener">run</a></span
       >
       <button type="button" class="adm-btn" @click="importing = true">Import YAML</button>
-      <button type="button" class="adm-btn" :disabled="ctx.mode === 'postgres'" @click="generatePdf">
-        Generate PDF
-      </button>
-      <span v-if="ctx.mode === 'postgres'" class="adm-muted"
-        >PDF generation in Postgres mode — coming in sub-project 4</span
+      <span v-if="pdfMeta" class="adm-muted"
+        >PDF: {{ new Date(pdfMeta.lastGenerated).toLocaleString() }} ·
+        <a :href="pdfMeta.pdfPath" target="_blank" rel="noopener">open</a></span
       >
+      <button type="button" class="adm-btn" :disabled="generating" @click="generatePdf">
+        {{ generating ? 'Generating…' : 'Generate PDF' }}
+      </button>
       <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || !doc.current" @click="publish">
         Publish
       </button>

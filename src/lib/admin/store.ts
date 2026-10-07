@@ -25,7 +25,9 @@ export interface CommitResult {
   /** New version of every file in the commit (null for deletions), in the store's own versioning. */
   versions: Record<string, string | null>;
   /** Postgres mode: the save stands but the CDN cache wasn't purged; `tags` is what to retry. */
-  warning?: 'cache-purge-failed';
+  /** The save stands, but: the CDN cache wasn't purged (`tags` is what to retry), or the CV PDF failed (`detail`). */
+  warning?: 'cache-purge-failed' | 'pdf-failed';
+  detail?: string;
   tags?: string[];
 }
 
