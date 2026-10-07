@@ -130,27 +130,24 @@ test('a save whose purge fails answers 200 with the warning and the tags to retr
   }
 });
 
-test('dashboard reports the mode and the last backup', async () => {
+test('dashboard reports the mode and the last daily jobs', async () => {
   const store = new PostgresStore(sql, undefined, {
     purge: async () => {},
     put: async () => ({ url: '' }),
     del: async () => {},
   });
-  await store.commit(
-    [{ path: 'src/data/backup.json', content: '{"at":"2026-10-06T03:00:00.000Z","ok":true,"changed":2}' }],
-    'r',
-    {},
-  );
+  const record = { backup: { ok: true, at: '2026-10-06T03:00:00.000Z', detail: '2 file(s) changed' } };
+  await store.commit([{ path: 'src/data/jobs.json', content: JSON.stringify(record) }], 'r', {});
   const outside = await (await call(dashboard)).json();
   assert.equal(outside.mode, 'static'); // tests run without VERCEL
-  assert.equal(outside.backup, null, 'only Postgres mode reads the backup');
+  assert.equal(outside.jobs, null, 'only Postgres mode reads the jobs record');
   const saved = { VERCEL: process.env.VERCEL, DATABASE_URL: process.env.DATABASE_URL };
   process.env.VERCEL = '1';
   process.env.DATABASE_URL = 'postgres://test';
   try {
     const body = await (await call(dashboard)).json();
     assert.equal(body.mode, 'postgres');
-    assert.deepEqual(body.backup, { at: '2026-10-06T03:00:00.000Z', ok: true, changed: 2 });
+    assert.deepEqual(body.jobs, record);
   } finally {
     for (const [k, v] of Object.entries(saved))
       if (v === undefined) delete process.env[k];

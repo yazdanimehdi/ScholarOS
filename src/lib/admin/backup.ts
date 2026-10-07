@@ -1,7 +1,7 @@
 import type { Sql } from '../db';
 import type { GitHubStore } from './github-store';
-import { BACKUP_JSON, isDocumentPath } from './paths';
-import { gitBlobSha, type Change, type ContentStore } from './store';
+import { JOBS_JSON, isDocumentPath } from './paths';
+import { gitBlobSha, type Change } from './store';
 
 export const BACKUP_BRANCH = 'content-backup';
 
@@ -25,7 +25,7 @@ export async function backupToGit(
 ): Promise<BackupResult> {
   const at = now.toISOString();
   const docs = await sql<{ path: string; content: string }>`
-    select path, content from documents where path <> ${BACKUP_JSON} order by path`;
+    select path, content from documents where path <> ${JOBS_JSON} order by path`;
   let tree = await gh.tree();
   if (!tree) {
     await gh.createBranch();
@@ -41,19 +41,11 @@ export async function backupToGit(
     base[d.path] = sha;
   }
   for (const [p, sha] of tree) {
-    if (inDb.has(p) || p === BACKUP_JSON || !isDocumentPath(p)) continue;
+    if (inDb.has(p) || p === JOBS_JSON || !isDocumentPath(p)) continue;
     changes.push({ path: p, content: null });
     base[p] = sha;
   }
   if (changes.length === 0) return { at, ok: true, changed: 0 };
   const result = await gh.commit(changes, `Content backup ${at.slice(0, 10)}`, base);
   return { at, ok: true, changed: changes.length, commit: result.url };
-}
-
-/** The dashboard shows the last result. */
-export async function recordBackup(store: ContentStore, result: BackupResult): Promise<void> {
-  const current = await store.read(BACKUP_JSON);
-  await store.commit([{ path: BACKUP_JSON, content: `${JSON.stringify(result, null, 2)}\n` }], 'Record backup', {
-    [BACKUP_JSON]: current?.version ?? null,
-  });
 }

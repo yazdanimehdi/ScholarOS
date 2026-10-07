@@ -13,8 +13,8 @@ export type CollectionName = (typeof COLLECTIONS)[number];
 export const CONFIG_FILES = ['site', 'research', 'feeds', 'cv', 'cv-upload'] as const;
 export type ConfigFile = (typeof CONFIG_FILES)[number];
 export const FEEDS_JSON = 'src/data/feeds.json';
-/** Last backup cron result (Postgres mode): admin-only, never rendered. */
-export const BACKUP_JSON = 'src/data/backup.json';
+/** Last daily-jobs results (Postgres mode): admin-only, never rendered. */
+export const JOBS_JSON = 'src/data/jobs.json';
 /** Images referenced by plain URLs (config files, Markdown bodies): served from public/. */
 export const SITE_MEDIA = { dir: 'public/images', url: '/images' };
 
@@ -73,7 +73,7 @@ export function assertAllowed(path: string): void {
   if (
     CONFIG_FILES.some((file) => path === configPath(file)) ||
     path === FEEDS_JSON ||
-    path === BACKUP_JSON ||
+    path === JOBS_JSON ||
     isMediaPath(path)
   )
     return;

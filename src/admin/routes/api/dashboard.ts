@@ -1,27 +1,20 @@
 import { listEntries, readConfig } from '../../../lib/admin/content';
 import { json, route } from '../../../lib/admin/http';
-import { BACKUP_JSON, FEEDS_JSON, collectionDir, configPath } from '../../../lib/admin/paths';
+import { parseJobs } from '../../../lib/admin/jobs';
+import { FEEDS_JSON, JOBS_JSON, collectionDir, configPath } from '../../../lib/admin/paths';
 import { getMode } from '../../../lib/mode';
 
 export const prerender = false;
 
-const parseJson = (text: string | undefined) => {
-  try {
-    return text ? JSON.parse(text) : null;
-  } catch {
-    return null;
-  }
-};
-
 export const GET = route(async (_ctx, store) => {
-  const [posts, publications, feeds, feedsJson, cvUpdated, lastSync, backup] = await Promise.all([
+  const [posts, publications, feeds, feedsJson, cvUpdated, lastSync, jobs] = await Promise.all([
     listEntries(store, 'posts'),
     store.list(collectionDir('publications')),
     readConfig(store, 'feeds'),
     store.read(FEEDS_JSON),
     store.lastModified(configPath('cv')),
     store.lastModified(FEEDS_JSON),
-    getMode() === 'postgres' ? store.read(BACKUP_JSON) : null,
+    getMode() === 'postgres' ? store.read(JOBS_JSON) : null,
   ]);
   let feedItems: unknown = [];
   let feedsError: string | undefined;
@@ -39,6 +32,6 @@ export const GET = route(async (_ctx, store) => {
     cvUpdated,
     lastSync,
     mode: getMode(),
-    backup: parseJson(backup?.content),
+    jobs: jobs ? parseJobs(jobs.content) : null,
   });
 });

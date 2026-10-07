@@ -4,10 +4,7 @@ import { migrate } from '../db-migrate';
 import { pgliteSql } from '../pglite-sql';
 import { setSqlForTests, type Sql } from '../db';
 import { backupToGit } from './backup';
-import { setStoreForTests } from './get-store';
-import { PostgresStore } from './postgres-store';
 import { gitBlobSha, type Change } from './store';
-import { GET as cron } from '../../admin/routes/api/cron/backup';
 
 let sql: Sql;
 before(async () => {
@@ -79,62 +76,6 @@ test('a missing branch is created from the default branch first', async () => {
   await backupToGit(sql, fake.gh);
   assert.equal(fake.branches, 1);
   assert.equal(fake.commits[0].changes.length, 3);
-});
-
-test('cron: 401 without or with a wrong secret; git mode skips', async () => {
-  const saved = {
-    CRON_SECRET: process.env.CRON_SECRET,
-    VERCEL: process.env.VERCEL,
-    DATABASE_URL: process.env.DATABASE_URL,
-  };
-  const req = (auth?: string) =>
-    cron({
-      request: new Request('https://site.test/api/admin/cron/backup', { headers: auth ? { authorization: auth } : {} }),
-    } as never);
-  try {
-    delete process.env.CRON_SECRET;
-    assert.equal((await req('Bearer anything')).status, 401);
-    process.env.CRON_SECRET = 's3cret';
-    assert.equal((await req()).status, 401);
-    assert.equal((await req('Bearer wrong!')).status, 401);
-    process.env.VERCEL = '1';
-    delete process.env.DATABASE_URL;
-    assert.deepEqual(await (await req('Bearer s3cret')).json(), { skipped: 'not in Postgres mode' });
-  } finally {
-    for (const [k, v] of Object.entries(saved))
-      if (v === undefined) delete process.env[k];
-      else process.env[k] = v;
-  }
-});
-
-test('cron without GITHUB_TOKEN records { skipped: "no token" } as src/data/backup.json', async () => {
-  const saved = {
-    CRON_SECRET: process.env.CRON_SECRET,
-    VERCEL: process.env.VERCEL,
-    DATABASE_URL: process.env.DATABASE_URL,
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-  };
-  Object.assign(process.env, { CRON_SECRET: 's3cret', VERCEL: '1', DATABASE_URL: 'postgres://test' });
-  delete process.env.GITHUB_TOKEN;
-  setSqlForTests(sql);
-  setStoreForTests(
-    (a) => new PostgresStore(sql, a, { purge: async () => {}, put: async () => ({ url: '' }), del: async () => {} }),
-  );
-  try {
-    const res = await cron({
-      request: new Request('https://site.test/x', { headers: { authorization: 'Bearer s3cret' } }),
-    } as never);
-    assert.equal(res.status, 200);
-    assert.equal((await res.json()).skipped, 'no token');
-    const [row] = await sql<{ content: string }>`select content from documents where path = 'src/data/backup.json'`;
-    assert.equal(JSON.parse(row.content).skipped, 'no token');
-  } finally {
-    setSqlForTests(null);
-    setStoreForTests(null);
-    for (const [k, v] of Object.entries(saved))
-      if (v === undefined) delete process.env[k];
-      else process.env[k] = v;
-  }
 });
 
 after(() => setSqlForTests(null));

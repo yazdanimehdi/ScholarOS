@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue';
 import AdminShell from './AdminShell.vue';
 import { api, committed, report, toast } from './api';
 import type { AdminCtx, CommitResult, Entry } from './types';
+import type { JobName, JobsRecord } from '../lib/admin/jobs';
 import type { FeedItem } from '../lib/types';
 import { postStatus } from '../lib/utils';
 
@@ -16,8 +17,29 @@ interface DashboardData {
   lastSync: string | null;
   feedsError?: string;
   mode: 'static' | 'git' | 'postgres';
-  backup: { at: string; ok: boolean; changed?: number; commit?: string; skipped?: string; error?: string } | null;
+  jobs: JobsRecord | null;
 }
+const JOB_LABELS: [JobName, string][] = [
+  ['feeds', 'Feeds'],
+  ['scheduled', 'Scheduled posts'],
+  ['backup', 'Backup to git'],
+];
+const running = ref(false);
+
+async function runNow() {
+  if (!d.value) return;
+  running.value = true;
+  try {
+    d.value.jobs = await api<JobsRecord>('jobs/run', { method: 'POST' });
+    const failed = JOB_LABELS.filter(([name]) => d.value?.jobs?.[name]?.ok === false).map(([, label]) => label);
+    toast(failed.length ? `Jobs finished; failed: ${failed.join(', ')}` : 'Jobs finished');
+  } catch (e) {
+    report(e);
+  } finally {
+    running.value = false;
+  }
+}
+
 interface Row {
   key: string;
   title: string;
@@ -159,21 +181,31 @@ onMounted(load);
           ><span>Content storage</span>
         </div>
       </div>
-      <p v-if="d.mode === 'postgres'" class="adm-muted" role="status">
-        Last backup:
-        <template v-if="!d.backup">never</template>
-        <template v-else>
-          {{ new Date(d.backup.at).toLocaleString() }} ·
-          {{
-            d.backup.skipped
-              ? `skipped (${d.backup.skipped})`
-              : d.backup.ok
-                ? `${d.backup.changed ?? 0} files`
-                : `failed: ${d.backup.error}`
-          }}
-          <a v-if="d.backup.commit" :href="d.backup.commit" target="_blank" rel="noopener">commit</a>
-        </template>
-      </p>
+      <section v-if="d.mode === 'postgres'" class="adm-card adm-form" aria-labelledby="adm-jobs">
+        <div class="adm-head">
+          <h2 id="adm-jobs" class="adm-h2">Daily jobs</h2>
+          <button type="button" class="adm-btn" :disabled="running" @click="runNow">
+            {{ running ? 'Running…' : 'Run now' }}
+          </button>
+        </div>
+        <table class="adm-table">
+          <tbody>
+            <tr v-for="[name, label] in JOB_LABELS" :key="name">
+              <td>{{ label }}</td>
+              <td>
+                <template v-if="d.jobs?.[name]">
+                  {{ d.jobs[name]!.ok ? 'OK' : 'Failed' }} · {{ new Date(d.jobs[name]!.at).toLocaleString() }}
+                </template>
+                <template v-else>Never run</template>
+              </td>
+              <td>
+                {{ d.jobs?.[name]?.detail }}
+                <a v-if="d.jobs?.[name]?.url" :href="d.jobs[name]!.url" target="_blank" rel="noopener">commit</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
       <section class="adm-card adm-form" aria-labelledby="adm-medium">
         <h2 id="adm-medium" class="adm-h2">Medium</h2>
