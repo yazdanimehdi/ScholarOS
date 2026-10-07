@@ -104,7 +104,13 @@ export class PostgresStore implements ContentStore {
         let id = 0;
         for (const c of changes) {
           const prev = current.get(c.path);
-          const version = (prev ?? 0) + 1;
+          let version = (prev ?? 0) + 1;
+          if (prev === undefined) {
+            // A re-created path continues after its history, so an editor holding a pre-delete version conflicts.
+            const [last] = await tx<{ v: number }>`
+              select coalesce(max(version), 0) as v from revisions where path = ${c.path}`;
+            version = last.v + 1;
+          }
           const content = text(c);
           const [rev] = await tx<{ id: string | number }>`
             insert into revisions (path, content, version, author)

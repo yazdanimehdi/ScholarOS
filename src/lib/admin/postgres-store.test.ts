@@ -104,6 +104,20 @@ test('delete records a null revision; history lists newest first with the delete
   assert.equal(await store.revision('not-a-number'), null);
 });
 
+test('a re-created path continues its version history, so a pre-delete editor conflicts', async () => {
+  const { store } = await setup();
+  await store.commit([{ path: P, content: 'one' }], 'Create', {});
+  await store.commit([{ path: P, content: null }], 'Delete', { [P]: '1' });
+  const recreated = await store.commit([{ path: P, content: 'again' }], 'Create', { [P]: null });
+  assert.deepEqual(recreated.versions, { [P]: '3' });
+  await assert.rejects(store.commit([{ path: P, content: 'stale' }], 'Save', { [P]: '1' }), ConflictError);
+  assert.equal((await store.read(P))?.content, 'again');
+  assert.deepEqual(
+    (await store.history(P)).map((h) => h.version),
+    [3, 2, 1],
+  );
+});
+
 test('keeps the newest 50 revisions per changed path', async () => {
   const { store } = await setup();
   let version: string | null = null;
