@@ -180,3 +180,33 @@ test('Run now: Postgres only; runs the same jobs as the signed-in user', async (
     restore();
   }
 });
+
+const HOUR = 60 * 60 * 1000;
+const ago = (hours: number) => new Date(Date.now() - hours * HOUR).toISOString();
+// The jobs.json commit purges its own tag; only the post purges matter here.
+const postPurges = () => purged.filter((tags) => tags.includes('col:posts'));
+async function cronWith(record: object, posts: Record<string, string>) {
+  const restore = env({ CRON_SECRET: 's3cret', VERCEL: '1', DATABASE_URL: 'postgres://test', GITHUB_TOKEN: undefined });
+  try {
+    await sql`insert into documents (path, content) values
+      ('config/feeds.yml', ${'feeds: []\n'}), ('src/data/jobs.json', ${JSON.stringify(record)})`;
+    for (const [slug, date] of Object.entries(posts))
+      await sql`insert into documents (path, content) values (${`src/content/posts/${slug}.md`}, ${post(date)})`;
+    const res = await cron({
+      request: new Request('https://site.test/x', { headers: { authorization: 'Bearer s3cret' } }),
+    } as never);
+    assert.equal(res.status, 200);
+  } finally {
+    restore();
+  }
+}
+
+test('cron after a failed scheduled run: looks a week back, so a post due 3 days ago is released', async () => {
+  await cronWith({ scheduled: { ok: false, at: ago(72) } }, { missed: ago(71) });
+  assert.deepEqual(postPurges(), [['col:posts', 'doc:posts/missed']]);
+});
+
+test('cron after a successful run: only posts due since that run are released', async () => {
+  await cronWith({ scheduled: { ok: true, at: ago(48) } }, { fresh: ago(30), old: ago(72) });
+  assert.deepEqual(postPurges(), [['col:posts', 'doc:posts/fresh']]);
+});
