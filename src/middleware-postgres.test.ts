@@ -20,13 +20,20 @@ before(async () => {
 });
 after(() => {
   setSqlForTests(null);
-  for (const [k, v] of Object.entries(saved)) if (v === undefined) delete process.env[k];
-  else process.env[k] = v;
+  for (const [k, v] of Object.entries(saved))
+    if (v === undefined) delete process.env[k];
+    else process.env[k] = v;
 });
 
 function ctx(path: string, method = 'GET') {
   const url = new URL(path, 'https://site.test');
-  return { url, isPrerendered: false, locals: {}, request: new Request(url, { method }), cookies: { get: () => undefined } };
+  return {
+    url,
+    isPrerendered: false,
+    locals: {},
+    request: new Request(url, { method }),
+    cookies: { get: () => undefined },
+  };
 }
 const run = (path: string, next: () => Promise<Response>) =>
   onRequest(ctx(path) as never, next as never) as Promise<Response>;

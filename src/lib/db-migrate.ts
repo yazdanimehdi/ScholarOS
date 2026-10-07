@@ -9,7 +9,10 @@ export async function migrate(sql: Sql, dir = path.resolve('migrations')): Promi
   );
   const done = new Set((await sql<{ name: string }>`select name from schema_migrations`).map((r) => r.name));
   const applied: string[] = [];
-  for (const name of fs.readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()) {
+  for (const name of fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.sql'))
+    .sort()) {
     if (done.has(name)) continue;
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
     await sql.begin(async (tx) => {

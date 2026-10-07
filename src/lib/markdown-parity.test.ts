@@ -13,7 +13,10 @@ const cases = [
   fs
     .readdirSync(`src/content/${dir}`)
     .filter((f) => f.endsWith('.md'))
-    .map((f) => ({ file: `src/content/${dir}/${f}`, page: path.join('dist', route, f.replace(/\.md$/, ''), 'index.html') })),
+    .map((f) => ({
+      file: `src/content/${dir}/${f}`,
+      page: path.join('dist', route, f.replace(/\.md$/, ''), 'index.html'),
+    })),
 );
 
 /** Whitespace, and the class/style attributes shiki and Astro's compressor may write differently. */
@@ -25,8 +28,12 @@ const normalize = (html: string) =>
     .trim();
 
 for (const c of cases) {
-  test(`renderMarkdownDocument matches the build: ${c.file}`, { skip: !fs.existsSync(c.page) && 'no static build of this page' }, async () => {
-    const { html } = await renderMarkdownDocument(parseMarkdown(fs.readFileSync(c.file, 'utf8')).body);
-    assert.ok(normalize(fs.readFileSync(c.page, 'utf8')).includes(normalize(html)), `${c.file} renders differently`);
-  });
+  test(
+    `renderMarkdownDocument matches the build: ${c.file}`,
+    { skip: !fs.existsSync(c.page) && 'no static build of this page' },
+    async () => {
+      const { html } = await renderMarkdownDocument(parseMarkdown(fs.readFileSync(c.file, 'utf8')).body);
+      assert.ok(normalize(fs.readFileSync(c.page, 'utf8')).includes(normalize(html)), `${c.file} renders differently`);
+    },
+  );
 }

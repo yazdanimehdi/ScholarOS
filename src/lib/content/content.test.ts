@@ -26,7 +26,8 @@ before(async () => {
   process.env.DATABASE_URL = 'postgres://test';
   sql = pgliteSql();
   await migrate(sql);
-  const post = (title: string, extra = '') => `---\ntitle: ${title}\ndate: 2024-06-01\n${extra}---\n\n## Hello\n\nBody\n`;
+  const post = (title: string, extra = '') =>
+    `---\ntitle: ${title}\ndate: 2024-06-01\n${extra}---\n\n## Hello\n\nBody\n`;
   await sql`insert into documents (path, content) values
     ('src/content/posts/a.md', ${post('A')}),
     ('src/content/posts/draft.md', ${post('Draft', 'draft: true\n')}),
@@ -36,8 +37,9 @@ before(async () => {
 });
 after(() => {
   setSqlForTests(null);
-  for (const [k, v] of Object.entries(saved)) if (v === undefined) delete process.env[k];
-  else process.env[k] = v;
+  for (const [k, v] of Object.entries(saved))
+    if (v === undefined) delete process.env[k];
+    else process.env[k] = v;
 });
 
 const inRequest = async <T>(fn: (ctx: RequestContext) => Promise<T>, files = new Map<string, string>()) => {
@@ -47,7 +49,9 @@ const inRequest = async <T>(fn: (ctx: RequestContext) => Promise<T>, files = new
 
 test('parseDocuments: demo content parses to getCollection-shaped entries', () => {
   const dir = 'src/content/people';
-  const docs = fs.readdirSync(dir).map((f) => ({ path: `${dir}/${f}`, content: fs.readFileSync(`${dir}/${f}`, 'utf8') }));
+  const docs = fs
+    .readdirSync(dir)
+    .map((f) => ({ path: `${dir}/${f}`, content: fs.readFileSync(`${dir}/${f}`, 'utf8') }));
   const entries = parseDocuments('people', docs);
   assert.equal(entries.length, docs.length);
   const jane = entries.find((e) => e.id === 'jane-smith')!;
@@ -93,12 +97,17 @@ test('getEntry: one document, tagged doc:<name>/<id>; unknown → undefined', as
 });
 
 test('feeds come from the request snapshot of src/data/feeds.json', async () => {
-  const feeds = JSON.stringify([{ id: 'm1', title: 'T', link: 'https://medium.com/x', date: '2024-01-01', source: 'Medium' }]);
+  const feeds = JSON.stringify([
+    { id: 'm1', title: 'T', link: 'https://medium.com/x', date: '2024-01-01', source: 'Medium' },
+  ]);
   const { items, tags } = await inRequest(
     async (ctx) => ({ items: await getEntries('feeds'), tags: [...ctx.tags] }),
     new Map([['src/data/feeds.json', feeds]]),
   );
-  assert.deepEqual(items.map((i) => i.id), ['m1']);
+  assert.deepEqual(
+    items.map((i) => i.id),
+    ['m1'],
+  );
   assert.ok(tags.includes('col:feeds'));
 });
 
@@ -117,7 +126,10 @@ test('a failed query marks the request for a 503', async () => {
   }) as unknown as Sql);
   try {
     const ctx = newContext(new Map());
-    await assert.rejects(runWithContext(ctx, () => getEntries('projects')), /down/);
+    await assert.rejects(
+      runWithContext(ctx, () => getEntries('projects')),
+      /down/,
+    );
     assert.equal(ctx.dbFailed, true);
   } finally {
     setSqlForTests(sql);
@@ -129,7 +141,10 @@ test('entry bodies: Markdown with headings; MDX gets the notice', async () => {
     const [a] = await quiet(() => getEntries('posts'));
     const { html } = await renderEntryHtml(a);
     assert.match(html, /<h2 id="hello">Hello<\/h2>/);
-    assert.deepEqual((await entryHeadings(a)).map((h) => h.slug), ['hello']);
+    assert.deepEqual(
+      (await entryHeadings(a)).map((h) => h.slug),
+      ['hello'],
+    );
     const mdx = (await quiet(() => getEntries('posts'))).find((p) => p.id === 'old')!;
     assert.match((await renderEntryHtml(mdx)).html, /only supported in static\/git mode/);
   });

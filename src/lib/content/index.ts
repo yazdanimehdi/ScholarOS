@@ -80,7 +80,10 @@ export function renderEntryHtml(entry: { body?: string; filePath?: string }) {
   let out = rendered.get(entry);
   if (!out) {
     out = entry.filePath?.endsWith('.mdx')
-      ? Promise.resolve({ html: '<p>This post uses MDX, which is only supported in static/git mode.</p>', headings: [] })
+      ? Promise.resolve({
+          html: '<p>This post uses MDX, which is only supported in static/git mode.</p>',
+          headings: [],
+        })
       : renderMarkdownDocument(entry.body ?? '');
     rendered.set(entry, out);
   }

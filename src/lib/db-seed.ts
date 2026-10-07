@@ -44,7 +44,12 @@ export function mediaFiles(root: string, mediaFolder: string): string[] {
 }
 
 /** The repo file a reference inside `docPath` points at: a public/ URL, a public_folder URL, or a relative path. */
-export function resolveReference(ref: string, docPath: string, publicFolder: string, mediaFolder: string): string | null {
+export function resolveReference(
+  ref: string,
+  docPath: string,
+  publicFolder: string,
+  mediaFolder: string,
+): string | null {
   if (/^[a-z][a-z0-9+.-]*:/i.test(ref) || ref.startsWith('//')) return null;
   if (ref.startsWith(`${publicFolder}/`)) return mediaFolder + ref.slice(publicFolder.length);
   if (ref.startsWith('/')) return `public${ref}`;

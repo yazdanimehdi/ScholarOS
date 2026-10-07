@@ -44,13 +44,27 @@ test('mediaFiles: images from media_folder and public/images only', () => {
 });
 
 test('resolveReference: public URLs, public_folder URLs, relative paths; external ignored', () => {
-  assert.equal(resolveReference('/images/x.svg', 'config/site.yml', folders.publicFolder, folders.mediaFolder), 'public/images/x.svg');
-  assert.equal(resolveReference('/src/assets/images/y.png', 'src/content/posts/a.md', folders.publicFolder, folders.mediaFolder), 'src/assets/images/y.png');
   assert.equal(
-    resolveReference('../../assets/images/people/p.svg', 'src/content/people/jane.md', folders.publicFolder, folders.mediaFolder),
+    resolveReference('/images/x.svg', 'config/site.yml', folders.publicFolder, folders.mediaFolder),
+    'public/images/x.svg',
+  );
+  assert.equal(
+    resolveReference('/src/assets/images/y.png', 'src/content/posts/a.md', folders.publicFolder, folders.mediaFolder),
+    'src/assets/images/y.png',
+  );
+  assert.equal(
+    resolveReference(
+      '../../assets/images/people/p.svg',
+      'src/content/people/jane.md',
+      folders.publicFolder,
+      folders.mediaFolder,
+    ),
     'src/assets/images/people/p.svg',
   );
-  assert.equal(resolveReference('https://cdn.example/x.png', 'config/site.yml', folders.publicFolder, folders.mediaFolder), null);
+  assert.equal(
+    resolveReference('https://cdn.example/x.png', 'config/site.yml', folders.publicFolder, folders.mediaFolder),
+    null,
+  );
   assert.equal(resolveReference('plain text', 'config/site.yml', folders.publicFolder, folders.mediaFolder), null);
 });
 
@@ -61,12 +75,16 @@ test('relative front-matter paths are rewritten; so are YAML values and Markdown
     ['src/assets/images/fig.png', 'https://b.public.blob.vercel-storage.com/fig-333333.png'],
   ]);
   const person = "---\nname: Jane\nphoto: '../../assets/images/people/p.svg'\n---\n\nBio\n";
-  assert.match(rewriteReferences('src/content/people/jane.md', person, urls, folders), /photo: 'https:\/\/b\.public\.blob\.vercel-storage\.com\/p-111111\.svg'/);
+  assert.match(
+    rewriteReferences('src/content/people/jane.md', person, urls, folders),
+    /photo: 'https:\/\/b\.public\.blob\.vercel-storage\.com\/p-111111\.svg'/,
+  );
   const site = "hero:\n  image: '/images/hero.svg' # figure\nother: '/images/missing.svg'\n";
   const out = rewriteReferences('config/site.yml', site, urls, folders);
   assert.match(out, /image: 'https:\/\/b\.public\.blob\.vercel-storage\.com\/hero-222222\.svg' # figure/);
   assert.match(out, /other: '\/images\/missing\.svg'/);
-  const post = '---\ntitle: T\n---\n\n![Fig](/src/assets/images/fig.png)\n\n<img src="/images/hero.svg" alt="">\n[link](https://x.y)\n';
+  const post =
+    '---\ntitle: T\n---\n\n![Fig](/src/assets/images/fig.png)\n\n<img src="/images/hero.svg" alt="">\n[link](https://x.y)\n';
   const rewritten = rewriteReferences('src/content/posts/t.md', post, urls, folders);
   assert.match(rewritten, /!\[Fig\]\(https:\/\/b\.public\.blob\.vercel-storage\.com\/fig-333333\.png\)/);
   assert.match(rewritten, /<img src="https:\/\/b\.public\.blob\.vercel-storage\.com\/hero-222222\.svg"/);
@@ -96,7 +114,8 @@ test('rewriteReferences replaces whole reference tokens only', () => {
     ['public/images/hero.svg', `${blob}/hero-222222.svg`],
     ['src/content/assets/a.png', `${blob}/a-444444.png`],
   ]);
-  const doc = "---\nhero: '/images/hero.svg'\next: https://other.example/images/hero.svg\nshort: '../assets/a.png'\nlong: '../../assets/a.png'\n---\n";
+  const doc =
+    "---\nhero: '/images/hero.svg'\next: https://other.example/images/hero.svg\nshort: '../assets/a.png'\nlong: '../../assets/a.png'\n---\n";
   const out = rewriteReferences('src/content/people/j.md', doc, urls, folders);
   assert.match(out, new RegExp(`hero: '${blob}/hero-222222\\.svg'`)); // (c) both rewritten sites still rewritten
   assert.match(out, new RegExp(`short: '${blob}/a-444444\\.png'`));

@@ -80,10 +80,21 @@ test('history: list newest first, read a revision, restore onto the current vers
 
 test('history: a deletion can’t be restored; unknown ids 404; paths outside the allowlist 400', async () => {
   const v1 = (await (await save('One', null)).json()).versions['src/content/posts/hist.md'];
-  const store = new PostgresStore(sql, { name: 'Jane', email: 'j@x' }, { purge: async () => {}, put: async () => ({ url: '' }), del: async () => {} });
-  await store.commit([{ path: 'src/content/posts/hist.md', content: null }], 'Delete', { 'src/content/posts/hist.md': v1 });
-  const [deleted] = (await (await call(history, { query: '?path=src/content/posts/hist.md' })).json()) as { id: string }[];
-  assert.equal((await call(restore, { method: 'POST', params: { id: deleted.id }, body: { version: null } })).status, 400);
+  const store = new PostgresStore(
+    sql,
+    { name: 'Jane', email: 'j@x' },
+    { purge: async () => {}, put: async () => ({ url: '' }), del: async () => {} },
+  );
+  await store.commit([{ path: 'src/content/posts/hist.md', content: null }], 'Delete', {
+    'src/content/posts/hist.md': v1,
+  });
+  const [deleted] = (await (await call(history, { query: '?path=src/content/posts/hist.md' })).json()) as {
+    id: string;
+  }[];
+  assert.equal(
+    (await call(restore, { method: 'POST', params: { id: deleted.id }, body: { version: null } })).status,
+    400,
+  );
   assert.equal((await call(revision, { params: { id: '999999' } })).status, 404);
   assert.equal((await call(history, { query: '?path=../../etc/passwd' })).status, 400);
 });
@@ -120,8 +131,16 @@ test('a save whose purge fails answers 200 with the warning and the tags to retr
 });
 
 test('dashboard reports the mode and the last backup', async () => {
-  const store = new PostgresStore(sql, undefined, { purge: async () => {}, put: async () => ({ url: '' }), del: async () => {} });
-  await store.commit([{ path: 'src/data/backup.json', content: '{"at":"2026-10-06T03:00:00.000Z","ok":true,"changed":2}' }], 'r', {});
+  const store = new PostgresStore(sql, undefined, {
+    purge: async () => {},
+    put: async () => ({ url: '' }),
+    del: async () => {},
+  });
+  await store.commit(
+    [{ path: 'src/data/backup.json', content: '{"at":"2026-10-06T03:00:00.000Z","ok":true,"changed":2}' }],
+    'r',
+    {},
+  );
   const body = await (await call(dashboard)).json();
   assert.equal(body.mode, 'static'); // tests run without VERCEL
   assert.deepEqual(body.backup, { at: '2026-10-06T03:00:00.000Z', ok: true, changed: 2 });

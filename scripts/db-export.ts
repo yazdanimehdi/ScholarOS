@@ -18,7 +18,10 @@ if (!process.env.DATABASE_URL) {
 const dir = path.resolve(process.argv[2] ?? path.resolve(import.meta.dirname, '..'));
 const client = postgres(process.env.DATABASE_URL, { max: 1, prepare: false });
 try {
-  const rows = await (client as unknown as Sql)<{ path: string; content: string }>`select path, content from documents order by path`;
+  const rows = await (client as unknown as Sql)<{
+    path: string;
+    content: string;
+  }>`select path, content from documents order by path`;
   let written = 0;
   for (const row of rows) {
     const target = exportTarget(dir, row.path);

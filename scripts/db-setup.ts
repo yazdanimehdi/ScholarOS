@@ -29,7 +29,9 @@ try {
   await migrate(sql, path.join(ROOT, 'migrations'));
   const [{ count }] = await sql<{ count: number }>`select count(*)::int as count from documents`;
   if (count > 0 && !process.argv.includes('--force')) {
-    console.error(`The database already has ${count} documents. Re-run with --force to overwrite them with the repo's files.`);
+    console.error(
+      `The database already has ${count} documents. Re-run with --force to overwrite them with the repo's files.`,
+    );
     process.exitCode = 1;
   } else {
     const { mediaFolder, publicFolder } = loadAdminSettings(ROOT);
@@ -38,7 +40,12 @@ try {
       const bytes = fs.readFileSync(path.join(ROOT, file));
       try {
         const { filename, contentType } = prepareUpload(path.basename(file), bytes);
-        const { url } = await put(filename, bytes, { access: 'public', contentType, addRandomSuffix: false, allowOverwrite: true });
+        const { url } = await put(filename, bytes, {
+          access: 'public',
+          contentType,
+          addRandomSuffix: false,
+          allowOverwrite: true,
+        });
         await sql`insert into media (url, pathname, size, content_type)
           values (${url}, ${filename}, ${bytes.length}, ${contentType}) on conflict (url) do nothing`;
         urls.set(file, url);
@@ -49,7 +56,10 @@ try {
     }
     const { documents, skipped } = seedFiles(ROOT);
     for (const file of documents) {
-      const content = rewriteReferences(file, fs.readFileSync(path.join(ROOT, file), 'utf8'), urls, { publicFolder, mediaFolder });
+      const content = rewriteReferences(file, fs.readFileSync(path.join(ROOT, file), 'utf8'), urls, {
+        publicFolder,
+        mediaFolder,
+      });
       await sql.begin(async (tx) => {
         const [row] = await tx<{ version: number }>`
           insert into documents (path, content, updated_by) values (${file}, ${content}, 'seed')
@@ -62,7 +72,9 @@ try {
     console.log(`Documents: ${documents.length}`);
     console.log(`Images uploaded to Blob: ${urls.size}`);
     if (skipped.length) {
-      console.log(`Not copied (Postgres mode edits only slug-named files the admin allows):\n  ${skipped.join('\n  ')}`);
+      console.log(
+        `Not copied (Postgres mode edits only slug-named files the admin allows):\n  ${skipped.join('\n  ')}`,
+      );
     }
   }
 } finally {
