@@ -547,13 +547,17 @@ content to the `content-backup` branch.
 
 1. In the Vercel project: **Storage → Marketplace → Neon** (sets `DATABASE_URL`) and **Storage → Blob**
    (sets `BLOB_READ_WRITE_TOKEN`). Add `CRON_SECRET` (`openssl rand -base64 48`). Keep `GITHUB_TOKEN` for the backup.
-2. Locally: `vercel env pull .env.local`, then `pnpm db:setup`. It creates the tables, copies `config/`,
+2. Locally: `vercel env pull .env.local --environment=production`, then `pnpm db:setup`. It creates the tables, copies `config/`,
    `src/content/` and `src/data/` into the database, uploads `src/assets/images` and `public/images` to Blob, and
-   rewrites image references to Blob URLs. It lists any file it could not copy.
+   rewrites image references to Blob URLs. It lists any file it could not copy. On a database that already has
+   content it stops; `pnpm db:setup --force` overwrites the documents that exist in the repo and leaves documents
+   that exist only in the database.
 3. Redeploy. The admin dashboard now shows **Postgres**.
 
 Notes: MDX posts are shown with a notice (MDX needs a build). PDF CV generation arrives in a later release.
-Editing `adminUsers` takes effect after a redeploy.
+Editing `adminUsers` takes effect after a redeploy. The feeds, Google Scholar and SEO workflows
+(`sync-feeds.yml`, `sync-scholar.yml`, `generate-seo.yml`) commit to git and have no effect on a Postgres-mode site;
+use **Check now** under feeds in the admin dashboard to refresh feeds.
 
 **Back to git mode:** `pnpm db:export` (writes the database's files into the repo; image references stay Blob
 URLs), commit, remove `DATABASE_URL` from the project, redeploy.
