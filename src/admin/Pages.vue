@@ -113,6 +113,8 @@ onMounted(() => {
     <section v-show="tab === 'home'" class="adm-form" aria-label="Home page">
       <DocBanners
         :draft="!!home.draft"
+        :path="'config/site.yml'"
+        :version="home.version"
         :conflict="home.conflict"
         :stale="home.draftStale ? home.draftChanges : null"
         @restore="home.restore()"
@@ -131,6 +133,8 @@ onMounted(() => {
     <section v-show="tab === 'research'" class="adm-form" aria-label="Research page">
       <DocBanners
         :draft="!!research.draft"
+        :path="'config/research.yml'"
+        :version="research.version"
         :conflict="research.conflict"
         :stale="research.draftStale ? research.draftChanges : null"
         @restore="research.restore()"

@@ -99,6 +99,8 @@ function setSubtitle(e: Event) {
     <template v-if="doc.current">
       <DocBanners
         :draft="!!doc.draft"
+        :path="isNew ? undefined : `src/content/posts/${slug}.md`"
+        :version="doc.version"
         :conflict="doc.conflict"
         :stale="doc.draftStale ? doc.draftChanges : null"
         @restore="doc.restore()"

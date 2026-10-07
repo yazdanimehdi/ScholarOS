@@ -44,7 +44,7 @@ interface Run {
   url: string;
 }
 
-defineProps<{ ctx: AdminCtx }>();
+const props = defineProps<{ ctx: AdminCtx }>();
 const doc = useDocument<CvDoc>();
 const upload = ref<{ enabled: boolean; version: string | null }>({ enabled: false, version: null });
 const publicationCount = ref(0);
@@ -286,6 +286,7 @@ function closeImport() {
 
 // ── PDF (GitHub Actions: render-cv.yml) ──
 async function checkPdf() {
+  if (props.ctx.mode === 'postgres') return;
   try {
     const { run } = await api<{ run: Run | null }>('cv/pdf');
     pdf.value = run;
@@ -316,7 +317,12 @@ async function generatePdf() {
         >{{ pdfLabel }} · <a :href="pdf.url" target="_blank" rel="noopener">run</a></span
       >
       <button type="button" class="adm-btn" @click="importing = true">Import YAML</button>
-      <button type="button" class="adm-btn" @click="generatePdf">Generate PDF</button>
+      <button type="button" class="adm-btn" :disabled="ctx.mode === 'postgres'" @click="generatePdf">
+        Generate PDF
+      </button>
+      <span v-if="ctx.mode === 'postgres'" class="adm-muted"
+        >PDF generation in Postgres mode — coming in sub-project 4</span
+      >
       <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || !doc.current" @click="publish">
         Publish
       </button>
@@ -332,6 +338,8 @@ async function generatePdf() {
     </p>
     <DocBanners
       :draft="!!doc.draft"
+      :path="'config/cv.yml'"
+      :version="doc.version"
       :conflict="doc.conflict"
       :stale="doc.draftStale ? doc.draftChanges : null"
       @restore="doc.restore()"

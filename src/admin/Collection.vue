@@ -156,6 +156,8 @@ async function remove() {
       <section v-if="doc.current" aria-label="Editor" class="adm-form">
         <DocBanners
           :draft="!!doc.draft"
+          :path="selected && !creating ? path(selected) : undefined"
+          :version="doc.version"
           :conflict="doc.conflict"
           :stale="doc.draftStale ? doc.draftChanges : null"
           @restore="doc.restore()"

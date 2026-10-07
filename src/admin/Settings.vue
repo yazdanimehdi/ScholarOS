@@ -134,6 +134,8 @@ onMounted(() => {
     </template>
     <DocBanners
       :draft="!!site.draft"
+      :path="'config/site.yml'"
+      :version="site.version"
       :conflict="site.conflict"
       :stale="site.draftStale ? site.draftChanges : null"
       @restore="site.restore()"
@@ -151,6 +153,8 @@ onMounted(() => {
       <legend>Feeds</legend>
       <DocBanners
         :draft="!!feeds.draft"
+        :path="'config/feeds.yml'"
+        :version="feeds.version"
         :conflict="feeds.conflict"
         :stale="feeds.draftStale ? feeds.draftChanges : null"
         @restore="feeds.restore()"

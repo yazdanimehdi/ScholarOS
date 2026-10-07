@@ -14,6 +14,8 @@ interface DashboardData {
   cvUpdated: string | null;
   lastSync: string | null;
   feedsError?: string;
+  mode: 'static' | 'git' | 'postgres';
+  backup: { at: string; ok: boolean; changed?: number; commit?: string; skipped?: string; error?: string } | null;
 }
 interface Row {
   key: string;
@@ -151,7 +153,26 @@ onMounted(load);
           <b>{{ d.cvUpdated ? new Date(d.cvUpdated).toLocaleDateString() : '—' }}</b
           ><span>CV last updated</span>
         </div>
+        <div class="adm-card adm-tile">
+          <b>{{ d.mode === 'postgres' ? 'Postgres' : 'Git' }}</b
+          ><span>Content storage</span>
+        </div>
       </div>
+      <p v-if="d.mode === 'postgres'" class="adm-muted" role="status">
+        Last backup:
+        <template v-if="!d.backup">never</template>
+        <template v-else>
+          {{ new Date(d.backup.at).toLocaleString() }} ·
+          {{
+            d.backup.skipped
+              ? `skipped (${d.backup.skipped})`
+              : d.backup.ok
+                ? `${d.backup.changed ?? 0} files`
+                : `failed: ${d.backup.error}`
+          }}
+          <a v-if="d.backup.commit" :href="d.backup.commit" target="_blank" rel="noopener">commit</a>
+        </template>
+      </p>
 
       <section class="adm-card adm-form" aria-labelledby="adm-medium">
         <h2 id="adm-medium" class="adm-h2">Medium</h2>

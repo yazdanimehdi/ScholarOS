@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { api, toasts } from './api';
+import { api, session, toasts } from './api';
 import type { AdminCtx } from './types';
 
 const props = defineProps<{ ctx: AdminCtx; active: string; title: string }>();
 const base = `/${props.ctx.adminPath}`;
+session.mode = props.ctx.mode;
 const banner = ref('');
 const contentOpen = ref(props.active.startsWith('content/'));
 // Phones (under 860px): the nav is a menu, closed until opened. Links reload the page, which closes it again.
@@ -97,7 +98,9 @@ async function signOut() {
       </div>
     </aside>
     <main class="adm-main">
-      <p v-if="banner" class="adm-banner adm-banner-error" role="alert">{{ banner }}</p>
+      <p v-if="banner || session.outage" class="adm-banner adm-banner-error" role="alert">
+        {{ session.outage || banner }}
+      </p>
       <div class="adm-head">
         <h1>{{ title }}</h1>
         <div class="adm-actions"><slot name="actions" /></div>
@@ -106,7 +109,10 @@ async function signOut() {
     </main>
     <div class="adm-toasts" aria-live="polite">
       <div v-for="t in toasts" :key="t.id" class="adm-toast">
-        {{ t.text }}<a v-if="t.href" :href="t.href" target="_blank" rel="noopener">View commit</a>
+        {{ t.text }}<a v-if="t.href" :href="t.href" target="_blank" rel="noopener">View commit</a
+        ><button v-if="t.action" type="button" class="adm-btn adm-btn-small" @click="t.action.run()">
+          {{ t.action.label }}
+        </button>
       </div>
     </div>
   </div>

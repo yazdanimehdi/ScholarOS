@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import type { CommitResult } from './types';
+import type { AdminCtx, CommitResult } from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -11,19 +11,34 @@ export class ApiError extends Error {
   }
 }
 
-export const toasts = reactive<{ id: number; text: string; href?: string }[]>([]);
+type ToastAction = { label: string; run: () => void };
+export const toasts = reactive<{ id: number; text: string; href?: string; action?: ToastAction }[]>([]);
 let lastToast = 0;
 
-export function toast(text: string, href?: string): void {
+export function toast(text: string, href?: string, action?: ToastAction): void {
   const id = ++lastToast;
-  toasts.push({ id, text, href });
-  setTimeout(() => {
-    const i = toasts.findIndex((t) => t.id === id);
-    if (i >= 0) toasts.splice(i, 1);
-  }, 8000);
+  toasts.push({ id, text, href, action });
+  setTimeout(
+    () => {
+      const i = toasts.findIndex((t) => t.id === id);
+      if (i >= 0) toasts.splice(i, 1);
+    },
+    action ? 20000 : 8000,
+  );
 }
 
-export function committed(result: Pick<CommitResult, 'url'>): void {
+/** Set by AdminShell from the page context; `outage` is the persistent "database unreachable" banner. */
+export const session = reactive({ mode: 'git' as AdminCtx['mode'], outage: '' });
+
+export function committed(result: Pick<CommitResult, 'url' | 'warning' | 'tags'>): void {
+  if (result.warning === 'cache-purge-failed') {
+    const tags = result.tags ?? [];
+    return toast('Published, but the page cache could not be refreshed: visitors may see the old version.', undefined, {
+      label: 'Retry refresh',
+      run: () => void api('cache/purge', { body: { tags } }).then(() => toast('Cache refreshed'), report),
+    });
+  }
+  if (session.mode === 'postgres') return toast('Published');
   toast('Committed · live in about a minute', result.url);
 }
 
@@ -49,6 +64,8 @@ export async function api<T = unknown>(
   const data = res.headers.get('content-type')?.includes('application/json') ? await res.json() : null;
   // The session ended: reloading lets the middleware send the page to the login screen.
   if (res.status === 401) location.reload();
+  if (res.status === 503) session.outage = data?.error ?? 'The database is unreachable.';
+  else if (res.ok) session.outage = '';
   if (!res.ok) throw new ApiError(res.status, data?.error ?? res.statusText, data?.details);
   return data as T;
 }
