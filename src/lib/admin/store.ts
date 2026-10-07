@@ -24,6 +24,9 @@ export interface CommitResult {
   url?: string;
   /** New version of every file in the commit (null for deletions), in the store's own versioning. */
   versions: Record<string, string | null>;
+  /** Postgres mode: the save stands but the CDN cache wasn't purged; `tags` is what to retry. */
+  warning?: 'cache-purge-failed';
+  tags?: string[];
 }
 
 /** Git blob sha of each changed file: the versions a git-backed store reports after a commit. */

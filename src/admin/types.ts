@@ -10,6 +10,8 @@ export interface CommitResult {
   id: string;
   url?: string;
   versions: Record<string, string | null>;
+  warning?: 'cache-purge-failed';
+  tags?: string[];
 }
 
 export interface Entry {
