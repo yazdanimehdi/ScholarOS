@@ -2,15 +2,14 @@
 import ClassicBlog from '../../themes/classic/Blog.astro';
 import EditorialBlog from '../../themes/editorial/Blog.astro';
 import { loadBlog } from '../../themes/editorial/data';
-import { getEntries } from '../../lib/content';
-import { getTheme, hiddenFeedIds, isPersonalMode } from '../../lib/config';
-import { withoutHidden } from '../../lib/utils';
+import { getEntries, getPublicFeeds } from '../../lib/content';
+import { getTheme, isPersonalMode } from '../../lib/config';
 
 const personal = isPersonalMode();
 
 const posts = (await getEntries('posts')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const feeds = withoutHidden(await getEntries('feeds'), hiddenFeedIds()).sort(
+const feeds = (await getPublicFeeds()).sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
 );
 

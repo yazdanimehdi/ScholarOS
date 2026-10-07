@@ -212,6 +212,15 @@ collections:
         required: false
         field: { label: 'Tag', name: 'tag', widget: 'string' }
       - { label: 'Keywords', name: 'keywords', widget: 'string', required: false }
+      - label: 'Medium'
+        name: 'medium'
+        widget: 'object'
+        required: false
+        collapsed: true
+        hint: 'Filled in when the post is cross-posted to Medium; the Medium copy is then hidden on the Writing page.'
+        fields:
+          - { label: 'Medium URL', name: 'url', widget: 'string', required: false }
+          - { label: 'Medium post id', name: 'id', widget: 'string', required: false }
       - { label: 'Body', name: 'body', widget: 'markdown' }
 
   - name: 'publications'

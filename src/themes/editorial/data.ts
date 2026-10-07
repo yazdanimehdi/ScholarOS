@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { getEntries, getEntry } from '../../lib/content';
+import { getEntries, getEntry, getPublicFeeds } from '../../lib/content';
 import {
   cvEntryView,
   cvSections,
@@ -9,7 +9,7 @@ import {
   sectionTitle,
   type CvEntryView,
 } from '../../lib/cv';
-import { getHomepageSections, getSiteConfig, getSiteName, hiddenFeedIds, loadYamlConfig } from '../../lib/config';
+import { getHomepageSections, getSiteConfig, getSiteName, loadYamlConfig } from '../../lib/config';
 import {
   elsewhereLabel,
   featuredFirst,
@@ -24,7 +24,7 @@ import {
   type WritingItem,
 } from '../../lib/editorial';
 import { renderMarkdown } from '../../lib/markdown';
-import { byId as idOrder, readingTime, withoutHidden } from '../../lib/utils';
+import { byId as idOrder, readingTime } from '../../lib/utils';
 
 export function loadResearchConfig(): ResearchConfig {
   try {
@@ -44,10 +44,10 @@ export function pick<T>(ids: string[], byId: Map<string, T>, where: string): T[]
   });
 }
 
-/** Site posts (non-draft) and feed items, newest first. External items never carry content. */
+/** Published site posts and feed items, newest first. External items never carry content. */
 export async function writingItems(): Promise<WritingItem[]> {
   const posts = await getEntries('posts');
-  const feeds = withoutHidden(await getEntries('feeds'), hiddenFeedIds());
+  const feeds = await getPublicFeeds();
   return mergeWriting([
     ...posts.map((p) => ({
       kind: 'site' as const,

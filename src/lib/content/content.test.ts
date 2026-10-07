@@ -6,7 +6,7 @@ import { pgliteSql } from '../pglite-sql';
 import { setSqlForTests, type Sql } from '../db';
 import { newContext, runWithContext, type RequestContext } from './context';
 import { parseDocuments } from './documents';
-import { entryHeadings, getEntries, getEntry, renderEntryHtml, staticProps } from './index';
+import { entryHeadings, getEntries, getEntry, getPublicFeeds, renderEntryHtml, staticProps } from './index';
 
 let sql: Sql;
 const saved = { VERCEL: process.env.VERCEL, DATABASE_URL: process.env.DATABASE_URL };
@@ -185,5 +185,33 @@ test('posts: drafts and future-dated posts are not public, in lists or by id', a
     assert.equal(a?.id, 'a');
   } finally {
     await sql`delete from documents where path = 'src/content/posts/later.md'`;
+  }
+});
+
+test('getPublicFeeds: drops hidden ids and copies of cross-posted posts', async () => {
+  await sql`insert into documents (path, content) values
+    ('src/content/posts/crossed.md', ${'---\ntitle: Crossed\ndate: 2024-06-01\nmedium:\n  url: https://medium.com/@j/crossed-1\n---\n'})`;
+  const feeds = JSON.stringify([
+    {
+      id: 'c',
+      title: 'Crossed',
+      link: 'https://medium.com/@j/crossed-1?source=rss',
+      date: '2024-06-02',
+      source: 'Medium',
+    },
+    { id: 'h', title: 'Hidden', link: 'https://medium.com/@j/h', date: '2024-06-02', source: 'Medium' },
+    { id: 'k', title: 'Kept', link: 'https://medium.com/@j/k', date: '2024-06-02', source: 'Medium' },
+  ]);
+  try {
+    const ids = await inRequest(
+      async () => (await quiet(() => getPublicFeeds())).map((f) => f.id),
+      new Map([
+        ['src/data/feeds.json', feeds],
+        ['config/feeds.yml', 'hidden: [h]\n'],
+      ]),
+    );
+    assert.deepEqual(ids, ['k']);
+  } finally {
+    await sql`delete from documents where path = 'src/content/posts/crossed.md'`;
   }
 });

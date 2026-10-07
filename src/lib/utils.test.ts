@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { becameDue, formatNewsDate, isPublished, postStatus, readingTime, withoutHidden } from './utils';
+import {
+  becameDue,
+  formatNewsDate,
+  isPublished,
+  postStatus,
+  readingTime,
+  withoutCrossPosted,
+  withoutHidden,
+} from './utils';
 
 // West of UTC: date-only frontmatter (UTC midnight) must not slip to the previous day.
 process.env.TZ = 'America/Los_Angeles';
@@ -66,4 +74,26 @@ test('postStatus: Draft, Scheduled · date, Published', () => {
   assert.equal(postStatus({ date: '2026-10-08' }, now), 'Scheduled · 2026-10-08');
   assert.equal(postStatus({ date: '2026-10-07' }, now), 'Published');
   assert.equal(postStatus({}, now), 'Published');
+});
+
+test('withoutCrossPosted: hides feed copies of cross-posted site posts by link (query ignored) or normalized title', () => {
+  const item = (link: string, title: string) => ({ id: link, data: { link, title } });
+  const posts = [
+    { data: { title: 'Fast  Proofs: A Tour!', medium: { url: 'https://medium.com/@jane/fast-proofs-a-tour-1a2b' } } },
+    { data: { title: 'Only on the site' } },
+  ];
+  const kept = withoutCrossPosted(
+    [
+      item('https://medium.com/@jane/fast-proofs-a-tour-1a2b?source=rss-abc------2', 'Fast proofs: a tour'),
+      item('https://medium.com/@jane/renamed-9z', 'fast proofs a tour'),
+      item('https://medium.com/@jane/other-3c', 'A different essay'),
+      item('https://medium.com/@jane/only-4d', 'Only on the site'),
+    ],
+    posts,
+  );
+  assert.deepEqual(
+    kept.map((i) => i.data.title),
+    ['A different essay', 'Only on the site'],
+    'link match, title match; a same-titled post without a Medium URL hides nothing',
+  );
 });

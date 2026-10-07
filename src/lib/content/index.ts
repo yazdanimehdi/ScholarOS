@@ -3,7 +3,8 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 import { getSql } from '../db';
 import { renderMarkdownDocument } from '../markdown';
 import { getMode } from '../mode';
-import { isPublished } from '../utils';
+import { hiddenFeedIds } from '../config';
+import { isPublished, withoutCrossPosted, withoutHidden } from '../utils';
 import { memo, readSiteFile, requestContext } from './context';
 import { parseDocuments, type DocumentCollection, type DocumentEntry } from './documents';
 
@@ -107,4 +108,9 @@ export function renderEntryHtml(entry: { body?: string; filePath?: string }) {
 export async function entryHeadings(entry: CollectionEntry<CollectionKey>): Promise<MarkdownHeading[]> {
   if (getMode() !== 'postgres') return (await (await import('astro:content')).render(entry)).headings;
   return (await renderEntryHtml(entry)).headings;
+}
+
+/** Feed items the public site lists: without `hidden` ids and without copies of site posts (cross-posted to Medium). */
+export async function getPublicFeeds(): Promise<CollectionEntry<'feeds'>[]> {
+  return withoutCrossPosted(withoutHidden(await getEntries('feeds'), hiddenFeedIds()), await getEntries('posts'));
 }

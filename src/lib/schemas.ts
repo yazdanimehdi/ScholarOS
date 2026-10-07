@@ -90,6 +90,8 @@ export const postsSchema = <I extends z.ZodTypeAny>(image: ImageFn<I>) =>
     featured: z.boolean().default(false),
     subtitle: emptyToUndefined,
     relatedPublication: emptyToUndefined,
+    /** Set when the post was cross-posted: the Writing page then hides Medium's copy of it. */
+    medium: z.object({ url: optionalUrl, id: emptyToUndefined }).optional(),
   });
 
 export const publicationsSchema = <I extends z.ZodTypeAny>(image: ImageFn<I>) =>

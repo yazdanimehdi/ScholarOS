@@ -75,3 +75,16 @@ test('cv: pdf.pageSize is LETTER or A4', () => {
   assert.ok(cvSchema.safeParse(cv).success);
   assert.equal(cvSchema.safeParse({ ...cv, pdf: { pageSize: 'A5' } }).success, false);
 });
+
+test('posts: medium.url must be a URL; empty values are dropped', () => {
+  const base = { title: 'T', date: '2024-01-01' };
+  assert.deepEqual(
+    adminCollections.posts.parse({ ...base, medium: { url: 'https://medium.com/@j/x-1', id: 'abc' } }).medium,
+    {
+      url: 'https://medium.com/@j/x-1',
+      id: 'abc',
+    },
+  );
+  assert.equal(adminCollections.posts.parse({ ...base, medium: { url: '' } }).medium?.url, undefined);
+  assert.equal(adminCollections.posts.safeParse({ ...base, medium: { url: 'not a url' } }).success, false);
+});

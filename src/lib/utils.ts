@@ -141,3 +141,28 @@ export function postStatus(data: { draft?: unknown; date?: unknown }, now = new 
   const date = new Date(String(data.date ?? ''));
   return date.getTime() > now.getTime() ? `Scheduled · ${date.toISOString().slice(0, 10)}` : 'Published';
 }
+
+const normalTitle = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+/** Medium's RSS links carry ?source=…: compare without query, fragment, trailing slash or case. */
+const normalLink = (s: string) =>
+  s
+    .trim()
+    .replace(/[?#].*$/, '')
+    .replace(/\/+$/, '')
+    .toLowerCase();
+
+/** Feed items that are copies of a site post cross-posted to Medium (same link, or same title as a post with a Medium URL). */
+export function withoutCrossPosted<T extends { data: { link: string; title: string } }>(
+  items: T[],
+  posts: { data: { title: string; medium?: { url?: string } } }[],
+): T[] {
+  const crossPosted = posts.filter((p) => p.data.medium?.url);
+  const links = new Set(crossPosted.map((p) => normalLink(p.data.medium!.url!)));
+  const titles = new Set(crossPosted.map((p) => normalTitle(p.data.title)));
+  return items.filter((i) => !links.has(normalLink(i.data.link)) && !titles.has(normalTitle(i.data.title)));
+}
