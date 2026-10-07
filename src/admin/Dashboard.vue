@@ -5,6 +5,7 @@ import AdminShell from './AdminShell.vue';
 import { api, committed, report, toast } from './api';
 import type { AdminCtx, CommitResult, Entry } from './types';
 import type { FeedItem } from '../lib/types';
+import { postStatus } from '../lib/utils';
 
 interface DashboardData {
   posts: Entry[];
@@ -22,7 +23,7 @@ interface Row {
   title: string;
   date: string;
   source: string;
-  status: 'Published' | 'Draft' | 'Hidden';
+  status: string;
   slug?: string;
   id?: string;
 }
@@ -45,7 +46,7 @@ const rows = computed<Row[]>(() => {
         title: String(p.data.title ?? p.slug),
         date: String(p.data.date ?? '').slice(0, 10),
         source: 'This site',
-        status: p.data.draft ? 'Draft' : 'Published',
+        status: postStatus(p.data),
         slug: p.slug,
       }),
     ),
@@ -218,7 +219,10 @@ onMounted(load);
               <td>
                 <span
                   class="adm-status"
-                  :class="{ 'adm-status-draft': r.status === 'Draft', 'adm-status-hidden': r.status === 'Hidden' }"
+                  :class="{
+                    'adm-status-draft': r.status === 'Draft' || r.status.startsWith('Scheduled'),
+                    'adm-status-hidden': r.status === 'Hidden',
+                  }"
                   >{{ r.status }}</span
                 >
               </td>

@@ -9,7 +9,7 @@ import { api, report, toast } from './api';
 import { resolveOptions, setIn, type FieldDef, type Option } from './fields';
 import { useDocument } from './useDocument';
 import type { AdminCtx, CommitResult, Entry } from './types';
-import { slugify } from '../lib/utils';
+import { postStatus, slugify } from '../lib/utils';
 
 type Post = { data: Record<string, any>; body: string };
 
@@ -28,6 +28,8 @@ const SIDEBAR: FieldDef[] = [
   { key: 'featured', label: 'Show on home page', type: 'checkbox' },
 ];
 const sidebar = computed(() => resolveOptions(SIDEBAR, { publications: publications.value }));
+/** A future date: "Publish" schedules the post. */
+const scheduled = computed(() => postStatus({ date: doc.current?.data.date }).startsWith('Scheduled'));
 const suggested = computed(() => slugify(String(doc.current?.data.title ?? '')));
 
 const loadPost = (target: string) => async () => {
@@ -93,7 +95,7 @@ function setSubtitle(e: Event) {
         Save draft
       </button>
       <button type="button" class="adm-btn adm-btn-primary" :disabled="doc.saving || doc.readonly" @click="save(false)">
-        Publish
+        {{ scheduled ? 'Schedule' : 'Publish' }}
       </button>
     </template>
     <template v-if="doc.current">

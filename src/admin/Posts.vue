@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue';
 import AdminShell from './AdminShell.vue';
 import { api, report } from './api';
 import type { AdminCtx, Entry } from './types';
+import { postStatus } from '../lib/utils';
 
 const props = defineProps<{ ctx: AdminCtx }>();
 const base = `/${props.ctx.adminPath}`;
@@ -41,8 +42,8 @@ onMounted(async () => {
             <a :href="`${base}/posts/${p.slug}`">{{ p.data.title || p.slug }}</a>
           </td>
           <td>
-            <span class="adm-status" :class="{ 'adm-status-draft': p.data.draft }">{{
-              p.data.draft ? 'Draft' : 'Published'
+            <span class="adm-status" :class="{ 'adm-status-draft': postStatus(p.data) !== 'Published' }">{{
+              postStatus(p.data)
             }}</span>
           </td>
           <td>{{ String(p.data.date ?? '').slice(0, 10) }}</td>
