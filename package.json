@@ -16,6 +16,8 @@
     "generate:keywords": "tsx scripts/generate-seo-keywords.ts",
     "migrate:al-folio": "tsx scripts/migrate-al-folio.ts",
     "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:setup": "tsx scripts/db-setup.ts",
+    "db:export": "tsx scripts/db-export.ts",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
     "format": "prettier --write .",

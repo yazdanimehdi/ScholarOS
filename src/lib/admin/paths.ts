@@ -81,3 +81,19 @@ export function assertAllowed(path: string): void {
   if (entry && COLLECTIONS.includes(entry[1] as CollectionName) && SLUG.test(entry[2])) return;
   throw new PathError(`Path not allowed: ${path}`);
 }
+
+/** Read-only data files Postgres mode keeps beside the editable ones: pages read them, the admin never writes them. */
+export const DATA_FILES = ['src/data/cv.json', 'src/data/cv-people.json'];
+
+/** A file Postgres mode stores as a document: the write allowlist without images, plus MDX entries and DATA_FILES. */
+export function isDocumentPath(path: string): boolean {
+  if (DATA_FILES.includes(path)) return true;
+  const mdx = /^src\/content\/([^/]+)\/([^/]+)\.mdx$/.exec(path);
+  if (mdx) return COLLECTIONS.includes(mdx[1] as CollectionName) && SLUG.test(mdx[2]);
+  try {
+    assertAllowed(path);
+  } catch {
+    return false;
+  }
+  return !isMediaPath(path);
+}
