@@ -538,6 +538,26 @@ Sign in at `https://<your-domain>/<adminPath>`. Only `adminUsers` can sign in, a
 
 To try the admin locally without GitHub, run `VERCEL=1 ADMIN_STORE=memory SESSION_SECRET=<32+ characters> pnpm dev` and open `http://localhost:4321/api/admin/auth/dev`. Edits stay in memory and are never written to disk.
 
+### Postgres mode (live edits, no rebuilds)
+
+With a Postgres database on Vercel, content lives in the database instead of git: a published edit shows on the
+next page load, images go to Vercel Blob, and pages are cached on Vercel's CDN and refreshed precisely when you
+publish. Git stays a safety net: every save keeps a revision (History in the admin) and a daily job commits all
+content to the `content-backup` branch.
+
+1. In the Vercel project: **Storage → Marketplace → Neon** (sets `DATABASE_URL`) and **Storage → Blob**
+   (sets `BLOB_READ_WRITE_TOKEN`). Add `CRON_SECRET` (`openssl rand -base64 48`). Keep `GITHUB_TOKEN` for the backup.
+2. Locally: `vercel env pull .env.local`, then `pnpm db:setup`. It creates the tables, copies `config/`,
+   `src/content/` and `src/data/` into the database, uploads `src/assets/images` and `public/images` to Blob, and
+   rewrites image references to Blob URLs. It lists any file it could not copy.
+3. Redeploy. The admin dashboard now shows **Postgres**.
+
+Notes: MDX posts are shown with a notice (MDX needs a build). PDF CV generation arrives in a later release.
+Editing `adminUsers` takes effect after a redeploy.
+
+**Back to git mode:** `pnpm db:export` (writes the database's files into the repo; image references stay Blob
+URLs), commit, remove `DATABASE_URL` from the project, redeploy.
+
 ### Cookie Consent (GDPR)
 
 Optional GDPR-compliant cookie consent banner:
