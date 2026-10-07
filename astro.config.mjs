@@ -11,21 +11,26 @@ import { modeFromEnv } from './src/lib/mode';
 
 const mode = modeFromEnv(process.env);
 
-// Postgres mode renders the CV PDF in the function, which reads these from process.cwd() at runtime.
-const cvPdfFonts = fs
-  .readdirSync('src/lib/cv-pdf/fonts')
-  .filter((f) => f.endsWith('.ttf'))
-  .map((f) => `./src/lib/cv-pdf/fonts/${f}`);
+// Postgres mode renders the CV PDF in the function, which reads these from process.cwd() at runtime. Listed only in
+// that mode, so a fork without the fonts directory still builds statically or in git mode.
+const cvPdfFonts =
+  mode === 'postgres'
+    ? fs
+        .readdirSync('src/lib/cv-pdf/fonts')
+        .filter((f) => f.endsWith('.ttf'))
+        .map((f) => `./src/lib/cv-pdf/fonts/${f}`)
+    : [];
 
 export default defineConfig({
   site: 'https://example.com',
   // Vercel only. Git mode: admin routes are functions, public pages prerendered. Postgres mode: every page is a
   // function, and Blob images are optimized by /_vercel/image.
+  // Postgres maxDuration 60 s: the daily cron runs feeds then backup in one request; the PDF renders on save.
   adapter:
     mode === 'static'
       ? undefined
       : mode === 'postgres'
-        ? vercel({ imageService: true, includeFiles: cvPdfFonts })
+        ? vercel({ imageService: true, includeFiles: cvPdfFonts, maxDuration: 60 })
         : vercel(),
   ...(mode === 'postgres'
     ? { image: { remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }] } }

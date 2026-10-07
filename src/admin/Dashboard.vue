@@ -20,8 +20,8 @@ interface DashboardData {
   jobs: JobsRecord | null;
 }
 const JOB_LABELS: [JobName, string][] = [
-  ['feeds', 'Feeds'],
   ['scheduled', 'Scheduled posts'],
+  ['feeds', 'Feeds'],
   ['backup', 'Backup to git'],
 ];
 const running = ref(false);
@@ -33,6 +33,7 @@ async function runNow() {
     d.value.jobs = await api<JobsRecord>('jobs/run', { method: 'POST' });
     const failed = JOB_LABELS.filter(([name]) => d.value?.jobs?.[name]?.ok === false).map(([, label]) => label);
     toast(failed.length ? `Jobs finished; failed: ${failed.join(', ')}` : 'Jobs finished');
+    await load(); // feeds, last sync and post statuses changed too
   } catch (e) {
     report(e);
   } finally {

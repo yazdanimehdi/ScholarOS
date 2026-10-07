@@ -10,7 +10,8 @@ import { FEEDS_JSON, JOBS_JSON } from './paths';
 import type { PostgresStore } from './postgres-store';
 import type { CommitResult, ContentStore } from './store';
 
-export const JOBS = ['feeds', 'scheduled', 'backup'] as const;
+// Scheduled first: it is cheap and time-sensitive, while feeds can take 15 s per source.
+export const JOBS = ['scheduled', 'feeds', 'backup'] as const;
 export type JobName = (typeof JOBS)[number];
 export interface StepResult {
   ok: boolean;

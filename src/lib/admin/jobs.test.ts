@@ -74,7 +74,7 @@ test('runJobs: a failing step is recorded and the others still run; jobs.json ho
   } finally {
     console.error = original;
   }
-  assert.deepEqual(ran, ['feeds', 'scheduled', 'backup']);
+  assert.deepEqual(ran, ['scheduled', 'feeds', 'backup']);
   const at = '2026-10-07T03:00:00.000Z';
   assert.deepEqual(await jobs(), {
     feeds: { ok: false, at, detail: 'feed down' },
@@ -173,7 +173,7 @@ test('Run now: Postgres only; runs the same jobs as the signed-in user', async (
     await sql`insert into documents (path, content) values ('config/feeds.yml', ${'feeds: []\n'})`;
     const res = await call();
     assert.equal(res.status, 200);
-    assert.deepEqual(Object.keys(await res.json()), ['feeds', 'scheduled', 'backup']);
+    assert.deepEqual(Object.keys(await res.json()), ['scheduled', 'feeds', 'backup']);
     setStoreForTests(() => new MemoryStore());
     assert.equal((await call()).status, 404);
   } finally {
