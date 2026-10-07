@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import yaml from 'js-yaml';
+import { memo, readSiteFile } from './content/context';
+import { getMode } from './mode';
 import type { SiteConfig, HomepageSectionId, HomepageSectionEntry, ThemeName } from './types';
 
 let _siteConfig: SiteConfig | null = null;
@@ -12,18 +12,25 @@ export function normalizeTheme(value: unknown, source: string): ThemeName {
   throw new Error(`${source}: theme must be 'classic' or 'editorial', got '${String(value)}'`);
 }
 
-export function getSiteConfig(): SiteConfig {
-  if (_siteConfig) return _siteConfig;
+function readConfigFile(filename: string): string {
+  const raw = readSiteFile(`config/${filename}`);
+  if (raw === null) throw new Error(`config/${filename} not found`);
+  return raw;
+}
 
-  const configPath = path.resolve(process.cwd(), 'config/site.yml');
-  const raw = fs.readFileSync(configPath, 'utf-8');
-  const config = yaml.load(raw) as SiteConfig;
+function parseSiteConfig(): SiteConfig {
+  const config = yaml.load(readConfigFile('site.yml')) as SiteConfig;
   const envTheme = process.env.SCHOLAROS_THEME;
   config.theme = envTheme
     ? normalizeTheme(envTheme, 'SCHOLAROS_THEME')
     : normalizeTheme(config.theme, 'config/site.yml');
-  _siteConfig = config;
-  return _siteConfig;
+  return config;
+}
+
+export function getSiteConfig(): SiteConfig {
+  // Postgres mode: site.yml can change between two requests to one warm function, so cache per request.
+  if (getMode() === 'postgres') return memo('config:site', parseSiteConfig);
+  return (_siteConfig ??= parseSiteConfig());
 }
 
 export function getTheme(): ThemeName {
@@ -85,9 +92,7 @@ export function normalizeKeys<T>(obj: T): T {
 }
 
 export function loadYamlConfig<T>(filename: string): T {
-  const configPath = path.resolve(process.cwd(), `config/${filename}`);
-  const raw = fs.readFileSync(configPath, 'utf-8');
-  return yaml.load(raw) as T;
+  return yaml.load(readConfigFile(filename)) as T;
 }
 
 /** Feed item ids hidden from the site (`hidden:` in config/feeds.yml). */

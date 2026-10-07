@@ -1,5 +1,4 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import { readSiteFile } from './content/context';
 import yaml from 'js-yaml';
 import { loadYamlConfig, normalizeKeys } from './config';
 import type { CvConfig, CvData, CvGenericEntry, CvMetadata } from './types';
@@ -30,7 +29,8 @@ export function loadCv(): CvConfig {
 /** PDF metadata written by scripts/render-cv.py; null until a PDF has been generated. */
 export function loadCvMeta(): CvMetadata | null {
   try {
-    return JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'src/data/cv.json'), 'utf-8')) as CvMetadata;
+    const raw = readSiteFile('src/data/cv.json');
+    return raw ? (JSON.parse(raw) as CvMetadata) : null;
   } catch {
     return null;
   }
