@@ -86,7 +86,11 @@ export function rewriteReferences(
   for (const ref of [...new Set(references(docPath, content))].sort((a, b) => b.length - a.length)) {
     const target = resolveReference(ref, docPath, folders.publicFolder, folders.mediaFolder);
     const url = target ? urls.get(path.posix.normalize(target)) : undefined;
-    if (url) out = out.split(ref).join(url);
+    if (url) {
+      // Whole tokens only: not inside an external URL or a longer path that merely contains the reference.
+      const token = new RegExp(`(?<![\\w./:-])${ref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w./-])`, 'g');
+      out = out.replace(token, () => url);
+    }
   }
   return out;
 }

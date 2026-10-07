@@ -88,3 +88,18 @@ test('isDocumentPath: allowlist minus images, plus MDX and data files', () => {
   assert.equal(isDocumentPath('src/assets/images/a.png'), false);
   assert.equal(isDocumentPath('package.json'), false);
 });
+
+test('rewriteReferences replaces whole reference tokens only', () => {
+  const blob = 'https://b.public.blob.vercel-storage.com';
+  // (a) the reference also sits inside an external URL; (b) the shorter relative reference is a suffix of a longer, un-uploaded one
+  const urls = new Map([
+    ['public/images/hero.svg', `${blob}/hero-222222.svg`],
+    ['src/content/assets/a.png', `${blob}/a-444444.png`],
+  ]);
+  const doc = "---\nhero: '/images/hero.svg'\next: https://other.example/images/hero.svg\nshort: '../assets/a.png'\nlong: '../../assets/a.png'\n---\n";
+  const out = rewriteReferences('src/content/people/j.md', doc, urls, folders);
+  assert.match(out, new RegExp(`hero: '${blob}/hero-222222\\.svg'`)); // (c) both rewritten sites still rewritten
+  assert.match(out, new RegExp(`short: '${blob}/a-444444\\.png'`));
+  assert.match(out, /ext: https:\/\/other\.example\/images\/hero\.svg\n/);
+  assert.match(out, /long: '\.\.\/\.\.\/assets\/a\.png'/);
+});
