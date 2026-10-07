@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "sync:feeds": "tsx scripts/sync-feeds.ts",
+    "due:posts": "tsx scripts/due-posts.ts",
     "sync:scholar": "python3 scripts/sync-scholar.py",
     "render:cv": "python3 scripts/render-cv.py",
     "generate:keywords": "tsx scripts/generate-seo-keywords.ts",

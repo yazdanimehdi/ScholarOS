@@ -1,0 +1,54 @@
+name: Release scheduled posts
+
+# Git mode on Vercel: pages are built at deploy time, so a post dated today needs a redeploy.
+on:
+  schedule:
+    - cron: '0 6 * * *' # Daily 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Did a post become due?
+        id: due
+        run: |
+          set +e
+          ./node_modules/.bin/tsx scripts/due-posts.ts
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then echo "due=true" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 78 ]; then echo "due=false" >> "$GITHUB_OUTPUT"
+          else exit "$code"; fi
+
+      - name: Redeploy on Vercel
+        if: steps.due.outputs.due == 'true'
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::notice::VERCEL_DEPLOY_HOOK_URL is not set: add a Vercel deploy hook as a repository secret to publish scheduled posts automatically."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK"
