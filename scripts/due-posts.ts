@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-/** Exit 0 when a post became public in the last 24 h (a rebuild is needed), 78 when none did. */
+/** Exit 0 when a post became public since the last daily check (a rebuild is needed), 78 when none did. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { duePosts } from '../src/lib/due-posts';
@@ -12,5 +12,5 @@ const files = fs.existsSync(DIR)
       .map((f) => ({ path: f, content: fs.readFileSync(path.join(DIR, f), 'utf-8') }))
   : [];
 const due = duePosts(files);
-console.log(due.length ? `Due: ${due.join(', ')}` : 'No post became due in the last 24 h');
+console.log(due.length ? `Due: ${due.join(', ')}` : 'No post became due since the last daily check');
 process.exit(due.length ? 0 : 78);

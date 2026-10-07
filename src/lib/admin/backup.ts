@@ -4,6 +4,8 @@ import { JOBS_JSON, isDocumentPath } from './paths';
 import { gitBlobSha, type Change } from './store';
 
 export const BACKUP_BRANCH = 'content-backup';
+/** Left in the database by sub-project 3's backup record; never backed up (like jobs.json). */
+const LEGACY_BACKUP_JSON = 'src/data/backup.json';
 
 export interface BackupResult {
   at: string;
@@ -25,7 +27,7 @@ export async function backupToGit(
 ): Promise<BackupResult> {
   const at = now.toISOString();
   const docs = await sql<{ path: string; content: string }>`
-    select path, content from documents where path <> ${JOBS_JSON} order by path`;
+    select path, content from documents where path <> ${JOBS_JSON} and path <> ${LEGACY_BACKUP_JSON} order by path`;
   let tree = await gh.tree();
   if (!tree) {
     await gh.createBranch();
@@ -41,7 +43,7 @@ export async function backupToGit(
     base[d.path] = sha;
   }
   for (const [p, sha] of tree) {
-    if (inDb.has(p) || p === JOBS_JSON || !isDocumentPath(p)) continue;
+    if (inDb.has(p) || p === JOBS_JSON || p === LEGACY_BACKUP_JSON || !isDocumentPath(p)) continue;
     changes.push({ path: p, content: null });
     base[p] = sha;
   }

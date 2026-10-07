@@ -78,4 +78,18 @@ test('a missing branch is created from the default branch first', async () => {
   assert.equal(fake.commits[0].changes.length, 3);
 });
 
+test('the legacy src/data/backup.json document is neither written to the branch nor deleted from it', async () => {
+  await sql`insert into documents (path, content) values ('src/data/backup.json', '{"at":"2026-10-05"}')`;
+  try {
+    const docs = await sql<{ path: string; content: string }>`select path, content from documents`;
+    const tree = new Map(docs.map((d) => [d.path, gitBlobSha(d.content)]));
+    tree.set('src/data/backup.json', 'oldsha');
+    const { gh, commits } = fakeGh(tree);
+    assert.equal((await backupToGit(sql, gh, new Date('2026-10-06T03:00:00Z'))).changed, 0);
+    assert.equal(commits.length, 0);
+  } finally {
+    await sql`delete from documents where path = 'src/data/backup.json'`;
+  }
+});
+
 after(() => setSqlForTests(null));
