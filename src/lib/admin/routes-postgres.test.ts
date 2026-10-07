@@ -141,9 +141,21 @@ test('dashboard reports the mode and the last backup', async () => {
     'r',
     {},
   );
-  const body = await (await call(dashboard)).json();
-  assert.equal(body.mode, 'static'); // tests run without VERCEL
-  assert.deepEqual(body.backup, { at: '2026-10-06T03:00:00.000Z', ok: true, changed: 2 });
+  const outside = await (await call(dashboard)).json();
+  assert.equal(outside.mode, 'static'); // tests run without VERCEL
+  assert.equal(outside.backup, null, 'only Postgres mode reads the backup');
+  const saved = { VERCEL: process.env.VERCEL, DATABASE_URL: process.env.DATABASE_URL };
+  process.env.VERCEL = '1';
+  process.env.DATABASE_URL = 'postgres://test';
+  try {
+    const body = await (await call(dashboard)).json();
+    assert.equal(body.mode, 'postgres');
+    assert.deepEqual(body.backup, { at: '2026-10-06T03:00:00.000Z', ok: true, changed: 2 });
+  } finally {
+    for (const [k, v] of Object.entries(saved))
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+  }
 });
 
 test('an unreachable database answers 503 JSON', async () => {

@@ -146,7 +146,10 @@ export class GitHubStore implements ContentStore {
   /** Creates the configured branch at the head of the repository's default branch. */
   async createBranch(): Promise<void> {
     const repo = await this.gh<{ default_branch: string }>('GET', '');
-    const head = await this.gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${encodePath(repo!.default_branch)}`);
+    const head = await this.gh<{ object: { sha: string } }>(
+      'GET',
+      `/git/ref/heads/${encodePath(repo!.default_branch)}`,
+    );
     await this.gh('POST', '/git/refs', { ref: `refs/heads/${this.cfg.branch}`, sha: head!.object.sha });
   }
 
@@ -228,7 +231,6 @@ export class GitHubStore implements ContentStore {
     return commits?.[0]?.commit.committer.date ?? null;
   }
 
-  /** Starts a workflow_dispatch run (e.g. render-cv.yml) on the configured branch. */
   listMedia(folder: MediaFolder) {
     return listRepoMedia(this, folder);
   }
@@ -241,6 +243,7 @@ export class GitHubStore implements ContentStore {
     return deleteRepoMedia(this, path, version);
   }
 
+  /** Starts a workflow_dispatch run (e.g. render-cv.yml) on the configured branch. */
   async dispatchWorkflow(file: string): Promise<void> {
     await this.gh('POST', `/actions/workflows/${encodeURIComponent(file)}/dispatches`, { ref: this.cfg.branch });
   }

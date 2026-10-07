@@ -38,7 +38,8 @@ const asEntries = <C extends CollectionKey>(entries: DocumentEntry[]) => entries
 export async function getEntries<C extends CollectionKey>(name: C): Promise<CollectionEntry<C>[]> {
   if (getMode() !== 'postgres') return (await import('astro:content')).getCollection(name);
   requestContext().tags.add(`col:${name}`);
-  return asEntries<C>(await memo(`col:${name}`, () => loadCollection(name as DocumentCollection)));
+  // A copy: callers sort in place, and the memo is shared by the whole request.
+  return [...asEntries<C>(await memo(`col:${name}`, () => loadCollection(name as DocumentCollection)))];
 }
 
 /** One entry, or undefined. Postgres mode: tagged doc:<name>/<id>, so edits to other entries don't purge it. */
@@ -53,7 +54,8 @@ export async function getEntry<C extends CollectionKey>(name: C, id: string): Pr
   const rows = await query(
     () =>
       getSql()<{ path: string; content: string }>`
-        select path, content from documents where path = any(${[`${base}.md`, `${base}.mdx`]}::text[])`,
+        select path, content from documents where path = any(${[`${base}.md`, `${base}.mdx`]}::text[])
+        order by path`,
   );
   return asEntries<C>(parseDocuments(name as DocumentCollection, rows))[0];
 }

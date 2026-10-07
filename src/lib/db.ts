@@ -24,6 +24,7 @@ export function getSql(): Sql {
   return (pool ??= postgres(process.env.DATABASE_URL, {
     max: 5,
     idle_timeout: 20,
+    connect_timeout: 5, // an unreachable database answers 503 in seconds, not after the 30 s default
     prepare: false,
   }) as unknown as Sql);
 }

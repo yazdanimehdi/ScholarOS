@@ -21,7 +21,7 @@ export const GET = route(async (_ctx, store) => {
     store.read(FEEDS_JSON),
     store.lastModified(configPath('cv')),
     store.lastModified(FEEDS_JSON),
-    store.read(BACKUP_JSON),
+    getMode() === 'postgres' ? store.read(BACKUP_JSON) : null,
   ]);
   let feedItems: unknown = [];
   let feedsError: string | undefined;

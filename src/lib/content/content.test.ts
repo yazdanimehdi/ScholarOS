@@ -96,6 +96,25 @@ test('getEntry: one document, tagged doc:<name>/<id>; unknown → undefined', as
   assert.deepEqual(tags, ['doc:posts/a', 'doc:posts/zzz']);
 });
 
+test('getEntry: .md wins over .mdx for the same id', async () => {
+  await sql`insert into documents (path, content) values
+    ('src/content/posts/dup.mdx', ${'---\ntitle: MDX\ndate: 2024-06-01\n---\n'}),
+    ('src/content/posts/dup.md', ${'---\ntitle: MD\ndate: 2024-06-01\n---\n'})`;
+  try {
+    assert.equal((await inRequest(() => getEntry('posts', 'dup')))?.data.title, 'MD');
+  } finally {
+    await sql`delete from documents where path like 'src/content/posts/dup.%'`;
+  }
+});
+
+test('getEntries: sorting the result in place does not reorder it for later callers in the request', async () => {
+  const ids = await inRequest(async () => {
+    (await quiet(() => getEntries('posts'))).reverse();
+    return (await getEntries('posts')).map((p) => p.id);
+  });
+  assert.deepEqual(ids, ['a', 'draft', 'old']);
+});
+
 test('feeds come from the request snapshot of src/data/feeds.json', async () => {
   const feeds = JSON.stringify([
     { id: 'm1', title: 'T', link: 'https://medium.com/x', date: '2024-01-01', source: 'Medium' },
