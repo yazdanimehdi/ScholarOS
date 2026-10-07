@@ -8,6 +8,9 @@ import PostEditor from '../PostEditor.vue';
 import Posts from '../Posts.vue';
 import Settings from '../Settings.vue';
 import { getMode } from '../../lib/mode';
+import { readConfig } from '../../lib/admin/content';
+import { getStore } from '../../lib/admin/get-store';
+import { authorOf } from '../../lib/admin/http';
 import { adminSettings } from '../../lib/admin/settings';
 import '../../themes/editorial/editorial.css';
 import '../admin.css';
@@ -21,12 +24,25 @@ const CONTENT = ['announcements', 'people', 'projects', 'talks', 'positions'];
 if (!SCREENS.has(screen)) return new Response('Not found', { status: 404 });
 if (screen === 'content' && !CONTENT.includes(arg)) return new Response('Not found', { status: 404 });
 
+// The post editor's "Import to Medium" needs the public site URL. Read from the store like the medium API route, so
+// it is current in both modes (git: GitHub; Postgres: the database, where site.yml lives); unreadable → the editor
+// falls back to its own origin.
+const user = Astro.locals.user;
+let siteUrl = '';
+if (screen === 'posts' && arg && user) {
+  try {
+    siteUrl = String((await readConfig(getStore(authorOf(user)), 'site')).data.siteUrl ?? '');
+  } catch {
+    // the editor still opens; its API calls report the store error
+  }
+}
 const ctx = {
   adminPath,
   siteName,
-  user: Astro.locals.user ?? null,
+  user: user ?? null,
   mode: getMode(),
   mediumToken: !!process.env.MEDIUM_TOKEN,
+  siteUrl,
 };
 const error = Astro.url.searchParams.get('error');
 if (screen === 'login' && error === 'denied') Astro.response.status = 403;

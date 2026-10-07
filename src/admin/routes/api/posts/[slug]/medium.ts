@@ -28,8 +28,9 @@ export const POST = route(async (ctx, store) => {
       e instanceof MediumError ? e.message : `Medium could not be reached: ${(e as Error).message}`,
     );
   }
-  const change = entryChange('posts', slug, { ...entry.data, medium }, entry.body);
   try {
+    // Inside the try: a schema error here still reports the URL of the draft Medium already accepted.
+    const change = entryChange('posts', slug, { ...entry.data, medium }, entry.body);
     const commit = await commitChanges(store, [change], `Link posts/${slug} to Medium`, {
       [change.path]: entry.version,
     });

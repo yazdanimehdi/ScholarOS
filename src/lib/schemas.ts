@@ -91,7 +91,13 @@ export const postsSchema = <I extends z.ZodTypeAny>(image: ImageFn<I>) =>
     subtitle: emptyToUndefined,
     relatedPublication: emptyToUndefined,
     /** Set when the post was cross-posted: the Writing page then hides Medium's copy of it. */
-    medium: z.object({ url: optionalUrl, id: emptyToUndefined }).optional(),
+    medium: z
+      .object({
+        // Rendered as a link in the admin: http(s) only (`.url()` alone accepts `javascript:`).
+        url: optionalUrl.refine((v) => v === undefined || /^https?:\/\//i.test(v), 'Must be an http(s) URL'),
+        id: emptyToUndefined,
+      })
+      .optional(),
   });
 
 export const publicationsSchema = <I extends z.ZodTypeAny>(image: ImageFn<I>) =>

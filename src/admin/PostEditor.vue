@@ -60,7 +60,11 @@ onMounted(async () => {
 
 const alsoMedium = ref(false);
 const importReady = ref(false);
-const onMedium = computed(() => String(doc.current?.data.medium?.url ?? ''));
+// Only an http(s) link is rendered as one: a stored `javascript:` URL would run on click.
+const onMedium = computed(() => {
+  const url = String(doc.current?.data.medium?.url ?? '');
+  return /^https?:\/\//i.test(url) ? url : '';
+});
 
 async function sendToMedium() {
   const target = slug.value;
@@ -81,14 +85,18 @@ async function sendToMedium() {
   }
 }
 
-/** No token: Medium's import tool copies the post and sets the canonical link itself. */
+/**
+ * No token: Medium's import tool copies the post and sets the canonical link to the URL it was given, so that is the
+ * site's public URL (siteUrl), not this admin's host (a *.vercel.app or preview URL).
+ */
 async function importToMedium() {
-  const url = `${location.origin}/blog/${slug.value}/`;
+  const url = `${(props.ctx.siteUrl || location.origin).replace(/\/$/, '')}/blog/${slug.value}/`;
+  const live = 'once the post is live (git mode: about a minute after publishing; a scheduled post: on its date)';
   try {
     await navigator.clipboard.writeText(url);
-    toast('Post URL copied: paste it into Medium’s import box, then paste the result into "Medium URL"');
+    toast(`Post URL copied: paste it into Medium’s import box ${live}, then paste the result into "Medium URL"`);
   } catch {
-    toast(`Paste this URL into Medium’s import box: ${url}`);
+    toast(`Paste this URL into Medium’s import box ${live}: ${url}`);
   }
   window.open('https://medium.com/p/import', '_blank', 'noopener');
 }

@@ -7,6 +7,8 @@ export interface AdminCtx {
   mode: 'static' | 'git' | 'postgres';
   /** MEDIUM_TOKEN is set: "Also publish to Medium" posts through the API. */
   mediumToken?: boolean;
+  /** siteUrl from config/site.yml (post editor only): the public post URL handed to Medium's import tool. */
+  siteUrl?: string;
 }
 
 export interface CommitResult {

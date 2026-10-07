@@ -87,4 +87,5 @@ test('posts: medium.url must be a URL; empty values are dropped', () => {
   );
   assert.equal(adminCollections.posts.parse({ ...base, medium: { url: '' } }).medium?.url, undefined);
   assert.equal(adminCollections.posts.safeParse({ ...base, medium: { url: 'not a url' } }).success, false);
+  assert.equal(adminCollections.posts.safeParse({ ...base, medium: { url: 'javascript:alert(1)' } }).success, false);
 });
