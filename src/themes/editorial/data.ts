@@ -46,7 +46,7 @@ export function pick<T>(ids: string[], byId: Map<string, T>, where: string): T[]
 
 /** Site posts (non-draft) and feed items, newest first. External items never carry content. */
 export async function writingItems(): Promise<WritingItem[]> {
-  const posts = (await getEntries('posts')).filter((p) => !p.data.draft);
+  const posts = await getEntries('posts');
   const feeds = withoutHidden(await getEntries('feeds'), hiddenFeedIds());
   return mergeWriting([
     ...posts.map((p) => ({
@@ -209,10 +209,7 @@ export type BlogData = Awaited<ReturnType<typeof loadBlog>>;
 
 export async function loadPost(post: CollectionEntry<'posts'>) {
   const config = getSiteConfig();
-  const posts = (await getEntries('posts'))
-    .filter((p) => !p.data.draft)
-    .sort(idOrder)
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const posts = (await getEntries('posts')).sort(idOrder).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
   const i = posts.findIndex((p) => p.id === post.id);
   const relatedId = post.data.relatedPublication;
   const related = relatedId ? await getEntry('publications', relatedId) : undefined;

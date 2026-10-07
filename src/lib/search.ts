@@ -27,7 +27,6 @@ export async function getSearchItems(): Promise<SearchItem[]> {
   const items: SearchItem[] = [];
 
   for (const post of posts) {
-    if (post.data.draft) continue;
     items.push({
       title: post.data.title,
       href: `/blog/${post.id}`,

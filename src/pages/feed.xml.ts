@@ -5,7 +5,7 @@ import { getSiteConfig, getSiteName } from '../lib/config';
 
 export async function GET(context: APIContext) {
   const config = getSiteConfig();
-  const posts = (await getEntries('posts')).filter(({ data }) => !data.draft);
+  const posts = await getEntries('posts');
 
   return rss({
     title: getSiteName(),

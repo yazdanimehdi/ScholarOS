@@ -122,3 +122,22 @@ export function withoutHidden<T extends { id: string }>(items: T[], hidden: stri
   const set = new Set(hidden);
   return items.filter((item) => !set.has(item.id));
 }
+
+type Dated = { data: { draft?: boolean; date: Date | string } };
+
+/** Public once it isn't a draft and its date has come. Date-only values are UTC midnight, so release is day-precise. */
+export function isPublished(post: Dated, now = new Date()): boolean {
+  return !post.data.draft && new Date(post.data.date).getTime() <= now.getTime();
+}
+
+/** Public at `now` but not yet at `since`: the posts a release run covering that window must make visible. */
+export function becameDue(post: Dated, since: Date, now: Date): boolean {
+  return isPublished(post, now) && !isPublished(post, since);
+}
+
+/** The admin's status label: "Draft", "Scheduled · 2026-10-09" or "Published". */
+export function postStatus(data: { draft?: unknown; date?: unknown }, now = new Date()): string {
+  if (data.draft) return 'Draft';
+  const date = new Date(String(data.date ?? ''));
+  return date.getTime() > now.getTime() ? `Scheduled · ${date.toISOString().slice(0, 10)}` : 'Published';
+}

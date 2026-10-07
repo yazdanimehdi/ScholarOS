@@ -8,12 +8,7 @@ import { resolveImage } from '../../lib/content/image';
 
 export async function getStaticPaths() {
   const posts = await getEntries('posts');
-  return posts
-    .filter((p) => !p.data.draft)
-    .map((post) => ({
-      params: { id: post.id },
-      props: { post },
-    }));
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
 }
 
 const props = await staticProps(Astro, getStaticPaths);

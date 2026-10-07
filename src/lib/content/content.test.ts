@@ -80,7 +80,7 @@ test('getEntries: valid documents from the database, tagged col:<name>, dates co
     const posts = await quiet(() => getEntries('posts'));
     return { ids: posts.map((p) => p.id), tags: [...ctx.tags], date: posts[0].data.date };
   });
-  assert.deepEqual(ids, ['a', 'draft', 'old']);
+  assert.deepEqual(ids, ['a', 'old']);
   assert.deepEqual(tags, ['col:posts']);
 });
 
@@ -112,7 +112,7 @@ test('getEntries: sorting the result in place does not reorder it for later call
     (await quiet(() => getEntries('posts'))).reverse();
     return (await getEntries('posts')).map((p) => p.id);
   });
-  assert.deepEqual(ids, ['a', 'draft', 'old']);
+  assert.deepEqual(ids, ['a', 'old']);
 });
 
 test('feeds come from the request snapshot of src/data/feeds.json', async () => {
@@ -167,4 +167,23 @@ test('entry bodies: Markdown with headings; MDX gets the notice', async () => {
     const mdx = (await quiet(() => getEntries('posts'))).find((p) => p.id === 'old')!;
     assert.match((await renderEntryHtml(mdx)).html, /only supported in static\/git mode/);
   });
+});
+
+test('posts: drafts and future-dated posts are not public, in lists or by id', async () => {
+  await sql`insert into documents (path, content) values
+    ('src/content/posts/later.md', ${'---\ntitle: Later\ndate: 2999-01-01\n---\n'})`;
+  try {
+    const { ids, later, draft, a } = await inRequest(async () => ({
+      ids: (await quiet(() => getEntries('posts'))).map((p) => p.id),
+      later: await getEntry('posts', 'later'),
+      draft: await getEntry('posts', 'draft'),
+      a: await getEntry('posts', 'a'),
+    }));
+    assert.deepEqual(ids, ['a', 'old']);
+    assert.equal(later, undefined);
+    assert.equal(draft, undefined);
+    assert.equal(a?.id, 'a');
+  } finally {
+    await sql`delete from documents where path = 'src/content/posts/later.md'`;
+  }
 });

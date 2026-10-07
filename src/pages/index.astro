@@ -71,10 +71,7 @@ const announcementData = await Promise.all(
 );
 
 const posts = sections.includes('blog')
-  ? (await getEntries('posts'))
-      .filter((p) => !p.data.draft)
-      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-      .slice(0, 3)
+  ? (await getEntries('posts')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 3)
   : [];
 
 const feeds = sections.includes('blog')
