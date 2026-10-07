@@ -26,6 +26,12 @@ const SIDEBAR: FieldDef[] = [
   { key: 'relatedPublication', label: 'Related publication', type: 'select', optionsFrom: 'publications' },
   { key: 'excerpt', label: 'Summary', type: 'textarea', hint: 'Shown in post lists and link previews.' },
   { key: 'featured', label: 'Show on home page', type: 'checkbox' },
+  {
+    key: 'medium.url',
+    label: 'Medium URL',
+    type: 'text',
+    hint: 'Set by "Also publish to Medium", or paste the link after importing.',
+  },
 ];
 const sidebar = computed(() => resolveOptions(SIDEBAR, { publications: publications.value }));
 /** A future date: "Publish" schedules the post. */
@@ -52,6 +58,41 @@ onMounted(async () => {
   }, report);
 });
 
+const alsoMedium = ref(false);
+const importReady = ref(false);
+const onMedium = computed(() => String(doc.current?.data.medium?.url ?? ''));
+
+async function sendToMedium() {
+  const target = slug.value;
+  try {
+    const result = await api<CommitResult & { medium: { id: string; url: string } }>(`posts/${target}/medium`, {
+      method: 'POST',
+    });
+    if (doc.current) doc.current.data.medium = result.medium;
+    doc.version = result.versions[`src/content/posts/${target}.md`] ?? doc.version;
+    await nextTick();
+    doc.discard(); // the link is committed, not an unsaved edit
+    toast('Sent to Medium as a draft', result.medium.url);
+  } catch (e) {
+    toast(`Published; Medium cross-post failed: ${e instanceof Error ? e.message : String(e)}`, undefined, {
+      label: 'Retry',
+      run: () => void sendToMedium(),
+    });
+  }
+}
+
+/** No token: Medium's import tool copies the post and sets the canonical link itself. */
+async function importToMedium() {
+  const url = `${location.origin}/blog/${slug.value}/`;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Post URL copied: paste it into Medium’s import box, then paste the result into "Medium URL"');
+  } catch {
+    toast(`Paste this URL into Medium’s import box: ${url}`);
+  }
+  window.open('https://medium.com/p/import', '_blank', 'noopener');
+}
+
 async function save(draft: boolean) {
   if (!doc.current) return;
   const target = isNew.value ? slug.value || suggested.value : slug.value;
@@ -77,6 +118,11 @@ async function save(draft: boolean) {
     slug.value = target;
     doc.retarget(`posts/${target}`, loadPost(target));
     history.replaceState(null, '', `/${props.ctx.adminPath}/posts/${target}`);
+  }
+  if (!draft && alsoMedium.value && !onMedium.value) {
+    alsoMedium.value = false;
+    if (props.ctx.mediumToken) await sendToMedium();
+    else importReady.value = true;
   }
 }
 
@@ -144,6 +190,16 @@ function setSubtitle(e: Event) {
           <fieldset class="adm-plain-fieldset" :disabled="doc.readonly">
             <FormFields :fields="sidebar" :model="doc.current.data" :errors="doc.errors" />
           </fieldset>
+          <div class="adm-field">
+            <a v-if="onMedium" :href="onMedium" target="_blank" rel="noopener">Already on Medium ↗</a>
+            <label v-else class="adm-check">
+              <input v-model="alsoMedium" type="checkbox" :disabled="doc.readonly" />
+              Also publish to Medium
+            </label>
+            <button v-if="importReady && !onMedium" type="button" class="adm-btn" @click="importToMedium">
+              Import to Medium
+            </button>
+          </div>
         </aside>
       </div>
     </template>

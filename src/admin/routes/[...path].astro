@@ -21,7 +21,13 @@ const CONTENT = ['announcements', 'people', 'projects', 'talks', 'positions'];
 if (!SCREENS.has(screen)) return new Response('Not found', { status: 404 });
 if (screen === 'content' && !CONTENT.includes(arg)) return new Response('Not found', { status: 404 });
 
-const ctx = { adminPath, siteName, user: Astro.locals.user ?? null, mode: getMode() };
+const ctx = {
+  adminPath,
+  siteName,
+  user: Astro.locals.user ?? null,
+  mode: getMode(),
+  mediumToken: !!process.env.MEDIUM_TOKEN,
+};
 const error = Astro.url.searchParams.get('error');
 if (screen === 'login' && error === 'denied') Astro.response.status = 403;
 const LOGIN_ERRORS: Record<string, string> = {

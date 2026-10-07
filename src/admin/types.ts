@@ -5,6 +5,8 @@ export interface AdminCtx {
   siteName: string;
   user: { login: string; name: string; avatar: string } | null;
   mode: 'static' | 'git' | 'postgres';
+  /** MEDIUM_TOKEN is set: "Also publish to Medium" posts through the API. */
+  mediumToken?: boolean;
 }
 
 export interface CommitResult {
