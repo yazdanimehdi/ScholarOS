@@ -13,7 +13,9 @@ export const affectsCvPdf = (paths: string[]) =>
 
 export function readCvMeta(content: string | undefined): CvMetadata | null {
   try {
-    return content ? (JSON.parse(content) as CvMetadata) : null;
+    const meta = content ? JSON.parse(content) : null;
+    // A seeded file has pdfPath null until the first PDF exists.
+    return typeof meta?.pdfPath === 'string' ? (meta as CvMetadata) : null;
   } catch {
     return null;
   }

@@ -157,3 +157,11 @@ test('git stores never render a PDF', async () => {
     [['config/cv.yml']],
   );
 });
+
+test('a seeded cv.json without a PDF yet reads as no PDF; generation still works', async () => {
+  await sql`insert into documents (path, content) values (${CV_JSON}, ${'{"lastGenerated":null,"pdfPath":null,"pdfSize":0}'})`;
+  assert.deepEqual(await (await call(pdfStatus)).json(), { run: null, pdf: null });
+  const result = await generateCvPdf(store);
+  assert.match(result.pdfPath, /^https:\/\/b\.public/);
+  assert.deepEqual(deleted, []);
+});
