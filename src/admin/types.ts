@@ -4,6 +4,7 @@ export interface AdminCtx {
   adminPath: string;
   siteName: string;
   user: { login: string; name: string; avatar: string } | null;
+  mode: 'static' | 'git' | 'postgres';
 }
 
 export interface CommitResult {

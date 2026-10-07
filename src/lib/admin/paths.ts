@@ -13,6 +13,8 @@ export type CollectionName = (typeof COLLECTIONS)[number];
 export const CONFIG_FILES = ['site', 'research', 'feeds', 'cv', 'cv-upload'] as const;
 export type ConfigFile = (typeof CONFIG_FILES)[number];
 export const FEEDS_JSON = 'src/data/feeds.json';
+/** Last backup cron result (Postgres mode): admin-only, never rendered. */
+export const BACKUP_JSON = 'src/data/backup.json';
 /** Images referenced by plain URLs (config files, Markdown bodies): served from public/. */
 export const SITE_MEDIA = { dir: 'public/images', url: '/images' };
 
@@ -68,7 +70,13 @@ export function assertMediaPath(path: unknown): string {
 
 /** The write allowlist: every path the admin may commit. */
 export function assertAllowed(path: string): void {
-  if (CONFIG_FILES.some((file) => path === configPath(file)) || path === FEEDS_JSON || isMediaPath(path)) return;
+  if (
+    CONFIG_FILES.some((file) => path === configPath(file)) ||
+    path === FEEDS_JSON ||
+    path === BACKUP_JSON ||
+    isMediaPath(path)
+  )
+    return;
   const entry = /^src\/content\/([^/]+)\/([^/]+)\.md$/.exec(path);
   if (entry && COLLECTIONS.includes(entry[1] as CollectionName) && SLUG.test(entry[2])) return;
   throw new PathError(`Path not allowed: ${path}`);

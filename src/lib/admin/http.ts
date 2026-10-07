@@ -4,6 +4,7 @@ import { ImportError } from './cv-import';
 import { getStore } from './get-store';
 import { MediaError } from './media';
 import { PathError, assertAllowed } from './paths';
+import { PostgresStore } from './postgres-store';
 import type { SessionUser } from './session';
 import { ConflictError, UpstreamError, type Author, type Change, type CommitResult, type ContentStore } from './store';
 
@@ -86,4 +87,10 @@ export async function commitChanges(
   }
   for (const c of changes) assertAllowed(c.path);
   return store.commit(changes, message, base);
+}
+
+/** History and cache purges only exist in Postgres mode. */
+export function postgresOnly(store: ContentStore): PostgresStore {
+  if (!(store instanceof PostgresStore)) throw new HttpError(404, 'Only available in Postgres mode');
+  return store;
 }
