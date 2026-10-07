@@ -4,6 +4,7 @@ import type { Sql } from '../db';
 import { migrate } from '../db-migrate';
 import { pgliteSql } from '../pglite-sql';
 import { PostgresStore, type PostgresDeps } from './postgres-store';
+import { PathError } from './paths';
 import { ConflictError, UpstreamError } from './store';
 
 const AUTHOR = { name: 'Jane', email: 'jane@users.noreply.github.com' };
@@ -13,13 +14,21 @@ async function setup(deps: Partial<PostgresDeps> = {}, wrap: (sql: Sql) => Sql =
   const sql = pgliteSql();
   await migrate(sql);
   const purged: string[][] = [];
+  const blobs = new Map<string, Buffer>();
   const store = new PostgresStore(wrap(sql), AUTHOR, {
     purge: async (tags) => {
       purged.push(tags);
     },
+    put: async (pathname, body) => {
+      blobs.set(pathname, body);
+      return { url: `https://store.public.blob.vercel-storage.com/${pathname}` };
+    },
+    del: async (url) => {
+      blobs.delete(url.slice(url.lastIndexOf('/') + 1));
+    },
     ...deps,
   });
-  return { sql, store, purged };
+  return { sql, store, purged, blobs };
 }
 
 /** Throws on the nth query whose text contains `needle`, inside or outside transactions. */
@@ -160,6 +169,43 @@ test('an unreachable database is a 503', async () => {
   const down = (async () => {
     throw Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' });
   }) as unknown as Sql;
-  const store = new PostgresStore(down, AUTHOR, { purge: async () => {} });
+  const store = new PostgresStore(down, AUTHOR, {
+    purge: async () => {},
+    put: async () => ({ url: '' }),
+    del: async () => {},
+  });
   await assert.rejects(store.read(P), (e) => e instanceof UpstreamError && e.status === 503);
+});
+
+test('media: Blob upload once per content hash, listed by URL, deleted only if this site uploaded it', async () => {
+  const { store, blobs, purged } = await setup();
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString('base64');
+  const up = await store.putMedia('content', 'fig-abc123.png', png, 'image/png');
+  assert.equal(up.url, 'https://store.public.blob.vercel-storage.com/fig-abc123.png');
+  assert.equal(up.path, up.url);
+  assert.ok(up.commit);
+  assert.equal(blobs.size, 1);
+  const again = await store.putMedia('site', 'fig-abc123.png', png, 'image/png');
+  assert.equal(again.commit, null);
+  assert.deepEqual(
+    (await store.listMedia('site')).map((f) => f.url),
+    [up.url],
+  );
+  await assert.rejects(store.deleteMedia('https://elsewhere.example/x.png', '1'), PathError);
+  await store.deleteMedia(up.path, up.version);
+  assert.equal(blobs.size, 0);
+  assert.deepEqual(await store.listMedia('content'), []);
+  assert.deepEqual(purged, []);
+});
+
+test('media: a Blob failure is a 502 with the reason', async () => {
+  const { store } = await setup({
+    put: async () => {
+      throw new Error('token expired');
+    },
+  });
+  await assert.rejects(
+    store.putMedia('content', 'x-abc123.png', 'iVBO', 'image/png'),
+    (e) => e instanceof UpstreamError && e.status === 502 && /token expired/.test(e.message),
+  );
 });

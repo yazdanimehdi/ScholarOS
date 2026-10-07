@@ -1,6 +1,8 @@
+import { del, put } from '@vercel/blob';
 import { dangerouslyDeleteByTag } from '@vercel/functions';
 import { tagsForPaths } from '../cache-tags';
 import { isUnreachable, type Sql } from '../db';
+import { PathError } from './paths';
 import {
   ConflictError,
   UpstreamError,
@@ -8,7 +10,10 @@ import {
   type Change,
   type CommitResult,
   type ContentStore,
+  type MediaFile,
+  type MediaFolder,
   type StoredFile,
+  type UploadResult,
 } from './store';
 
 const KEEP_REVISIONS = 50;
@@ -24,11 +29,19 @@ export interface Revision {
 /** What the store calls outside the database; tests pass fakes. */
 export interface PostgresDeps {
   purge(tags: string[]): Promise<void>;
+  put(pathname: string, body: Buffer, contentType: string): Promise<{ url: string }>;
+  del(url: string): Promise<void>;
 }
 
 const defaultDeps: PostgresDeps = {
   purge: (tags) => dangerouslyDeleteByTag(tags),
+  put: (pathname, body, contentType) =>
+    put(pathname, body, { access: 'public', contentType, addRandomSuffix: false, allowOverwrite: true }),
+  del: (url) => del(url),
 };
+
+const blobFailure = (e: unknown) =>
+  new UpstreamError(`Image storage (Vercel Blob) failed: ${(e as Error).message}`, 502);
 
 const text = (c: Change) =>
   c.content === null ? null : c.encoding === 'base64' ? Buffer.from(c.content, 'base64').toString('utf8') : c.content;
@@ -167,8 +180,51 @@ export class PostgresStore implements ContentStore {
   async revision(id: string): Promise<{ path: string; content: string | null } | null> {
     if (!/^\d{1,18}$/.test(id)) return null;
     const [row] = await this.db(
-      () => this.sql<{ path: string; content: string | null }>`select path, content from revisions where id = ${id}::bigint`,
+      () =>
+        this.sql<{
+          path: string;
+          content: string | null;
+        }>`select path, content from revisions where id = ${id}::bigint`,
     );
     return row ? { path: row.path, content: row.content } : null;
+  }
+
+  /** Postgres mode keeps every image in Blob, so both folders list the same library. */
+  async listMedia(_folder: MediaFolder): Promise<MediaFile[]> {
+    const rows = await this.db(() => this.sql<{ url: string }>`select url from media order by created_at desc, url`);
+    return rows.map((r) => ({ path: r.url, url: r.url, version: '1' }));
+  }
+
+  async putMedia(_folder: MediaFolder, filename: string, base64: string, contentType: string): Promise<UploadResult> {
+    const [existing] = await this.db(
+      () => this.sql<{ url: string }>`select url from media where pathname = ${filename}`,
+    );
+    if (existing) return { path: existing.url, url: existing.url, version: '1', commit: null };
+    const bytes = Buffer.from(base64, 'base64');
+    let url: string;
+    try {
+      ({ url } = await this.deps.put(filename, bytes, contentType));
+    } catch (e) {
+      throw blobFailure(e);
+    }
+    await this.db(
+      () => this.sql`
+        insert into media (url, pathname, size, content_type)
+        values (${url}, ${filename}, ${bytes.length}, ${contentType}) on conflict (url) do nothing`,
+    );
+    return { path: url, url, version: '1', commit: { id: `blob:${filename}` } };
+  }
+
+  /** Only images this site uploaded (a row in `media`) can be deleted. */
+  async deleteMedia(path: string, _version: string): Promise<CommitResult> {
+    const [row] = await this.db(() => this.sql`select url from media where url = ${path}`);
+    if (!row) throw new PathError('Not an image in this site’s library');
+    try {
+      await this.deps.del(path);
+    } catch (e) {
+      throw blobFailure(e);
+    }
+    await this.db(() => this.sql`delete from media where url = ${path}`);
+    return { id: `blob:${path}`, versions: { [path]: null } };
   }
 }

@@ -1,6 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ConflictError, blobVersions, gitBlobSha, type Change, type ContentStore, type StoredFile } from './store';
+import { deleteRepoMedia, listRepoMedia, putRepoMedia } from './git-media';
+import {
+  ConflictError,
+  blobVersions,
+  gitBlobSha,
+  type Change,
+  type ContentStore,
+  type MediaFolder,
+  type StoredFile,
+} from './store';
 
 type Overlay = { content: string; encoding: 'utf-8' | 'base64' } | null;
 
@@ -71,6 +80,18 @@ export class MemoryStore implements ContentStore {
 
   async lastModified(p: string): Promise<string | null> {
     return this.modified.get(p) ?? null;
+  }
+
+  listMedia(folder: MediaFolder) {
+    return listRepoMedia(this, folder);
+  }
+
+  putMedia(folder: MediaFolder, filename: string, base64: string, _contentType?: string) {
+    return putRepoMedia(this, folder, filename, base64);
+  }
+
+  deleteMedia(path: string, version: string) {
+    return deleteRepoMedia(this, path, version);
   }
 }
 

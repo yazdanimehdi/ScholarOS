@@ -1,29 +1,21 @@
 import { posix } from 'node:path';
 import { listEntries } from '../../../lib/admin/content';
-import { HttpError, commitChanges, json, readBody, route } from '../../../lib/admin/http';
+import { HttpError, json, readBody, route } from '../../../lib/admin/http';
 import { MAX_UPLOAD, MediaError, prepareUpload } from '../../../lib/admin/media';
-import { COLLECTIONS, SITE_MEDIA, assertMediaPath, collectionDir } from '../../../lib/admin/paths';
-import type { ContentStore } from '../../../lib/admin/store';
+import { COLLECTIONS, collectionDir } from '../../../lib/admin/paths';
+import type { ContentStore, MediaFolder } from '../../../lib/admin/store';
 import { adminSettings } from '../../../lib/admin/settings';
 
 export const prerender = false;
 
-/** `content`: collection images (processed by image()); `site`: plain-URL images for config files and post bodies. */
-function folderOf(value: unknown): { dir: string; url: string } {
-  if (value === 'content') return { dir: adminSettings().mediaFolder, url: adminSettings().publicFolder };
-  if (value === 'site') return SITE_MEDIA;
+function folderOf(value: unknown): MediaFolder {
+  if (value === 'content' || value === 'site') return value;
   throw new HttpError(400, "`folder` must be 'content' or 'site'");
 }
 
-const IMAGE = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
-
-export const GET = route(async ({ url }, store) => {
-  const folder = folderOf(url.searchParams.get('folder') ?? 'content');
-  const files = (await store.list(folder.dir)).filter((f) => IMAGE.test(f.path));
-  return json(
-    files.map((f) => ({ path: f.path, version: f.version, url: folder.url + f.path.slice(folder.dir.length) })),
-  );
-});
+export const GET = route(async ({ url }, store) =>
+  json(await store.listMedia(folderOf(url.searchParams.get('folder') ?? 'content'))),
+);
 
 export const POST = route(async ({ request }, store) => {
   if (Number(request.headers.get('content-length') ?? 0) > MAX_UPLOAD + 64 * 1024) {
@@ -35,26 +27,20 @@ export const POST = route(async ({ request }, store) => {
   const file = form.get('file');
   if (!(file instanceof File)) throw new HttpError(400, 'No file in the upload');
   const folder = folderOf(form.get('folder') ?? 'content');
-  const { filename, base64 } = prepareUpload(file.name, new Uint8Array(await file.arrayBuffer()));
-  const path = `${folder.dir}/${filename}`;
-  const url = `${folder.url}/${filename}`;
-  // The name carries a content hash: the same image is already there, nothing to commit.
-  const existing = (await store.list(folder.dir)).find((f) => f.path === path);
-  if (existing) return json({ path, url, version: existing.version, commit: null });
-  const result = await commitChanges(store, [{ path, content: base64, encoding: 'base64' }], `Upload ${path}`, {
-    [path]: null,
-  });
-  return json({ path, url, version: result.versions[path], commit: { id: result.id, url: result.url } });
+  const { filename, base64, contentType } = prepareUpload(file.name, new Uint8Array(await file.arrayBuffer()));
+  return json(await store.putMedia(folder, filename, base64, contentType));
 });
 
+const isUrl = (s: string) => /^https:\/\//.test(s);
+
 /**
- * A collection image referenced from front matter (by its public URL or a path relative to the entry) must stay:
- * image() fails the build when the file is gone. Site images are plain URLs and never break the build.
+ * An image referenced from front matter must stay: in git mode image() fails the build when the file is gone; in
+ * Postgres mode the page would show a broken image. Repo images match by public URL or entry-relative path.
  */
 async function refuseInUse(store: ContentStore, file: string) {
   const { mediaFolder, publicFolder } = adminSettings();
-  if (!file.startsWith(`${mediaFolder}/`)) return;
-  const url = publicFolder + file.slice(mediaFolder.length);
+  if (!isUrl(file) && !file.startsWith(`${mediaFolder}/`)) return;
+  const url = isUrl(file) ? file : publicFolder + file.slice(mediaFolder.length);
   const users = (
     await Promise.all(
       COLLECTIONS.map(async (name) => {
@@ -62,7 +48,7 @@ async function refuseInUse(store: ContentStore, file: string) {
         return (await listEntries(store, name))
           .filter((e) => {
             const text = JSON.stringify(e.data);
-            return text.includes(url) || text.includes(relative);
+            return text.includes(url) || (!isUrl(file) && text.includes(relative));
           })
           .map((e) => `${name}/${e.slug}`);
       }),
@@ -74,7 +60,7 @@ async function refuseInUse(store: ContentStore, file: string) {
 export const DELETE = route(async (ctx, store) => {
   const { path, version } = await readBody<{ path?: unknown; version?: unknown }>(ctx);
   if (typeof version !== 'string' || !version) throw new HttpError(400, '`version` is required to delete');
-  const file = assertMediaPath(path);
-  await refuseInUse(store, file);
-  return json(await commitChanges(store, [{ path: file, content: null }], `Delete ${file}`, { [file]: version }));
+  if (typeof path !== 'string') throw new HttpError(400, '`path` is required');
+  await refuseInUse(store, path);
+  return json(await store.deleteMedia(path, version));
 });

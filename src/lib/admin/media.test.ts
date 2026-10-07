@@ -31,6 +31,7 @@ test('sniffImage recognizes each allowed type by its bytes, not its name', () =>
 test('prepareUpload: slug + content hash + sniffed extension', () => {
   const a = prepareUpload('My Figure (final).PNG', PNG);
   assert.match(a.filename, /^my-figure-final-[0-9a-f]{6}\.png$/);
+  assert.equal(a.contentType, 'image/png');
   const b = prepareUpload('other.jpg', PNG);
   assert.equal(b.filename.slice(-10), a.filename.slice(-10), 'same bytes, same hash; the real type wins');
   assert.equal(Buffer.from(a.base64, 'base64').length, PNG.length);

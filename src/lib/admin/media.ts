@@ -133,8 +133,20 @@ export function sniffImage(bytes: Uint8Array): string | null {
   return svgText(bytes) ? 'svg' : null;
 }
 
+const CONTENT_TYPES: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  avif: 'image/avif',
+  svg: 'image/svg+xml',
+};
+
 /** Validates an upload and names it `<slug>-<6 hex of sha256>.<ext>`. Throws MediaError (413 / 415). */
-export function prepareUpload(name: string, bytes: Uint8Array): { filename: string; base64: string } {
+export function prepareUpload(
+  name: string,
+  bytes: Uint8Array,
+): { filename: string; base64: string; contentType: string } {
   if (bytes.length > MAX_UPLOAD) throw new MediaError('Files must be 4 MB or smaller', 413);
   const ext = sniffImage(bytes);
   if (!ext) throw new MediaError('Only PNG, JPEG, WebP, GIF, AVIF and SVG images can be uploaded', 415);
@@ -150,5 +162,9 @@ export function prepareUpload(name: string, bytes: Uint8Array): { filename: stri
       .slice(0, 60)
       .replace(/-+$/, '') || 'image';
   const hash = createHash('sha256').update(bytes).digest('hex').slice(0, 6);
-  return { filename: `${base}-${hash}.${ext}`, base64: Buffer.from(bytes).toString('base64') };
+  return {
+    filename: `${base}-${hash}.${ext}`,
+    base64: Buffer.from(bytes).toString('base64'),
+    contentType: CONTENT_TYPES[ext],
+  };
 }

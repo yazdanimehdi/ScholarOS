@@ -36,6 +36,20 @@ export function blobVersions(changes: Change[]): Record<string, string | null> {
   );
 }
 
+/** `content`: collection images (processed by image() in git mode); `site`: plain-URL images (public/). */
+export type MediaFolder = 'content' | 'site';
+
+export interface MediaFile {
+  path: string;
+  url: string;
+  version: string;
+}
+
+export interface UploadResult extends MediaFile {
+  /** null: the same image was already stored (names carry a content hash). */
+  commit: { id: string; url?: string } | null;
+}
+
 export interface ContentStore {
   /** Files under `dir`, recursively; [] when the folder doesn't exist. */
   list(dir: string): Promise<{ path: string; version: string }[]>;
@@ -48,6 +62,11 @@ export interface ContentStore {
   commit(changes: Change[], message: string, base: Record<string, string | null>): Promise<CommitResult>;
   /** ISO time of the last change to `path`, or null when unknown. */
   lastModified(path: string): Promise<string | null>;
+  listMedia(folder: MediaFolder): Promise<MediaFile[]>;
+  /** `filename` is already validated and content-addressed by prepareUpload. */
+  putMedia(folder: MediaFolder, filename: string, base64: string, contentType: string): Promise<UploadResult>;
+  /** `path` and `version` as listMedia/putMedia reported them. */
+  deleteMedia(path: string, version: string): Promise<CommitResult>;
 }
 
 export class ConflictError extends Error {

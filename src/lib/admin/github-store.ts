@@ -1,3 +1,4 @@
+import { deleteRepoMedia, listRepoMedia, putRepoMedia } from './git-media';
 import {
   ConflictError,
   UpstreamError,
@@ -5,6 +6,7 @@ import {
   type Author,
   type Change,
   type ContentStore,
+  type MediaFolder,
   type StoredFile,
 } from './store';
 
@@ -207,6 +209,18 @@ export class GitHubStore implements ContentStore {
   }
 
   /** Starts a workflow_dispatch run (e.g. render-cv.yml) on the configured branch. */
+  listMedia(folder: MediaFolder) {
+    return listRepoMedia(this, folder);
+  }
+
+  putMedia(folder: MediaFolder, filename: string, base64: string, _contentType?: string) {
+    return putRepoMedia(this, folder, filename, base64);
+  }
+
+  deleteMedia(path: string, version: string) {
+    return deleteRepoMedia(this, path, version);
+  }
+
   async dispatchWorkflow(file: string): Promise<void> {
     await this.gh('POST', `/actions/workflows/${encodeURIComponent(file)}/dispatches`, { ref: this.cfg.branch });
   }
