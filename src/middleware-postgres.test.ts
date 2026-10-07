@@ -79,6 +79,50 @@ test('a failed query during render → 503 with Retry-After, not a cached error 
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
 
+test('a bodyless 404 keeps a null body so Astro reroutes it to 404.astro', async () => {
+  const res = await run('/blog/nope', async () => new Response(null, { status: 404 }));
+  assert.equal(res.status, 404);
+  assert.equal(res.body, null);
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+});
+
+test('a failed page query rejects next() → 503', async () => {
+  const res = await run('/blog', async () => {
+    requestContext().dbFailed = true;
+    throw new Error('db');
+  });
+  assert.equal(res.status, 503);
+  assert.equal(res.headers.get('retry-after'), '30');
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+});
+
+test('a failed query in a child component errors the body stream → 503', async () => {
+  const res = await run(
+    '/blog',
+    async () =>
+      new Response(
+        new ReadableStream({
+          pull(c) {
+            requestContext().dbFailed = true;
+            c.error(new Error('db'));
+          },
+        }),
+      ),
+  );
+  assert.equal(res.status, 503);
+  assert.equal(res.headers.get('retry-after'), '30');
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+});
+
+test('a render error that is not a database failure propagates to Astro', async () => {
+  await assert.rejects(
+    run('/blog', async () => {
+      throw new Error('bug');
+    }),
+    /bug/,
+  );
+});
+
 test('database unreachable before render → 503', async () => {
   setSqlForTests((async () => {
     throw Object.assign(new Error('x'), { code: 'ECONNREFUSED' });

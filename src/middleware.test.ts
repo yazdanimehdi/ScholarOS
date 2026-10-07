@@ -77,3 +77,12 @@ test('the bare /api/admin path is guarded too', async () => {
   assert.equal(res.headers.get('cache-control'), 'no-store');
   assert.equal((await run(context('/api/admin', { method: 'POST', origin: 'https://evil.test' }))).status, 403);
 });
+
+test('the cron route skips the session check (it checks CRON_SECRET itself); its neighbours do not', async () => {
+  const cron = await run(context('/api/admin/cron/backup'));
+  assert.equal(cron.status, 200);
+  assert.equal(await cron.text(), 'ok');
+  assert.equal(cron.headers.get('cache-control'), 'no-store');
+  assert.equal((await run(context('/api/admin/cronx'))).status, 401);
+  assert.equal((await run(context('/api/admin/collections/posts'))).status, 401);
+});

@@ -35,9 +35,19 @@ async function publicPage(next: () => Promise<Response>): Promise<Response> {
   }
   const context = newContext(files);
   return runWithContext(context, async () => {
-    const res = await next();
-    // Child components read content while the body streams: finish rendering here so every read is in the context.
-    const body = NO_BODY.has(res.status) ? null : await res.arrayBuffer();
+    let res: Response;
+    let body: ArrayBuffer | null;
+    try {
+      // A failing page query rejects next(); a failing child component errors the body stream.
+      res = await next();
+      // Child components read content while the body streams: finish rendering here so every read is in the context.
+      // A null body stays null: Astro reroutes a bodyless 404 to 404.astro.
+      // ponytail: the whole page is buffered in memory (no streaming, later TTFB); to stream, pass the body through and set tags via a trailing mechanism or addCacheTag before the body.
+      body = res.body === null || NO_BODY.has(res.status) ? null : await res.arrayBuffer();
+    } catch (e) {
+      if (context.dbFailed) return unavailable();
+      throw e;
+    }
     if (context.dbFailed) return unavailable();
     const out = new Response(body, res);
     if (res.status === 200) {
