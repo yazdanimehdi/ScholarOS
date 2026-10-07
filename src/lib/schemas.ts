@@ -185,6 +185,11 @@ export const cvSchema = z
         sections: z.record(z.array(cvEntrySchema)).optional(),
       })
       .passthrough(),
+    /** The JS PDF renderer's paper size (Postgres mode); RenderCV ignores it. */
+    pdf: z
+      .object({ pageSize: z.enum(['LETTER', 'A4']).optional() })
+      .passthrough()
+      .optional(),
   })
   .passthrough();
 

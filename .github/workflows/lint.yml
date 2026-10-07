@@ -42,6 +42,7 @@ jobs:
         run: |
           pnpm build
           test -d .vercel/output/functions
+          test -f .vercel/output/functions/_render.func/src/lib/cv-pdf/fonts/SourceSerif4-Regular.ttf
           if grep -rq "__SCHOLAROS_ADMIN__" .vercel/output/functions; then echo "admin settings were not baked in"; exit 1; fi
 
       - name: Postgres-mode build (public pages are functions; the build never connects)

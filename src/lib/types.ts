@@ -332,6 +332,7 @@ export interface CvData {
 
 export interface CvConfig {
   cv: CvData;
+  pdf?: { pageSize?: 'LETTER' | 'A4' };
   design?: {
     theme?: string;
   };

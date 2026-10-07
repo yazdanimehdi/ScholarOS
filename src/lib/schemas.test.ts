@@ -68,3 +68,10 @@ test('Sveltia config exposes the new fields (featured, visible, hidden)', () => 
     assert.equal(names(s.fields).at(-1), 'visible', `person-cvs ${s.name} ends with visible`);
   }
 });
+
+test('cv: pdf.pageSize is LETTER or A4', () => {
+  const cv = { cv: { name: 'N' } };
+  assert.ok(cvSchema.safeParse({ ...cv, pdf: { pageSize: 'A4' } }).success);
+  assert.ok(cvSchema.safeParse(cv).success);
+  assert.equal(cvSchema.safeParse({ ...cv, pdf: { pageSize: 'A5' } }).success, false);
+});

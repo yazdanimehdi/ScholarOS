@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
 import mdx from '@astrojs/mdx';
@@ -10,16 +11,32 @@ import { modeFromEnv } from './src/lib/mode';
 
 const mode = modeFromEnv(process.env);
 
+// Postgres mode renders the CV PDF in the function, which reads these from process.cwd() at runtime.
+const cvPdfFonts = fs
+  .readdirSync('src/lib/cv-pdf/fonts')
+  .filter((f) => f.endsWith('.ttf'))
+  .map((f) => `./src/lib/cv-pdf/fonts/${f}`);
+
 export default defineConfig({
   site: 'https://example.com',
   // Vercel only. Git mode: admin routes are functions, public pages prerendered. Postgres mode: every page is a
   // function, and Blob images are optimized by /_vercel/image.
-  adapter: mode === 'static' ? undefined : mode === 'postgres' ? vercel({ imageService: true }) : vercel(),
+  adapter:
+    mode === 'static'
+      ? undefined
+      : mode === 'postgres'
+        ? vercel({ imageService: true, includeFiles: cvPdfFonts })
+        : vercel(),
   ...(mode === 'postgres'
     ? { image: { remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }] } }
     : {}),
   // @astrojs/sitemap only sees prerendered pages; Postgres mode serves its own /sitemap-index.xml.
-  integrations: [vue({ appEntrypoint: '/src/pages/_app.ts' }), mdx(), ...(mode === 'postgres' ? [] : [sitemap()]), admin()],
+  integrations: [
+    vue({ appEntrypoint: '/src/pages/_app.ts' }),
+    mdx(),
+    ...(mode === 'postgres' ? [] : [sitemap()]),
+    admin(),
+  ],
   markdown: markdownOptions,
   vite: {
     plugins: [tailwindcss()],

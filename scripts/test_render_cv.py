@@ -43,4 +43,6 @@ with tempfile.TemporaryDirectory() as d:
 # A CV whose own publications are all hidden keeps them hidden instead of showing the collection.
 all_hidden = {"cv": {"name": "N", "sections": {"selected": [{"title": "T", "authors": ["A"], "visible": False}]}}}
 assert "publications" not in rc.build_rendercv_input(all_hidden, with_collection=True)["cv"]["sections"]
+with_pdf = {"cv": {"name": "N", "sections": {}}, "pdf": {"pageSize": "A4"}}
+assert "pdf" not in rc.build_rendercv_input(with_pdf), "the JS renderer's page size never reaches RenderCV"
 print("render-cv self-check passed")
